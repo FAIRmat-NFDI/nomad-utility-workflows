@@ -486,11 +486,13 @@ def build_nomad_workflow(
     return workflow.workflow_graph
 
 
+# TODO make sure that the post_nomad etc with authentication are passing the correct urls without sections added!
 # TODO add is_simulation, is_nomad_entry as flags
 # TODO test this code on a number of already existing examples
 # TODO create docs with some examples for dict and graph input types
-# TODO change the rest of the functions to pydantic
 # TODO add to readme/docs that this is not currently using NOMAD, but could be linked later?
 # TODO rename utils.py
 # TODO should nodes_to_graph() be an external function from the class? So, that the user can call it, but also add attributes from there?
 # TODO add some text to the test notebooks
+
+# TODO change the rest of the functions to pydantic -- not sure if I really want to tackle this now

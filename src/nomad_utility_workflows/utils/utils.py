@@ -39,7 +39,7 @@ def get_authentication_token(
         str: _description_
     """
     url = get_nomad_url(url)
-    logger.info(f'Requesting authentication token @ {url}')
+    logger.info('Requesting authentication token @ %s', url)
     response = requests.get(
         url + '/auth/token',
         params={'username': username, 'password': password},
@@ -76,13 +76,13 @@ def get_nomad_request(
     Returns:
         Any: _description_
     """
-    url = get_nomad_url(url)
-    url += f"{'/' if section[0] != '/' else ''}{section}"
-    logger.info(f'Sending get request @ {url}')
+    url_base = get_nomad_url(url)
+    url = url_base + f"{'/' if section[0] != '/' else ''}{section}"
+    logger.info('Sending get request @ %s', url)
     if headers is None:
         headers = {}
     if with_authentication:
-        token = get_authentication_token(use_prod=use_prod)
+        token = get_authentication_token(url=url_base)
         headers |= {
             'Authorization': f'Bearer {token}',
             'Accept': accept_field,
@@ -118,10 +118,12 @@ def get_nomad_url(url: str) -> str:
     elif url == 'test':
         return NOMAD_TEST_URL
 
-    if not url.endswith('/api/v1'):
-        logger.warning(
-            'The given URL does not appear to be a valid NOMAD API URL, i.e., ending with /api/v1.'
-        )
+    # if not url.endswith('/api/v1'):
+    #     logger.warning(
+    #         'The given URL: %s does not appear to be a valid NOMAD API URL, '
+    #         'i.e., ending with /api/v1.',
+    #         url,
+    #     )
 
     return url
 
