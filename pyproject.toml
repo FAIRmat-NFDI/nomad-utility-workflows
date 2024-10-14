@@ -26,7 +26,7 @@ maintainers = [
 ]
 license = { file = "LICENSE" }
 dependencies = [
-    "nomad-lab>=1.3.0",
+    "nomad-lab>=1.3.6.dev1",
     "python-magic-bin; sys_platform == 'win32'",
     "nomad-schema-plugin-simulation-workflow@git+https://github.com/nomad-coe/nomad-schema-plugin-simulation-workflow.git@develop",
     "networkx",
@@ -43,6 +43,7 @@ dependencies = [
     "isort>=5.8.0",
     "insane>=1.2.0",
     "anyio>=3.0.0,<4.0",
+    "gravis>=0.1.0"
 ]
 
 [project.urls]

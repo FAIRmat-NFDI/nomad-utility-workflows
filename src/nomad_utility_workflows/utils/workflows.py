@@ -488,5 +488,8 @@ def build_nomad_workflow(
 
 # TODO add is_simulation, is_nomad_entry as flags
 # TODO test this code on a number of already existing examples
-# TODO create new plugin repo and migrate the code
 # TODO create docs with some examples for dict and graph input types
+# TODO change the rest of the functions to pydantic
+# TODO add to readme/docs that this is not currently using NOMAD, but could be linked later?
+# TODO rename utils.py
+# TODO should nodes_to_graph() be an external function from the class? So, that the user can call it, but also add attributes from there?

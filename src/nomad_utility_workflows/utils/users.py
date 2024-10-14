@@ -6,7 +6,7 @@ from typing import Optional
 from cachetools.func import ttl_cache
 from marshmallow_dataclass import class_schema, dataclass
 
-from nomad_simulation_workflow_utilities.utils import get_nomad_request
+from nomad_utility_workflows.utils import get_nomad_request
 
 logger = logging.getLogger(__name__)
 

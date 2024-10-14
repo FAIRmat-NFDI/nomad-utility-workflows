@@ -6,8 +6,8 @@ from cachetools.func import ttl_cache
 from marshmallow import Schema, pre_load
 from marshmallow_dataclass import class_schema, dataclass
 
-from nomad_simulation_workflow_utilities.users import NomadUser, get_user_by_id
-from nomad_simulation_workflow_utilities.utils import (
+from nomad_utility_workflows.utils.users import NomadUser, get_user_by_id
+from nomad_utility_workflows.utils.utils import (
     delete_nomad_request,
     get_nomad_base_url,
     get_nomad_request,

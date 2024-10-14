@@ -14,10 +14,10 @@ from marshmallow_dataclass import class_schema, dataclass
 # from signac.job import Job
 
 # from martignac import config
-from nomad_simulation_workflow_utilities.datasets import NomadDataset
-from nomad_simulation_workflow_utilities.uploads import get_all_my_uploads
-from nomad_simulation_workflow_utilities.users import NomadUser, get_user_by_id
-from nomad_simulation_workflow_utilities.utils import (
+from nomad_utility_workflows.utils.datasets import NomadDataset
+from nomad_utility_workflows.utils.uploads import get_all_my_uploads
+from nomad_utility_workflows.utils.users import NomadUser, get_user_by_id
+from nomad_utility_workflows.utils.utils import (
     get_nomad_base_url,
     get_nomad_request,
     post_nomad_request,
