@@ -39,6 +39,17 @@ The plugin is still under development. If you would like to contribute, install 
 uv pip install -e '.[dev]' --index-url https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple
 ```
 
+### Linking to your NOMAD account
+Create an account on https://nomad-lab.eu/.
+Store your credentials in a `.env` file at the root plugin directory, with the following content
+```bash
+NOMAD_USERNAME="MyLogin"
+NOMAD_PASSWORD="MyPassWord"
+```
+and insert your username and password.
+
+> [!CAUTION]
+> Never push your `.env` file to a repository. This would expose your password.
 
 ### Run the tests
 
@@ -105,6 +116,12 @@ uv pip install -r requirements_docs.txt
 Run the documentation server:
 ```sh
 mkdocs serve
+```
+
+### Test Notebooks
+To run the test notebooks, create a jupyter kernel using your venv:
+```sh
+python -m ipykernel install --user --name=nomad_utility_workflows
 ```
 
 

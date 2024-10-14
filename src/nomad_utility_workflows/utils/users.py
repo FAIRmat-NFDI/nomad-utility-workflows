@@ -6,7 +6,11 @@ from typing import Optional
 from cachetools.func import ttl_cache
 from marshmallow_dataclass import class_schema, dataclass
 
-from nomad_utility_workflows.utils import get_nomad_request
+from nomad_utility_workflows.utils.utils import (
+    get_nomad_request,
+    get_nomad_url,
+    get_nomad_url_name,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -32,32 +36,38 @@ class NomadUser:
 
 @ttl_cache(maxsize=128, ttl=180)
 def search_users_by_name(
-    user_name: str, use_prod: bool = True, timeout_in_sec: int = 10
+    user_name: str, url: str = None, timeout_in_sec: int = 10
 ) -> NomadUser:
-    logger.info(
-        f"retrieving user {user_name} on {'prod' if use_prod else 'test'} server"
-    )
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+    logger.info('retrieving user %s on %s server', user_name, url_name)
     response = get_nomad_request(
-        f'/users?prefix={user_name}', timeout_in_sec=timeout_in_sec
+        f'/users?prefix={user_name}', timeout_in_sec=timeout_in_sec, url=url
     ).get('data', [])
     return [class_schema(NomadUser)().load(user) for user in response]
 
 
 @ttl_cache(maxsize=128, ttl=180)
 def get_user_by_id(
-    user_id: str, use_prod: bool = True, timeout_in_sec: int = 10
+    user_id: str, url: str = None, timeout_in_sec: int = 10
 ) -> NomadUser:
-    logger.info(f"retrieving user {user_id} on {'prod' if use_prod else 'test'} server")
-    response = get_nomad_request(f'/users/{user_id}', timeout_in_sec=timeout_in_sec)
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+    logger.info('retrieving user %s on %s server', user_id, url_name)
+    response = get_nomad_request(
+        f'/users/{user_id}', timeout_in_sec=timeout_in_sec, url=url
+    )
     user_schema = class_schema(NomadUser)
     return user_schema().load(response)
 
 
 @ttl_cache(maxsize=128, ttl=180)
-def who_am_i(use_prod: bool = True, timeout_in_sec: int = 10) -> NomadUser:
-    logger.info(f"retrieving self user info on {'prod' if use_prod else 'test'} server")
+def who_am_i(url: str = None, timeout_in_sec: int = 10) -> NomadUser:
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+    logger.info('retrieving self user info on %s server', url_name)
     response = get_nomad_request(
-        '/users/me', with_authentication=True, timeout_in_sec=timeout_in_sec
+        '/users/me', with_authentication=True, timeout_in_sec=timeout_in_sec, url=url
     )
     user_schema = class_schema(NomadUser)
     return user_schema().load(response)

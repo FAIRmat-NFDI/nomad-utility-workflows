@@ -9,6 +9,8 @@ from marshmallow_dataclass import class_schema, dataclass
 from nomad_utility_workflows.utils.users import NomadUser, get_user_by_id
 from nomad_utility_workflows.utils.utils import (
     delete_nomad_request,
+    get_nomad_url,
+    get_nomad_url_name,
     get_nomad_base_url,
     get_nomad_request,
     post_nomad_request,
@@ -62,100 +64,98 @@ class NomadUpload:
     external_db: Optional[str] = None
     upload_name: Optional[str] = None
     comment: Optional[str] = None
-    use_prod: Optional[bool] = None
+    url: Optional[str] = None
     complete_time: Optional[dt.datetime] = None
 
     @property
     def base_url(self) -> Optional[str]:
-        if self.use_prod is not None:
-            return get_nomad_base_url(self.use_prod)
-        return None
+        url = get_nomad_url(self.url)
+        return get_nomad_base_url(url)
 
     @property
     def nomad_gui_url(self) -> str:
-        if self.base_url is None:
-            raise ValueError(f"missing attribute 'use_prod' for upload {self}")
+        if self.upload_id is None:
+            raise ValueError(f"missing attributes 'upload_id' for entry {self}")
         return f'{self.base_url}/gui/user/uploads/upload/id/{self.upload_id}'
 
 
 @ttl_cache(maxsize=128, ttl=180)
-def get_all_my_uploads(
-    use_prod: bool = False, timeout_in_sec: int = 10
-) -> list[NomadUpload]:
-    logger.info(f"retrieving all uploads on {'prod' if use_prod else 'test'} server")
+def get_all_my_uploads(url: str = None, timeout_in_sec: int = 10) -> list[NomadUpload]:
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+    logger.info('retrieving all uploads on %s server', url_name)
     response = get_nomad_request(
         '/uploads',
-        use_prod=use_prod,
+        url=url,
         with_authentication=True,
         timeout_in_sec=timeout_in_sec,
     )
     upload_class_schema = class_schema(NomadUpload, base_schema=NomadUploadSchema)
-    return [
-        upload_class_schema().load({**r, 'use_prod': use_prod})
-        for r in response['data']
-    ]
+    return [upload_class_schema().load({**r, 'url': url}) for r in response['data']]
 
 
 def get_upload_by_id(
-    upload_id: str, use_prod: bool = False, timeout_in_sec: int = 10
+    upload_id: str, url: str = None, timeout_in_sec: int = 10
 ) -> NomadUpload:
-    logger.info(
-        f"retrieving upload {upload_id} on {'prod' if use_prod else 'test'} server"
-    )
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+    logger.info('retrieving upload %s on %s server', upload_id, url_name)
     response = get_nomad_request(
         f'/uploads/{upload_id}',
-        use_prod=use_prod,
+        url=url,
         with_authentication=True,
         timeout_in_sec=timeout_in_sec,
     )
     upload_class_schema = class_schema(NomadUpload, base_schema=NomadUploadSchema)
-    return upload_class_schema().load({**response['data'], 'use_prod': use_prod})
+    return upload_class_schema().load({**response['data'], 'url': url})
 
 
 def delete_upload(
-    upload_id: str, use_prod: bool = False, timeout_in_sec: int = 10
+    upload_id: str, url: str = None, timeout_in_sec: int = 10
 ) -> NomadUpload:
-    logger.info(
-        f"deleting upload {upload_id} on {'prod' if use_prod else 'test'} server"
-    )
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+    logger.info(f'deleting upload {upload_id} on {url_name} server')
     response = delete_nomad_request(
         f'/uploads/{upload_id}',
         with_authentication=True,
+        url=url,
         timeout_in_sec=timeout_in_sec,
     )
     upload_class_schema = class_schema(NomadUpload, base_schema=NomadUploadSchema)
-    return upload_class_schema().load({**response['data'], 'use_prod': use_prod})
+    return upload_class_schema().load({**response['data'], 'url': url})
 
 
 def upload_files_to_nomad(
-    filename: str, use_prod: bool = False, timeout_in_sec: int = 30
+    filename: str, url: str = None, timeout_in_sec: int = 30
 ) -> str:
-    logger.info(f"uploading file {filename} on {'prod' if use_prod else 'test'} server")
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+    logger.info('uploading file %s on %s server', filename, url_name)
     with open(filename, 'rb') as f:
         response = post_nomad_request(
             '/uploads',
             with_authentication=True,
             data=f,
-            use_prod=use_prod,
+            url=url,
             timeout_in_sec=timeout_in_sec,
         )
     upload_id = response.get('upload_id')
     if upload_id:
-        logger.info(f'successful upload to {upload_id}')
+        logger.info('successful upload to %s', upload_id)
         return upload_id
     else:
-        logger.error(f'could not upload {filename}. Response {response}')
+        logger.error('could not upload %s. Response %s', filename, response)
 
 
-def publish_upload(
-    upload_id: str, use_prod: bool = False, timeout_in_sec: int = 10
-) -> dict:
-    logger.info(
-        f"publishing upload {upload_id} on {'prod' if use_prod else 'test'} server"
-    )
+def publish_upload(upload_id: str, url: str = None, timeout_in_sec: int = 10) -> dict:
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+    logger.info('publishing upload %s on %s server', upload_id, url_name)
     response = post_nomad_request(
         f'/uploads/{upload_id}/action/publish',
         with_authentication=True,
+        url=url,
         timeout_in_sec=timeout_in_sec,
     )
     return response
@@ -169,12 +169,12 @@ def edit_upload_metadata(
     embargo_length: Optional[float] = None,
     coauthors_ids: Optional[list[str]] = None,
     comment: Optional[str] = None,
-    use_prod: bool = False,
+    url: str = None,
     timeout_in_sec: int = 10,
 ) -> dict:
-    logger.info(
-        f"editing the metadata for upload {upload_id} on {'prod' if use_prod else 'test'} server"
-    )
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+    logger.info('editing the metadata for upload %s on %s server', upload_id, url_name)
     metadata = {'metadata': {}}
     if upload_name:
         metadata['metadata']['upload_name'] = upload_name
@@ -190,7 +190,7 @@ def edit_upload_metadata(
         metadata['metadata']['comment'] = comment
     response = post_nomad_request(
         f'/uploads/{upload_id}/edit',
-        use_prod=use_prod,
+        url=url,
         with_authentication=True,
         json_dict=metadata,
         timeout_in_sec=timeout_in_sec,

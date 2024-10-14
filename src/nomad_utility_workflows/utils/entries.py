@@ -18,17 +18,14 @@ from nomad_utility_workflows.utils.datasets import NomadDataset
 from nomad_utility_workflows.utils.uploads import get_all_my_uploads
 from nomad_utility_workflows.utils.users import NomadUser, get_user_by_id
 from nomad_utility_workflows.utils.utils import (
+    get_nomad_url,
+    get_nomad_url_name,
     get_nomad_base_url,
     get_nomad_request,
     post_nomad_request,
 )
-# from martignac.utils.martini_flow_projects import MartiniFlowProject
-# from martignac.utils.misc import update_nested_dict
 
 logger = logging.getLogger(__name__)
-
-# DEFAULT_DATABASE = config()["nomad"]["dataset"]["id"].get(str)
-# DEFAULT_USE_PROD = config()["nomad"]["use_prod"].get(bool)
 
 
 @dataclass(frozen=True)
@@ -100,18 +97,19 @@ class NomadEntry:
     text_search_contents: Optional[list[str]] = None
     publish_time: Optional[dt.datetime] = None
     entry_references: Optional[list[dict]] = None
-    use_prod: Optional[bool] = None
+    url: Optional[str] = None
 
     @property
     def base_url(self) -> Optional[str]:
-        if self.use_prod is not None:
-            return get_nomad_base_url(self.use_prod)
-        return None
+        url = get_nomad_url(self.url)
+        return get_nomad_base_url(url)
 
     @property
     def nomad_gui_url(self) -> str:
-        if self.base_url is None:
-            raise ValueError(f"missing attribute 'use_prod' for entry {self}")
+        if self.upload_id is None or self.entry_id is None:
+            raise ValueError(
+                f"missing attributes 'upload_id' or 'entry_id' for entry {self}"
+            )
         return f'{self.base_url}/gui/user/uploads/upload/id/{self.upload_id}/entry/id/{self.entry_id}'
 
     @property
@@ -138,54 +136,54 @@ class NomadEntry:
 @ttl_cache(maxsize=128, ttl=180)
 def get_entry_by_id(
     entry_id: str,
-    use_prod: bool = True,
+    url: str = None,
     with_authentication: bool = False,
     timeout_in_sec: int = 10,
 ) -> NomadEntry:
-    logger.info(
-        f"retrieving entry {entry_id} on {'prod' if use_prod else 'test'} server"
-    )
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+    logger.info('retrieving entry %s on %s server', entry_id, url_name)
     response = get_nomad_request(
         f'/entries/{entry_id}',
         with_authentication=with_authentication,
-        use_prod=use_prod,
+        url=url,
         timeout_in_sec=timeout_in_sec,
     )
     nomad_entry_schema = class_schema(NomadEntry, base_schema=NomadEntrySchema)
-    return nomad_entry_schema().load({**response['data'], 'use_prod': use_prod})
+    return nomad_entry_schema().load({**response['data'], 'url': url})
 
 
 @ttl_cache(maxsize=128, ttl=180)
 def get_entries_of_upload(
     upload_id: str,
-    use_prod: bool = False,
+    url: str = None,
     with_authentication: bool = False,
     timeout_in_sec: int = 10,
 ) -> list[NomadEntry]:
-    logger.info(
-        f"retrieving entries for upload {upload_id} on {'prod' if use_prod else 'test'} server"
-    )
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+    logger.info(f'retrieving entries for upload {upload_id} on {url_name} server')
     response = get_nomad_request(
         f'/uploads/{upload_id}/entries',
         with_authentication=with_authentication,
-        use_prod=use_prod,
+        url=url,
         timeout_in_sec=timeout_in_sec,
     )
     nomad_entry_schema = class_schema(NomadEntry, base_schema=NomadEntrySchema)
     return [
-        nomad_entry_schema().load({**r['entry_metadata'], 'use_prod': use_prod})
+        nomad_entry_schema().load({**r['entry_metadata'], 'url': url})
         for r in response['data']
     ]
 
 
 def get_entries_of_my_uploads(
-    use_prod: bool = False, timeout_in_sec: int = 10
+    url: str = None, timeout_in_sec: int = 10
 ) -> list[NomadEntry]:
     return [
         upload_entry
-        for u in get_all_my_uploads(use_prod=use_prod, timeout_in_sec=timeout_in_sec)
+        for u in get_all_my_uploads(url=url, timeout_in_sec=timeout_in_sec)
         for upload_entry in get_entries_of_upload(
-            u.upload_id, with_authentication=True, use_prod=use_prod
+            u.upload_id, with_authentication=True, url=url
         )
     ]
 
@@ -202,7 +200,7 @@ def query_entries(
     origin: str = None,
     page_size: int = 10,
     max_entries: int = 50,
-    use_prod: bool = True,
+    url: str = None,
 ) -> list[NomadEntry]:
     json_dict = {
         'query': {},
@@ -221,9 +219,7 @@ def query_entries(
             }
         if origin:
             json_dict['query']['origin'] = origin
-        query = post_nomad_request(
-            '/entries/query', json_dict=json_dict, use_prod=use_prod
-        )
+        query = post_nomad_request('/entries/query', json_dict=json_dict, url=url)
         entries.extend([q['entry_id'] for q in query['data']])
         next_page_after_value = query['pagination'].get('next_page_after_value', None)
         if next_page_after_value:
@@ -232,7 +228,7 @@ def query_entries(
             break
     if max_entries > 0:
         entries = entries[:max_entries]
-    return [get_entry_by_id(e, use_prod=use_prod) for e in entries]
+    return [get_entry_by_id(e, url=url) for e in entries]
 
 
 # def download_raw_data_of_job(job: Job, timeout_in_sec: int = 10) -> bool:
@@ -300,17 +296,17 @@ def query_entries(
 
 def _get_raw_data_of_entry_by_id(
     entry_id: str,
-    use_prod: bool = False,
+    url: str = None,
     timeout_in_sec: int = 10,
     with_authentication: bool = False,
 ) -> ByteString:
-    logger.info(
-        f"retrieving raw data of entry ID {entry_id} on {'prod' if use_prod else 'test'} server"
-    )
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+    logger.info('retrieving raw data of entry ID %s on %s server', entry_id, url_name)
     response = get_nomad_request(
         f'/entries/{entry_id}/raw?compress=true',
         with_authentication=with_authentication,
-        use_prod=use_prod,
+        url=url,
         timeout_in_sec=timeout_in_sec,
         return_json=False,
         accept_field='application/zip',

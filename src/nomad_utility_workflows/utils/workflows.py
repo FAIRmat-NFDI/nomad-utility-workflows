@@ -493,3 +493,4 @@ def build_nomad_workflow(
 # TODO add to readme/docs that this is not currently using NOMAD, but could be linked later?
 # TODO rename utils.py
 # TODO should nodes_to_graph() be an external function from the class? So, that the user can call it, but also add attributes from there?
+# TODO add some text to the test notebooks
