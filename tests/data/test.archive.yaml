@@ -1,0 +1,3 @@
+data:
+  m_def: nomad_utility_workflows.schema_packages.schema_package.NewSchemaPackage
+  name: Markus
