@@ -6,7 +6,7 @@ from typing import Optional
 from cachetools.func import ttl_cache
 from marshmallow_dataclass import class_schema, dataclass
 
-from nomad_utility_workflows.utils.utils import (
+from nomad_utility_workflows.utils.core import (
     get_nomad_request,
     get_nomad_url,
     get_nomad_url_name,

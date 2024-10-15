@@ -1,29 +1,27 @@
 import datetime as dt
 import json
 import logging
-import os
-import shutil
+from collections.abc import ByteString
 from dataclasses import field
-from pathlib import Path
-from typing import Any, ByteString, Optional, cast
-from zipfile import ZipFile
+from typing import Any, Optional
 
 from cachetools.func import ttl_cache
-from marshmallow import Schema, pre_load, EXCLUDE
+from marshmallow import Schema, pre_load
 from marshmallow_dataclass import class_schema, dataclass
-# from signac.job import Job
 
+from nomad_utility_workflows.utils.core import (
+    get_nomad_base_url,
+    get_nomad_request,
+    get_nomad_url,
+    get_nomad_url_name,
+    post_nomad_request,
+)
+
+# from signac.job import Job
 # from martignac import config
 from nomad_utility_workflows.utils.datasets import NomadDataset
 from nomad_utility_workflows.utils.uploads import get_all_my_uploads
 from nomad_utility_workflows.utils.users import NomadUser, get_user_by_id
-from nomad_utility_workflows.utils.utils import (
-    get_nomad_url,
-    get_nomad_url_name,
-    get_nomad_base_url,
-    get_nomad_request,
-    post_nomad_request,
-)
 
 logger = logging.getLogger(__name__)
 

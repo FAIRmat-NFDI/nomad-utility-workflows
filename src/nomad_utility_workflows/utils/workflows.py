@@ -1,10 +1,10 @@
 import logging
-from pydantic import BaseModel, Field
-from typing import Dict, List, Literal, Optional, Any, Union, TypedDict
 from collections import OrderedDict
+from typing import Any, Dict, List, Literal, Optional, TypedDict, Union
 
 import networkx as nx
 import yaml
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)  # ! this is not functional I think
 TASK_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
