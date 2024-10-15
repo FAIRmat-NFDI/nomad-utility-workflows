@@ -1,6 +1,6 @@
-# nomad-utility-workflows
+# nomad-utility-workflows plugin
 
-A module with utilities for interacting with NOMAD via, e.g., a workflow manager.
+Utilities for interfacing with NOMAD within workflows, e.g., via a workflow manager, including python API functions for uploading to NOMAD and querying the repository as well as automated generation of NOMAD custom workflow yaml file ([NOMAD workflow data models](https://github.com/nomad-coe/nomad-schema-plugin-simulation-workflow)).
 
 This `nomad` plugin was generated with `Cookiecutter` along with `@nomad`'s [`cookiecutter-nomad-plugin`](https://github.com/FAIRmat-NFDI/cookiecutter-nomad-plugin) template.
 
@@ -39,6 +39,17 @@ The plugin is still under development. If you would like to contribute, install 
 uv pip install -e '.[dev]' --index-url https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple
 ```
 
+### Linking to your NOMAD account
+Create an account on https://nomad-lab.eu/.
+Store your credentials in a `.env` file at the root plugin directory, with the following content
+```bash
+NOMAD_USERNAME="MyLogin"
+NOMAD_PASSWORD="MyPassWord"
+```
+and insert your username and password.
+
+> [!CAUTION]
+> Never push your `.env` file to a repository. This would expose your password.
 
 ### Run the tests
 
@@ -107,6 +118,12 @@ Run the documentation server:
 mkdocs serve
 ```
 
+### Test Notebooks
+To run the test notebooks, create a jupyter kernel using your venv:
+```sh
+python -m ipykernel install --user --name=nomad_utility_workflows
+```
+
 
 ## Adding this plugin to NOMAD
 
@@ -160,7 +177,7 @@ on the [PyPI documentation](https://packaging.python.org/en/latest/tutorials/pac
 
 ### Template update
 
-We use cruft to update the project based on template changes. A `cruft-update.yml` is included in Github workflows to automatically check for updates and create pull requests to apply updates. Follow the [instructions](https://github.blog/changelog/2022-05-03-github-actions-prevent-github-actions-from-creating-and-approving-pull-requests/) on how to enable Github Actions to create pull requests. 
+We use cruft to update the project based on template changes. A `cruft-update.yml` is included in Github workflows to automatically check for updates and create pull requests to apply updates. Follow the [instructions](https://github.blog/changelog/2022-05-03-github-actions-prevent-github-actions-from-creating-and-approving-pull-requests/) on how to enable Github Actions to create pull requests.
 
 To run the check for updates locally, follow the instructions on [`cruft` website](https://cruft.github.io/cruft/#updating-a-project).
 

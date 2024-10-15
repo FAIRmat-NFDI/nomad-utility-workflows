@@ -7,13 +7,14 @@ edit_uri: ""
 
 nav:
   - Home: index.md
-  - Tutorial: tutorial/tutorial.md
+  # - Tutorial: tutorial/tutorial.md
   - How-to guides:
-      - Install this Plugin: how_to/install_this_plugin.md
-      - Use this Plugin: how_to/use_this_plugin.md
-      - Contribute to this plugin: how_to/contribute_to_this_plugin.md
-      - Contribute to the documentation: how_to/contribute_to_the_documentation.md
-  - Explanation: explanation/explanation.md
+      - API Functions: how_to/use_api_functions.md
+      # - Install this Plugin: how_to/install_this_plugin.md
+      # - Use this Plugin: how_to/use_this_plugin.md
+      # - Contribute to this plugin: how_to/contribute_to_this_plugin.md
+      # - Contribute to the documentation: how_to/contribute_to_the_documentation.md
+  # - Explanation: explanation/explanation.md
   - Reference: reference/references.md
 plugins:
   - search
