@@ -42,15 +42,15 @@ from nomad_utility_workflows.utils.users import (
 
 The NOMAD URL specifies the base address of the API for the NOMAD deployment of interest. Typically, this URL is structured as `https://<deployment_base_path>/api/v1`.
 
-By default, nomad-utility-workflows uses the Test deployment of NOMAD to make API calls. This is simply a safety mechanism so that users do not accidentally publish something during testing. 
+By default, nomad-utility-workflows uses the Test deployment of NOMAD to make API calls. This is simply a safety mechanism so that users do not accidentally publish something during testing.
 
 All API functions allow the user to specify the URL with the optional keyword argument `url`. If you want to use the central NOMAD URLs, you can simply set `url` equal to "prod", "staging", or "test", which correspond to the following deployments (see full URLs below):
 
-- prod: the official NOMAD deployment. 
+- prod: the official NOMAD deployment.
     - Updated most infrequently (as advertised in #software-updates on the NOMAD Discord Server)
-- staging: the beta version of NOMAD. 
-    - Updated more frequently than prod in order to integrate and test new features. 
-- test: a test NOMAD deployment. 
+- staging: the beta version of NOMAD.
+    - Updated more frequently than prod in order to integrate and test new features.
+- test: a test NOMAD deployment.
     - The data is occassionally wiped, such that test publishing can be made.
 
 Note that the prod and staging deployments share a common database, and that publishing on either will result in publically available data.
@@ -70,8 +70,11 @@ from nomad_utility_workflows.utils.core import (
 print(NOMAD_PROD_URL, NOMAD_STAGING_URL, NOMAD_TEST_URL)
 ```
 
-    https://nomad-lab.eu/prod/v1/api/v1 https://nomad-lab.eu/prod/v1/staging/api/v1 https://nomad-lab.eu/prod/v1/test/api/v1
+??? success "output"
 
+    ```
+    https://nomad-lab.eu/prod/v1/api/v1 https://nomad-lab.eu/prod/v1/staging/api/v1 https://nomad-lab.eu/prod/v1/test/api/v1
+    ```
 
 ## Authentication
 
@@ -91,11 +94,10 @@ NOMAD_PASSWORD = environ('NOMAD_PASSWORD')
 NOMAD_USERNAME
 ```
 
-
-
-
+??? success "output"
+    ```
     'JFRudzinski'
-
+    ```
 
 
 Use `get_authentication_token()` with your credentials to explicitly obtain and store a token:
@@ -110,11 +112,11 @@ token = get_authentication_token(
 token
 ```
 
+??? success "output"
 
-
-
-    'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJmb1hmZnM5QlFQWHduLU54Yk5PYlExOFhnZnlKU1FNRkl6ZFVnWjhrZzdVIn0.eyJleHAiOjE3MjkwNzM4NzcsImlhdCI6MTcyODk4NzQ3NywianRpIjoiOGQ0ODgwYTAtY2VlOS00NDMyLTliOGUtNTBjNGI5YzgzOWI2IiwiaXNzIjoiaHR0cHM6Ly9ub21hZC1sYWIuZXUvZmFpcmRpL2tleWNsb2FrL2F1dGgvcmVhbG1zL2ZhaXJkaV9ub21hZF9wcm9kIiwic3ViIjoiOGYwNTJlMWYtMTkwNi00MWZkLWIyZWItNjkwYzAzNDA3Nzg4IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoibm9tYWRfcHVibGljIiwic2Vzc2lvbl9zdGF0ZSI6Ijc2NzM0NTYxLTVmMzgtNGUyMS1hYzZiLTU4OTlmZDVjZmI4ZiIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJzaWQiOiI3NjczNDU2MS01ZjM4LTRlMjEtYWM2Yi01ODk5ZmQ1Y2ZiOGYiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6Ikpvc2VwaCBSdWR6aW5za2kiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJqZnJ1ZHppbnNraSIsImdpdmVuX25hbWUiOiJKb3NlcGgiLCJmYW1pbHlfbmFtZSI6IlJ1ZHppbnNraSIsImVtYWlsIjoicnVkemluc2tpQG1waXAtbWFpbnoubXBnLmRlIn0.Z4FKIpUgYYPVmopYc6iW5U7ENTxgRKQq29pDbllsKGsbsj5cqCTvYbj3RB2tsN99bjV_2SJ3qkH9GSgyamZ558bcPDJvS-KBGYBb-CcJ0QrKyJoa0jJwcVc4ibHuqY0PNVs5c5eubtDb1xGoRWdFxjxrcGXxHrYSn1dgSKPCKA3B-GdkcSr0R60f-MOiLN9ONKMc4JxrMexJKdtxZCaDJVFzePACH5qkzC2l-ZiFYp86w4vOt3hQqZPTGl1SKo6RTSme2p4QQxa0IG31h-HJ1lbTJsPFjh1Yh9KROz8zuGZJLLZCHdbp2k_ktBbFehdPL2dbkST3-F1LGkuyx_1Tiw'
-
+    ```
+    <A very long series of numbers and letters>
+    ```
 
 
 In practice, you do not need to obtain a token yourself when using nomad-utility-workflows. A token will automatically be obtained for API calls that require authentication. However, you may want to do the token generation yourself for custom API calls (see `Writing your own wrappers` below.)
@@ -127,15 +129,15 @@ nomad-utility-workflows uses the `NomadUser()` class to store the following user
 class NomadUser:
     user_id: str
     name: str
-    first_name: str 
-    last_name: str 
-    username: str 
-    affiliation: str 
-    affiliation_address: str 
+    first_name: str
+    last_name: str
+    username: str
+    affiliation: str
+    affiliation_address: str
     email: str
-    is_oasis_admin: bool 
+    is_oasis_admin: bool
     is_admin: bool
-    repo_user_id: str 
+    repo_user_id: str
     created: dt.datetime
 ```
 
@@ -148,11 +150,11 @@ nomad_user_me = who_am_i(url='test')
 nomad_user_me
 ```
 
+??? success "output"
 
-
-
+    ```
     NomadUser(name='Joseph Rudzinski')
-
+    ```
 
 
 Similarly, you can query NOMAD for other users with `search_users_by_name()`:
@@ -163,11 +165,11 @@ nomad_users = search_users_by_name('Rudzinski', url='test')
 nomad_users
 ```
 
+??? success "output"
 
-
-
+    ```
     [NomadUser(name='Joseph Rudzinski'), NomadUser(name='Joseph Rudzinski')]
-
+    ```
 
 
 In the case of multiple matches or for robustly identifying particular users, e.g., coauthors, in the future, it may be useful to store their `user_id`&mdash;a persistent identifier for each user account. Then, in the future you can use `get_user_by_id()` to grab the user info:
@@ -178,11 +180,11 @@ nomad_user = get_user_by_id(nomad_users[0].user_id, url='test')
 nomad_user
 ```
 
+??? success "output"
 
-
-
+    ```
     NomadUser(name='Joseph Rudzinski')
-
+    ```
 
 
 ### Uploading Data
@@ -217,16 +219,16 @@ class NomadUpload:
     n_entries: int
     upload_files_server_path: str
     publish_time: dt.datetime
-    references: list[str] 
-    datasets: list[str] 
-    external_db: str 
+    references: list[str]
+    datasets: list[str]
+    external_db: str
     upload_name: str
-    comment: str 
+    comment: str
     url: str
     complete_time: dt.datetime
 ```
 
-You can make an upload using the `upload_files_to_nomad()` function with input `filename=<path_to_a_zip_file_with_your_upload_data>`, as follows:  
+You can make an upload using the `upload_files_to_nomad()` function with input `filename=<path_to_a_zip_file_with_your_upload_data>`, as follows:
 
 
 ```python
@@ -239,11 +241,11 @@ upload_id = upload_files_to_nomad(filename=test_upload_fnm, url='test')
 upload_id
 ```
 
+??? success "output"
 
-
-
+    ```
     'RdA_3ZsOTMqbtAhYLivVsw'
-
+    ```
 
 
 ### Checking the upload status
@@ -257,6 +259,8 @@ nomad_upload = get_upload_by_id(upload_id, url='test')
 pprint(nomad_upload)
 ```
 
+??? success "output"
+    ```
     NomadUpload(upload_id='RdA_3ZsOTMqbtAhYLivVsw',
                 upload_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 378000),
                 main_author=NomadUser(name='Joseph Rudzinski'),
@@ -290,6 +294,7 @@ pprint(nomad_upload)
                 comment=None,
                 url='https://nomad-lab.eu/prod/v1/test/api/v1',
                 complete_time=datetime.datetime(2024, 10, 15, 20, 2, 11, 320000))
+    ```
 
 
 One common usage of this function is to ensure that an upload has been processed successfully before making a subsequent action on it, e.g., editing the metadata or publishing. For this purpose, one could require the `process_running==False` or `process_status='SUCCESS'`, e.g.:
@@ -303,11 +308,11 @@ One common usage of this function is to ensure that an upload has been processed
 
     while elapsed_time < max_wait_time:
         nomad_upload = get_upload_by_id(upload_id, url='test')
-        
+
         # Check if the upload is complete
         if nomad_upload.process_status == 'SUCCESS':
             break
-        
+
         # Wait for 2 minutes before the next call
         time.sleep(interval)
         elapsed_time += interval
@@ -340,9 +345,9 @@ metadata_new = {'upload_name': 'Test Upload', 'comment': 'This is a test upload.
 edit_upload_metadata(upload_id, url='test', **metadata_new)
 ```
 
+??? success "output"
 
-
-
+    ```
     {'upload_id': 'RdA_3ZsOTMqbtAhYLivVsw',
      'data': {'process_running': True,
       'current_process': 'edit_upload_metadata',
@@ -369,7 +374,7 @@ edit_upload_metadata(upload_id, url='test', **metadata_new)
       'license': 'CC BY 4.0',
       'entries': 1,
       'upload_files_server_path': '/nomad/test/fs/staging/R/RdA_3ZsOTMqbtAhYLivVsw'}}
-
+    ```
 
 
 Before moving on, let's again check that this additional process is complete:
@@ -382,9 +387,12 @@ pprint(nomad_upload.process_status == 'SUCCESS')
 pprint(nomad_upload.process_running is False)
 ```
 
-    True
-    True
+??? success "output"
 
+    ```
+    True
+    True
+    ```
 
 ### Accessing individual entries of an upload
 
@@ -398,13 +406,13 @@ class NomadEntry:
     upload_id: str
     references: list[str]
     origin: str
-    quantities: list[str] 
-    datasets: list[NomadDataset] 
+    quantities: list[str]
+    datasets: list[NomadDataset]
     n_quantities: int
     nomad_version: str
     upload_create_time: dt.datetime
     nomad_commit: str
-    section_defs: list[NomadSectionDefinition] 
+    section_defs: list[NomadSectionDefinition]
     processing_errors: list[Any]
     results: dict
     entry_name: str
@@ -413,16 +421,16 @@ class NomadEntry:
     calc_id: str
     published: bool
     writers: list[NomadUser]
-    sections: list[str] 
+    sections: list[str]
     processed: bool
     mainfile: str
     main_author: NomadUser
-    viewers: list[NomadUser] 
+    viewers: list[NomadUser]
     entry_create_time: dt.datetime
     with_embargo: bool
-    files: list[str] 
+    files: list[str]
     entry_type: str
-    authors: list[NomadUser] 
+    authors: list[NomadUser]
     license: str
     domain: str
     optimade: dict
@@ -431,7 +439,7 @@ class NomadEntry:
     viewer_groups: list[Any]
     writer_groups: list[Any]
     text_search_contents: list[str]
-    publish_time: dt.datetime 
+    publish_time: dt.datetime
     entry_references: list[dict]
     url: str
 ```
@@ -446,9 +454,12 @@ for entry in entries:
     pprint(f'entry_id={entry.entry_id}')
 ```
 
+??? success "output"
+
+    ```
     'Entries within upload_id=RdA_3ZsOTMqbtAhYLivVsw:'
     'entry_id=Htbl78lHDSNAKbvPjEgEN_6sOcxF'
-
+    ```
 
 To query an entry directly using the `entry_id`, use `get_entry_by_id()`:
 
@@ -458,14 +469,14 @@ entry = get_entry_by_id(entries[0].entry_id, url='test', with_authentication=Tru
 entry
 ```
 
+??? success "output"
 
-
-
+    ```
     NomadEntry(entry_id='Htbl78lHDSNAKbvPjEgEN_6sOcxF', upload_id='RdA_3ZsOTMqbtAhYLivVsw', references=[], origin='Joseph Rudzinski', n_quantities=0, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 378000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 752000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='Htbl78lHDSNAKbvPjEgEN_6sOcxF', published=False, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 543000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=None, entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1')
+    ```
 
 
-
-You can download the full (meta)data stored in an entry using `download_entry_by_id()`. This will return the entire archive as a dictionary. If you supply a `zip_file_name` (including the desired local path), the raw data of the entry will also be downloaded and saved to a zip file. Otherwise, only the archive will be downloaded. 
+You can download the full (meta)data stored in an entry using `download_entry_by_id()`. This will return the entire archive as a dictionary. If you supply a `zip_file_name` (including the desired local path), the raw data of the entry will also be downloaded and saved to a zip file. Otherwise, only the archive will be downloaded.
 
 
 ```python
@@ -476,8 +487,9 @@ test
 ```
 
 
+??? success "output"
 
-
+    ```
     {'processing_logs': [{'event': 'Executing celery task',
        'proc': 'Entry',
        'process': 'process_entry',
@@ -657,12 +669,12 @@ test
         'used_directly': True}]},
      'results': {'properties': {}},
      'm_ref_archives': {}}
-
+    ```
 
 
 ## Publishing Uploads
 
-Once the processing of your upload is successful and you have added/adjusted the appropriate metadata, you can publish your upload with `publish_upload()`, making it publicly available on the corresponding NOMAD deployment. 
+Once the processing of your upload is successful and you have added/adjusted the appropriate metadata, you can publish your upload with `publish_upload()`, making it publicly available on the corresponding NOMAD deployment.
 
 Note that once the upload is published you will no longer be able to make changes to the raw files that you uploaded. However, the upload metadata (accessed and edited in the above example) can be changed after publishing.
 
@@ -672,9 +684,9 @@ published_upload = publish_upload(nomad_upload.upload_id, url='test')
 published_upload
 ```
 
+??? success "output"
 
-
-
+    ```
     {'upload_id': 'RdA_3ZsOTMqbtAhYLivVsw',
      'data': {'process_running': True,
       'current_process': 'publish_upload',
@@ -702,12 +714,12 @@ published_upload
       'license': 'CC BY 4.0',
       'entries': 1,
       'upload_files_server_path': '/nomad/test/fs/staging/R/RdA_3ZsOTMqbtAhYLivVsw'}}
-
+    ```
 
 
 ## Finding and Creating Datasets
 
-Although uploads can group multiple entries together, they are limited by the maximum upload size and act more as a practical tool for optimizing the transfer of data to the NOMAD repository. For scientifically relevant connections between entries, NOMAD uses *Datasets* and *Workflows*. 
+Although uploads can group multiple entries together, they are limited by the maximum upload size and act more as a practical tool for optimizing the transfer of data to the NOMAD repository. For scientifically relevant connections between entries, NOMAD uses *Datasets* and *Workflows*.
 
 You can easily create a dataset with `create_dataset()`:
 
@@ -718,11 +730,11 @@ dataset_id = create_dataset('test dataset', url='test')
 dataset_id
 ```
 
+??? success "output"
 
-
-
+    ```
     'NCKd75f9R9S8rnkd-GBZlg'
-
+    ```
 
 
 The returned `dataset_id` can then be used to add individual entries (or all entries within an upload) to the dataset by including it in the upload/entry metadata, using the method described above:
@@ -733,9 +745,9 @@ metadata_new = {'dataset_id': dataset_id}
 edit_upload_metadata(upload_id, url='test', **metadata_new)
 ```
 
+??? success "output"
 
-
-
+    ```
     {'upload_id': 'RdA_3ZsOTMqbtAhYLivVsw',
      'data': {'process_running': True,
       'current_process': 'edit_upload_metadata',
@@ -763,7 +775,7 @@ edit_upload_metadata(upload_id, url='test', **metadata_new)
       'embargo_length': 0,
       'license': 'CC BY 4.0',
       'entries': 1}}
-
+    ```
 
 
 
@@ -774,9 +786,12 @@ pprint(nomad_upload.process_status == 'SUCCESS')
 pprint(nomad_upload.process_running is False)
 ```
 
-    True
-    True
+??? success "output"
 
+    ```
+    True
+    True
+    ```
 
 
 
@@ -801,11 +816,11 @@ nomad_dataset = get_dataset_by_id(dataset_id, url='test')
 nomad_dataset
 ```
 
+??? success "output"
 
-
-
+    ```
     NomadDataset(dataset_id='NCKd75f9R9S8rnkd-GBZlg', dataset_create_time=datetime.datetime(2024, 10, 15, 20, 10, 17, 568000), dataset_name='test dataset', dataset_type='owned', dataset_modified_time=datetime.datetime(2024, 10, 15, 20, 10, 17, 568000), user=NomadUser(name='Joseph Rudzinski'), doi=None, pid=None, m_annotations=None)
-
+    ```
 
 
 Alternatively, you can search for datasets, e.g., by `user_id` or `dataset_name`, using `retrieve_datasets()`:
@@ -818,6 +833,9 @@ my_datasets = retrieve_datasets(
 pprint(my_datasets)
 ```
 
+??? success "output"
+
+    ```
     [NomadDataset(dataset_id='NCKd75f9R9S8rnkd-GBZlg',
                   dataset_create_time=datetime.datetime(2024, 10, 15, 20, 10, 17, 568000),
                   dataset_name='test dataset',
@@ -827,7 +845,7 @@ pprint(my_datasets)
                   doi=None,
                   pid=None,
                   m_annotations=None)]
-
+    ```
 
 To get the list of entries contained within a dataset, use `query_entries()`:
 
@@ -838,8 +856,11 @@ for entry in dataset_entries:
     pprint(f'entry_id={entry.entry_id}, upload_id={entry.upload_id}')
 ```
 
-    'entry_id=Htbl78lHDSNAKbvPjEgEN_6sOcxF, upload_id=RdA_3ZsOTMqbtAhYLivVsw'
+??? success "output"
 
+    ```
+    'entry_id=Htbl78lHDSNAKbvPjEgEN_6sOcxF, upload_id=RdA_3ZsOTMqbtAhYLivVsw'
+    ```
 
 There is no "publishing" action for datasets. Instead, when the dataset is complete (i.e., you are ready to lock the contents of the dataset), you can *assign a DOI*. There is currently no API action for this within nomad-utility-workflows. You must go to the GUI of the relevant deployment, go to `PUBLISH > Datasets`, find the dataset, and then click the "assign a DOI" banner icon to the right of the dataset entry.
 
@@ -888,8 +909,11 @@ except Exception:
     pprint(f'Upload with upload_id={upload_id} was deleted successfully.')
 ```
 
-    'Upload with upload_id=zpq-JTzWQJ63jtSOlbueKA was deleted successfully.'
+??? success "output"
 
+    ```
+    'Upload with upload_id=zpq-JTzWQJ63jtSOlbueKA was deleted successfully.'
+    ```
 
 **create dataset, check for success, delete, check for success**:
 
@@ -918,8 +942,11 @@ except Exception:
     pprint(f'Dataset with dataset_id={dataset_id} was deleted successfully.')
 ```
 
-    'Dataset with dataset_id=eT2WPkfCQgmwNadsurYz0A was deleted successfully.'
+??? success "output"
 
+    ```
+    'Dataset with dataset_id=eT2WPkfCQgmwNadsurYz0A was deleted successfully.'
+    ```
 
 ## Useful Wrappers
 
@@ -930,15 +957,15 @@ nomad-utility-workflows contains a few useful wrapper functions to help users qu
 get_all_my_uploads(url='test')
 ```
 
+??? success "output"
 
-
-
+    ```
     [NomadUpload(upload_id='bQa5SGDQQ8auQUBb5AaYHw', upload_create_time=datetime.datetime(2024, 10, 14, 10, 48, 40, 994000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='publish_upload', process_status='SUCCESS', last_status_message='Process publish_upload completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 14, 10, 48, 55, 806000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 14, 10, 48, 55, 818000)),
      NomadUpload(upload_id='DN61X4r7SCyzm5q1kxcEcw', upload_create_time=datetime.datetime(2024, 10, 14, 10, 55, 12, 410000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='publish_upload', process_status='SUCCESS', last_status_message='Process publish_upload completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 14, 10, 55, 23, 52000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 14, 10, 55, 23, 65000)),
      NomadUpload(upload_id='z4QvhZ7qSCmgIFv_qJqlyQ', upload_create_time=datetime.datetime(2024, 10, 14, 20, 20, 38, 757000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='edit_upload_metadata', process_status='SUCCESS', last_status_message='Process edit_upload_metadata completed successfully', errors=[], warnings=[], coauthors=['7c85bdf1-8b53-40a8-81a4-04f26ff56f29'], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski'), NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski'), NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 15, 6, 18, 27, 700000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 15, 6, 22, 33, 45000)),
      NomadUpload(upload_id='GJdVAOCxRVe-Cwo3qMz9Kg', upload_create_time=datetime.datetime(2024, 10, 15, 10, 48, 44, 337000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='edit_upload_metadata', process_status='SUCCESS', last_status_message='Process edit_upload_metadata completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 15, 10, 49, 24, 4000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 15, 10, 49, 30, 962000)),
      NomadUpload(upload_id='RdA_3ZsOTMqbtAhYLivVsw', upload_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 378000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='edit_upload_metadata', process_status='SUCCESS', last_status_message='Process edit_upload_metadata completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 15, 20, 9, 28, 757000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 15, 20, 10, 33, 141000))]
-
+    ```
 
 
 
@@ -946,15 +973,15 @@ get_all_my_uploads(url='test')
 get_entries_of_my_uploads(url='test')
 ```
 
+??? success "output"
 
-
-
+    ```
     [NomadEntry(entry_id='ycdeXhPDG-nIgEQlqBfzIEKPWCvy', upload_id='bQa5SGDQQ8auQUBb5AaYHw', references=[], origin='Joseph Rudzinski', n_quantities=34, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 14, 10, 48, 40, 994000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 14, 10, 48, 42, 415000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='ycdeXhPDG-nIgEQlqBfzIEKPWCvy', published=True, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 14, 10, 48, 41, 672000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=None, entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1'),
      NomadEntry(entry_id='7A6lJb-14xR9lxXO8kjuYt5-vxg2', upload_id='DN61X4r7SCyzm5q1kxcEcw', references=[], origin='Joseph Rudzinski', n_quantities=34, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 14, 10, 55, 12, 410000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 14, 10, 55, 12, 808000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='7A6lJb-14xR9lxXO8kjuYt5-vxg2', published=True, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 14, 10, 55, 12, 563000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=None, entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1'),
      NomadEntry(entry_id='jWSpYURP5GgPtgF9LXZJpNlDv-GL', upload_id='z4QvhZ7qSCmgIFv_qJqlyQ', references=[], origin='Joseph Rudzinski', n_quantities=0, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 14, 20, 20, 38, 757000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 14, 20, 20, 39, 272000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='jWSpYURP5GgPtgF9LXZJpNlDv-GL', published=True, writers=[NomadUser(name='Joseph Rudzinski'), NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 14, 20, 20, 38, 982000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...edited', upload_name='Test Upload', text_search_contents=[], publish_time=datetime.datetime(2024, 10, 15, 6, 18, 27, 700000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1'),
      NomadEntry(entry_id='MVBIMEZOuIzH7-QFU2TtMIM6LLPp', upload_id='GJdVAOCxRVe-Cwo3qMz9Kg', references=[], origin='Joseph Rudzinski', n_quantities=0, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 15, 10, 48, 44, 337000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 15, 10, 48, 45, 206000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='MVBIMEZOuIzH7-QFU2TtMIM6LLPp', published=True, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 15, 10, 48, 44, 741000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=datetime.datetime(2024, 10, 15, 10, 49, 24, 4000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1'),
      NomadEntry(entry_id='Htbl78lHDSNAKbvPjEgEN_6sOcxF', upload_id='RdA_3ZsOTMqbtAhYLivVsw', references=[], origin='Joseph Rudzinski', n_quantities=0, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 378000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 752000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='Htbl78lHDSNAKbvPjEgEN_6sOcxF', published=True, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 543000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=datetime.datetime(2024, 10, 15, 20, 9, 28, 757000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1')]
-
+    ```
 
 
 ### Writing Your Own Wrappers
