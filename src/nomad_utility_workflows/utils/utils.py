@@ -118,12 +118,12 @@ def get_nomad_url(url: str) -> str:
     elif url == 'test':
         return NOMAD_TEST_URL
 
-    # if not url.endswith('/api/v1'):
-    #     logger.warning(
-    #         'The given URL: %s does not appear to be a valid NOMAD API URL, '
-    #         'i.e., ending with /api/v1.',
-    #         url,
-    #     )
+    if not url.endswith('/api/v1'):
+        logger.warning(
+            'The given URL: %s does not appear to be a valid NOMAD API URL, '
+            'i.e., ending with /api/v1.',
+            url,
+        )
 
     return url
 

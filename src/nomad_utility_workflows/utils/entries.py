@@ -231,74 +231,12 @@ def query_entries(
     return [get_entry_by_id(e, url=url) for e in entries]
 
 
-# def download_raw_data_of_job(job: Job, timeout_in_sec: int = 10) -> bool:
-#     entries = find_entries_corresponding_to_job(job)
-#     if len(entries) == 0:
-#         return False
-#     entry = entries[0]
-#     zip_content = _get_raw_data_of_entry_by_id(
-#         entry.entry_id, use_prod=entry.use_prod, timeout_in_sec=timeout_in_sec, with_authentication=not entry.published
-#     )
-#     zip_file_name = "nomad_archive.zip"
-#     with open(job.fn(zip_file_name), "wb") as f:
-#         f.write(bytes(zip_content))
-#     zip_file = ZipFile(job.fn(zip_file_name))
-#     archive_path = job.path + "/" + entry.upload_id
-#     name_list = zip_file.namelist()
-#     name_list = [name for name in name_list if name.startswith(f"{entry.upload_id}/")]
-#     zip_file.extractall(path=job.path, members=name_list)
-#     for file_name in name_list:
-#         if Path(file_name).name not in os.listdir(job.path):
-#             shutil.move(job.path + "/" + file_name, job.path)
-#     os.remove(job.fn(zip_file_name))
-#     if "signac_job_document.json" in os.listdir(archive_path):
-#         with open(archive_path + "/signac_job_document.json") as fp:
-#             json_data = json.load(fp)
-#             job.doc = update_nested_dict(job.doc, dict(json_data))
-#     for file_name in os.listdir(archive_path):
-#         os.remove(archive_path + "/" + file_name)
-#     os.removedirs(archive_path)
-#     job.document["nomad_dataset_id"] = MartiniFlowProject.nomad_dataset_id
-#     if entry.workflow_name not in job.document:
-#         job.document[entry.workflow_name] = {}
-#     job.document[entry.workflow_name]["nomad_upload_id"] = entry.upload_id
-#     return True
-
-
-# def find_entries_corresponding_to_job(job: Job) -> list[NomadEntry]:
-#     if not issubclass(type(job.project), MartiniFlowProject):
-#         raise TypeError(f"job project {type(job.project)} does not derive from MartiniFlowProject")
-#     project = cast("MartiniFlowProject", job.project)
-
-#     def associate_entry_to_job(entry_: NomadEntry) -> Optional[NomadEntry]:
-#         if (
-#             entry_.comment is not None
-#             and entry_.job_id == job.id
-#             and entry_.mdp_files == project.get_hash_for_files(job, list(project.mdp_files.values()))
-#         ):
-#             return entry_
-
-#     match_entries = []
-#     nomad_entries = query_entries(dataset_id=project.nomad_dataset_id, use_prod=project.nomad_use_prod_database)
-#     for entry in nomad_entries:
-#         if found_entry := associate_entry_to_job(entry):
-#             match_entries.append(found_entry)
-#     my_uploads = get_all_my_uploads(use_prod=project.nomad_use_prod_database)
-#     for upload in my_uploads:
-#         upload_entries = get_entries_of_upload(upload.upload_id)
-#         for entry in upload_entries:
-#             if found_entry := associate_entry_to_job(entry):
-#                 match_entries.append(found_entry)
-#     if len(match_entries) > 0 and not all([entry.upload_id == match_entries[0].upload_id for entry in match_entries]):
-#         raise ValueError(f"Inconsistent upload IDs in entries:\n{match_entries}")
-#     return match_entries
-
-
-def _get_raw_data_of_entry_by_id(
+def download_entry_raw_data_by_id(
     entry_id: str,
     url: str = None,
     timeout_in_sec: int = 10,
     with_authentication: bool = False,
+    zip_file_name: str = None,
 ) -> ByteString:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
@@ -311,4 +249,39 @@ def _get_raw_data_of_entry_by_id(
         return_json=False,
         accept_field='application/zip',
     )
+
+    if zip_file_name is not None:
+        with open(zip_file_name, 'wb') as f:
+            f.write(bytes(response))
+
+    return response
+
+
+def download_entry_by_id(
+    entry_id: str,
+    url: str = None,
+    timeout_in_sec: int = 10,
+    with_authentication: bool = False,
+    zip_file_name: str = None,
+) -> dict:
+    url = get_nomad_url(url)
+    url_name = get_nomad_url_name(url)
+
+    logger.info('retrieving data of entry ID %s on %s server', entry_id, url_name)
+    response = get_nomad_request(
+        f'/entries/{entry_id}/archive/download',
+        with_authentication=with_authentication,
+        url=url,
+        timeout_in_sec=timeout_in_sec,
+    )
+
+    if zip_file_name is not None:
+        __ = download_entry_raw_data_by_id(
+            entry_id=entry_id,
+            url=url,
+            timeout_in_sec=timeout_in_sec,
+            with_authentication=with_authentication,
+            zip_file_name=zip_file_name,
+        )
+
     return response
