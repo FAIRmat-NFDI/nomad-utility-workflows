@@ -1,6 +1,6 @@
 import logging
 from collections import OrderedDict
-from typing import Any, Dict, List, Literal, Optional, TypedDict, Union
+from typing import Any, Literal, Optional, TypedDict, Union
 
 import networkx as nx
 import yaml
@@ -48,14 +48,14 @@ default_path_info = {
 class NomadSection(BaseModel):
     name: Optional[str] = Field(None, description='Name of the section')
     type: Optional[SectionType] = Field(None, description='Type of the section')
-    path_info: Dict[str, Any] = Field(
+    path_info: dict[str, Any] = Field(
         default=default_path_info.copy(), description='Archive path'
     )
-    inputs: List[Dict[str, Any]] = Field(
+    inputs: list[dict[str, Any]] = Field(
         [{}],
         description='section inputs',
     )
-    outputs: List[Dict[str, Any]] = Field([{}], description='section outputs')
+    outputs: list[dict[str, Any]] = Field([{}], description='section outputs')
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -82,9 +82,9 @@ class NomadSection(BaseModel):
                 'supersection_path'
             ]:  # case 1 - supersection path is given
                 archive_path = self.path_info['supersection_path']
-                if (
-                    self.path_info.get('supersection_index') is not None
-                ):  # add supersection index when given, else supersection is assumed to be nonrepeating
+                if self.path_info.get('supersection_index') is not None:
+                    # add supersection index when given, else supersection is assumed
+                    # to be nonrepeating
                     archive_path += f'/{self.path_info.get("supersection_index")}'
             elif self.path_info.get('section_type') in [
                 'system',
@@ -93,12 +93,16 @@ class NomadSection(BaseModel):
             ]:  # case 2 - no supersection path, but section type is contained in run
                 run_index = self.path_info.get('supersection_index')
                 run_index = run_index if run_index is not None else -1
-                archive_path = f'run/{run_index}'  # add run index when given, else use last run section
+                # add run index when given, else use last run section
+                archive_path = f'run/{run_index}'
             elif self.path_info.get('section_type') in ['results']:
                 archive_path = 'workflow2'
             else:
                 logger.warning(
-                    'No supersection path provided for %s-%s. Section reference may be incorrect.',
+                    (
+                        'No supersection path provided for %s-%s. '
+                        'Section reference may be incorrect.'
+                    ),
                     self.type,
                     self.name,
                 )
@@ -150,8 +154,8 @@ class NomadSection(BaseModel):
 class NomadTask(BaseModel):
     name: str
     m_def: str
-    inputs: List[NomadSection] = Field(default_factory=list)
-    outputs: List[NomadSection] = Field(default_factory=list)
+    inputs: list[NomadSection] = Field(default_factory=list)
+    outputs: list[NomadSection] = Field(default_factory=list)
     task_section: Optional[NomadSection] = None
 
     # class Config:
@@ -220,9 +224,9 @@ class NomadWorkflowArchive(BaseModel):
 
 class NomadWorkflow(BaseModel):
     destination_filename: str
-    node_attributes: Dict[int, Any] = {}
+    node_attributes: dict[int, Any] = {}
     workflow_graph: nx.DiGraph = None
-    task_elements: Dict[str, NomadSection] = Field(default_factory=dict)
+    task_elements: dict[str, NomadSection] = Field(default_factory=dict)
 
     class Config:
         arbitrary_types_allowed = True
@@ -235,7 +239,7 @@ class NomadWorkflow(BaseModel):
         self.fill_workflow_graph()
 
     def register_section(
-        self, node_key: Union[int, str, tuple], node_attrs: Dict[str, Any]
+        self, node_key: Union[int, str, tuple], node_attrs: dict[str, Any]
     ) -> None:
         section = NomadSection(**node_attrs)
         self.task_elements[node_key] = section  # ! build the tasks section by section
@@ -322,7 +326,7 @@ class NomadWorkflow(BaseModel):
 
         def get_defaults(
             inout_type: Literal['inputs', 'outputs'], node_source, node_dest
-        ) -> List:
+        ) -> list:
             defaults = {
                 'inputs': {
                     'section': 'system',
@@ -471,7 +475,7 @@ class NomadWorkflow(BaseModel):
 
 def build_nomad_workflow(
     destination_filename: str = './nomad_workflow.archive.yaml',
-    node_attributes: Dict[int, Any] = {},
+    node_attributes: dict[int, Any] = {},
     workflow_graph: nx.DiGraph = None,
     write_to_yaml: bool = False,
 ) -> nx.DiGraph:
@@ -491,7 +495,6 @@ def build_nomad_workflow(
 # TODO test this code on a number of already existing examples
 # TODO create docs with some examples for dict and graph input types
 # TODO add to readme/docs that this is not currently using NOMAD, but could be linked later?
-# TODO rename utils.py
 # TODO should nodes_to_graph() be an external function from the class? So, that the user can call it, but also add attributes from there?
 # TODO add some text to the test notebooks
 
