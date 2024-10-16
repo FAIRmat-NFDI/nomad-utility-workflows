@@ -114,7 +114,10 @@ class NomadSection(BaseModel):
                     archive_path += f'/{self.path_info["section_index"]}'
             else:
                 logger.warning(
-                    'No section type provided for %s-%s. Section reference may be incorrect.',
+                    (
+                        'No section type provided for %s-%s. '
+                        'Section reference may be incorrect.'
+                    ),
                     self.type,
                     self.name,
                 )
@@ -125,7 +128,8 @@ class NomadSection(BaseModel):
     def upload_prefix(self) -> str:
         if not self.path_info['mainfile_path']:
             logger.warning(
-                'No mainfile path provided for %s-%s. Section reference will be missing.',
+                'No mainfile path provided for %s-%s. '
+                'Section reference will be missing.',
                 self.type,
                 self.name,
             )
@@ -305,7 +309,8 @@ class NomadWorkflow(BaseModel):
 
         return workflow_graph
 
-    # TODO Change the archive building function to loop over nodes and then add the corrsponding inputs/outputs from the edges
+    # TODO Change the archive building function to loop over nodes and then add the
+    # corresponding inputs/outputs from the edges
     def fill_workflow_graph(self) -> None:
         def get_mainfile_path(node):
             return (
@@ -360,7 +365,10 @@ class NomadWorkflow(BaseModel):
             partner_name = self.workflow_graph.nodes[partner_node].get('name', '')
             inouts = [
                 {
-                    'name': f'DEFAULT {inout_type[:-1]} {default_section} from {partner_name}',
+                    'name': (
+                        f'DEFAULT {inout_type[:-1]} {default_section} '
+                        f'from {partner_name}'
+                    ),
                     'path_info': {
                         'section_type': default_section,
                         'mainfile_path': get_mainfile_path(partner_node),
@@ -399,9 +407,10 @@ class NomadWorkflow(BaseModel):
                         'type', ''
                     )
                     # edge output assigned to source unless source is an input node
-                    if (
-                        node_source_type == 'input'
-                    ):  # ! assuming here that the input is coming from the same archive, but will not be assigned anyway if path_info is empty for this node
+                    if node_source_type == 'input':
+                        # ! assuming here that the input is coming from the same
+                        # archive, but will not be assigned anyway if path_info is empty
+                        # for this node
                         output_['path_info']['mainfile_path'] = get_mainfile_path(
                             node_dest
                         )
@@ -411,7 +420,8 @@ class NomadWorkflow(BaseModel):
                         )
 
             # ADD DEFAULTS
-            # ? Here I am added the default to the first edge in case they are missing, not positive this covers all cases correctly
+            # ? Here I am added the default to the first edge in case they are missing,
+            # not positive this covers all cases correctly
             # edge_input is source output
             if self.workflow_graph.nodes[node_source].get('type', '') in [
                 'task',
@@ -490,12 +500,16 @@ def build_nomad_workflow(
     return workflow.workflow_graph
 
 
-# TODO make sure that the post_nomad etc with authentication are passing the correct urls without sections added!
+# TODO make sure that the post_nomad etc with authentication are passing the correct
+# urls without sections added!
 # TODO add is_simulation, is_nomad_entry as flags
 # TODO test this code on a number of already existing examples
 # TODO create docs with some examples for dict and graph input types
-# TODO add to readme/docs that this is not currently using NOMAD, but could be linked later?
-# TODO should nodes_to_graph() be an external function from the class? So, that the user can call it, but also add attributes from there?
+# TODO add to readme/docs that this is not currently using NOMAD, but could be linked
+# later?
+# TODO should nodes_to_graph() be an external function from the class? So, that the user
+# can call it, but also add attributes from there?
 # TODO add some text to the test notebooks
 
-# TODO change the rest of the functions to pydantic -- not sure if I really want to tackle this now
+# TODO change the rest of the functions to pydantic -- not sure if I really want to
+# tackle this now
