@@ -1,4 +1,4 @@
-import logging
+from nomad.utils import get_logger
 from collections import OrderedDict
 from typing import Any, Literal, Optional, TypedDict, Union
 
@@ -6,7 +6,8 @@ import networkx as nx
 import yaml
 from pydantic import BaseModel, Field
 
-logger = logging.getLogger(__name__)  # ! this is not functional I think
+# logger = logging.getLogger(__name__)  # ! this is not functional I think
+logger = get_logger(__name__)
 TASK_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
 WORKFLOW_M_DEF = 'nomad.datamodel.metainfo.workflow.Workflow'
 
@@ -207,9 +208,6 @@ class NomadWorkflowArchive(BaseModel):
     outputs: list[NomadSection] = Field(default_factory=list)
     tasks: list[NomadTask] = Field(default_factory=list)
 
-    # class Config:
-    #     arbitrary_types_allowed = True
-
     def to_dict(self) -> dict:
         return {
             self.name: OrderedDict(
@@ -248,73 +246,6 @@ class NomadWorkflow(BaseModel):
         section = NomadSection(**node_attrs)
         self.task_elements[node_key] = section  # ! build the tasks section by section
 
-    # # TODO Extend the graph to add nodes for the additional default inouts etc
-    # def nodes_to_graph(self) -> nx.DiGraph:
-    #     if not self.node_attributes:
-    #         logger.error(
-    #             'No workflow graph or node attributes provided.
-    # Cannot build workflow.'
-    #         )
-    #         return None
-
-    #     workflow_graph = nx.DiGraph()
-    #     workflow_graph.add_nodes_from(self.node_attributes.keys())
-    #     nx.set_node_attributes(workflow_graph, self.node_attributes)
-
-    #     for node_key, node_attrs in list(workflow_graph.nodes(data=True)):
-    #         # Add any given edges
-    #         for edge in node_attrs.get('in_edge_nodes', []):
-    #             workflow_graph.add_edge(edge, node_key)
-    #         for edge in node_attrs.get('out_edge_nodes', []):
-    #             workflow_graph.add_edge(node_key, edge)
-    #         # Global inputs/outputs
-    #         if node_attrs.get('type', '') == 'input':
-    #             for edge_node in node_attrs.get('out_edge_nodes', []):
-    #                 workflow_graph.add_edge(node_key, edge_node)
-    #         elif node_attrs.get('type', '') == 'output':
-    #             for edge_node in node_attrs.get('in_edge_nodes', []):
-    #                 workflow_graph.add_edge(edge_node, node_key)
-
-    #         # Task inputs/outputs
-    #         inputs = node_attrs.pop('inputs', [])
-    #         for input_ in inputs:
-    #             edge_nodes = input_.get('out_edge_nodes', [])
-    #             if not edge_nodes:
-    #                 edge_nodes.append(len(workflow_graph.nodes))
-    #                 workflow_graph.add_node(edge_nodes[0], type='input', **input_)
-
-    #             # transfer node inputs to edge ouputs
-    #             for edge_node in edge_nodes:
-    #                 workflow_graph.add_edge(edge_node, node_key)
-    #                 if not workflow_graph.edges[edge_node, node_key].get(
-    # 'outputs', []):
-    #                     nx.set_edge_attributes(
-    #                         workflow_graph, {(edge_node, node_key): {'outputs': []}}
-    #                     )
-    #                 workflow_graph.edges[edge_node, node_key]['outputs'].append(
-    # input_)
-
-    #         outputs = node_attrs.pop('outputs', [])
-    #         for output_ in outputs:
-    #             edge_nodes = output_.get('in_edge_node', [])
-    #             if not edge_nodes:
-    #                 edge_nodes.append(len(workflow_graph.nodes))
-    #                 workflow_graph.add_node(edge_nodes[0], type='output', **output_)
-
-    #             # transfer node outputs to edge inputs
-    #             for edge_node in edge_nodes:
-    #                 workflow_graph.add_edge(node_key, edge_node)
-    #                 if not workflow_graph.edges[node_key, edge_node].get(
-    # 'inputs', []):
-    #                     nx.set_edge_attributes(
-    #                         workflow_graph, {(node_key, edge_node): {'inputs': []}}
-    #                     )
-    #                 workflow_graph.edges[node_key, edge_node]['inputs'].append(
-    # output_)
-
-    #     return workflow_graph
-
-    # ! suggested by copilot to fix too many branches ruff
     # TODO Extend the graph to add nodes for the additional default inouts etc
     def nodes_to_graph(self) -> nx.DiGraph:
         """_summary_
@@ -384,140 +315,8 @@ class NomadWorkflow(BaseModel):
                     )
                 workflow_graph.edges[node_key, edge_node]['inputs'].append(output_)
 
-    # # TODO Change the archive building function to loop over nodes and then add the
-    # # corresponding inputs/outputs from the edges
-    # def fill_workflow_graph(self) -> None:
-    #     """_summary_"""
-
-    #     def get_mainfile_path(node):
-    #         return (
-    #             self.workflow_graph.nodes[node]
-    #             .get('path_info', '')
-    #             .get('mainfile_path', '')
-    #         )
-
-    #     def check_for_defaults(inout_type, default_section, edge) -> bool:
-    #         inout_type = 'inputs' if inout_type == 'outputs' else 'outputs'
-    #         for input_ in edge.get(inout_type, []):
-    #             if (
-    #                 input_.get('path_info', {}).get('section_type', '')
-    #                 == default_section
-    #             ):
-    #                 return True
-    #         return False
-
-    #     def get_defaults(
-    #         inout_type: Literal['inputs', 'outputs'], node_source, node_dest
-    #     ) -> list:
-    #         defaults = {
-    #             'inputs': {
-    #                 'section': 'system',
-    #             },
-    #             'outputs': {
-    #                 'section': 'calculation',
-    #             },
-    #         }
-    #         partner_node = node_source
-    #         node_source_type = self.workflow_graph.nodes[node_source].get('type', '')
-    #         if node_source_type == 'input':
-    #             partner_node = node_dest
-
-    #         default_section = defaults[inout_type]['section']
-    #         flag_defaults = False
-    #         if inout_type == 'outputs':
-    #             for _, _, edge2 in self.workflow_graph.out_edges(
-    #                 node_source, data=True
-    #             ):
-    #                 if check_for_defaults(inout_type, default_section, edge2):
-    #                     flag_defaults = True
-    #                     break
-    #         elif inout_type == 'inputs':
-    #             for _, _, edge2 in self.workflow_graph.in_edges(node_dest, data=True):
-    #                 if check_for_defaults(inout_type, default_section, edge2):
-    #                     flag_defaults = True
-    #                     break
-    #         if flag_defaults:
-    #             return []
-
-    #         partner_name = self.workflow_graph.nodes[partner_node].get('name', '')
-    #         inouts = [
-    #             {
-    #                 'name': (
-    #                     f'DEFAULT {inout_type[:-1]} {default_section} '
-    #                     f'from {partner_name}'
-    #                 ),
-    #                 'path_info': {
-    #                     'section_type': default_section,
-    #                     'mainfile_path': get_mainfile_path(partner_node),
-    #                 },
-    #             },
-    #         ]
-
-    #         return inouts
-
-    #     # resolve mainfile for all edge inouts and add defaults
-    #     for node_source, node_dest, edge in self.workflow_graph.edges(data=True):
-    #         # EDGE INPUTS
-    #         if not edge.get('inputs'):
-    #             nx.set_edge_attributes(
-    #                 self.workflow_graph, {(node_source, node_dest): {'inputs': []}}
-    #             )
-    #         for input_ in edge['inputs']:
-    #             if not input_.get('path_info', {}):
-    #                 continue
-    #             if not input_['path_info'].get('mainfile_path', ''):
-    #                 # edge inputs always coming from the source node
-    #                 input_['path_info']['mainfile_path'] = get_mainfile_path(
-    #                     node_source
-    #                 )
-
-    #         # EDGE OUTPUTS
-    #         if not edge.get('outputs'):
-    #             nx.set_edge_attributes(
-    #                 self.workflow_graph, {(node_source, node_dest): {'outputs': []}}
-    #             )
-    #         for output_ in edge.get('outputs', []):
-    #             if not output_.get('path_info', {}):
-    #                 continue
-    #             if not output_['path_info'].get('mainfile_path', ''):
-    #                 node_source_type = self.workflow_graph.nodes[node_source].get(
-    #                     'type', ''
-    #                 )
-    #                 # edge output assigned to source unless source is an input node
-    #                 if node_source_type == 'input':
-    #                     # ! assuming here that the input is coming from the same
-    #                     # archive, but will not be assigned anyway if path_info is
-    #  empty
-    #                     # for this node
-    #                     output_['path_info']['mainfile_path'] = get_mainfile_path(
-    #                         node_dest
-    #                     )
-    #                 else:
-    #                     output_['path_info']['mainfile_path'] = get_mainfile_path(
-    #                         node_source
-    #                     )
-
-    #         # ADD DEFAULTS
-    #         # ? Here I am added the default to the first edge in case they are
-    # missing,
-    #         # not positive this covers all cases correctly
-    #         # edge_input is source output
-    #         if self.workflow_graph.nodes[node_source].get('type', '') in [
-    #             'task',
-    #             'workflow',
-    #         ]:
-    #             for outputs_ in get_defaults('outputs', node_source, node_dest):
-    #                 edge['inputs'].append(outputs_)
-
-    #         # edge_output is dest input
-    #         if self.workflow_graph.nodes[node_dest].get('type', '') in [
-    #             'task',
-    #             'workflow',
-    #         ]:
-    #             for inputs_ in get_defaults('inputs', node_source, node_dest):
-    #                 edge['outputs'].append(inputs_)
-
-    # ! Suggested by copilot to replace the above in order to fix too many branches ruff
+    # TODO Change the archive building function to loop over nodes and then add the
+    # TODO corresponding inputs/outputs from the edges
     def fill_workflow_graph(self) -> None:
         """_summary_"""
         for node_source, node_dest, edge in self.workflow_graph.edges(data=True):
@@ -693,16 +492,16 @@ def build_nomad_workflow(
     return workflow.workflow_graph
 
 
-# TODO make sure that the post_nomad etc with authentication are passing the correct
-# urls without sections added!
 # TODO add is_simulation, is_nomad_entry as flags
 # TODO test this code on a number of already existing examples
 # TODO create docs with some examples for dict and graph input types
 # TODO add to readme/docs that this is not currently using NOMAD, but could be linked
 # later?
-# TODO should nodes_to_graph() be an external function from the class? So, that the user
-# can call it, but also add attributes from there?
+
 # TODO add some text to the test notebooks
 
 # TODO change the rest of the functions to pydantic -- not sure if I really want to
 # tackle this now
+
+# TODO should nodes_to_graph() be an external function from the class? So, that the user
+# can call it, but also add attributes from there?
