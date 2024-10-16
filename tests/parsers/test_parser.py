@@ -1,5 +1,4 @@
 import logging
-
 from nomad.datamodel import EntryArchive
 from nomad_utility_workflows.parsers.parser import NewParser
 
