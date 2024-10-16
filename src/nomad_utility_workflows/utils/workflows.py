@@ -237,7 +237,7 @@ class NomadWorkflow(BaseModel):
         super().__init__(**data)
         self.task_elements = {}
         if self.workflow_graph is None:
-            self.workflow_graph = self.nodes_to_graph()
+            self.workflow_graph = nodes_to_graph(self.node_attributes)
         self.fill_workflow_graph()
 
     def register_section(
@@ -245,75 +245,6 @@ class NomadWorkflow(BaseModel):
     ) -> None:
         section = NomadSection(**node_attrs)
         self.task_elements[node_key] = section  # ! build the tasks section by section
-
-    # TODO Extend the graph to add nodes for the additional default inouts etc
-    def nodes_to_graph(self) -> nx.DiGraph:
-        """_summary_
-
-        Returns:
-            nx.DiGraph: _description_
-        """
-        if not self.node_attributes:
-            logger.error(
-                'No workflow graph or node attributes provided. Cannot build workflow.'
-            )
-            return None
-
-        workflow_graph = nx.DiGraph()
-        workflow_graph.add_nodes_from(self.node_attributes.keys())
-        nx.set_node_attributes(workflow_graph, self.node_attributes)
-
-        for node_key, node_attrs in list(workflow_graph.nodes(data=True)):
-            self._add_edges(workflow_graph, node_key, node_attrs)
-            self._add_global_inouts(workflow_graph, node_key, node_attrs)
-            self._add_task_inouts(workflow_graph, node_key, node_attrs)
-
-        return workflow_graph
-
-    def _add_edges(self, workflow_graph, node_key, node_attrs):
-        for edge in node_attrs.get('in_edge_nodes', []):
-            workflow_graph.add_edge(edge, node_key)
-        for edge in node_attrs.get('out_edge_nodes', []):
-            workflow_graph.add_edge(node_key, edge)
-
-    def _add_global_inouts(self, workflow_graph, node_key, node_attrs):
-        if node_attrs.get('type', '') == 'input':
-            for edge_node in node_attrs.get('out_edge_nodes', []):
-                workflow_graph.add_edge(node_key, edge_node)
-        elif node_attrs.get('type', '') == 'output':
-            for edge_node in node_attrs.get('in_edge_nodes', []):
-                workflow_graph.add_edge(edge_node, node_key)
-
-    def _add_task_inouts(self, workflow_graph, node_key, node_attrs):
-        inputs = node_attrs.pop('inputs', [])
-        for input_ in inputs:
-            edge_nodes = input_.get('out_edge_nodes', [])
-            if not edge_nodes:
-                edge_nodes.append(len(workflow_graph.nodes))
-                workflow_graph.add_node(edge_nodes[0], type='input', **input_)
-
-            for edge_node in edge_nodes:
-                workflow_graph.add_edge(edge_node, node_key)
-                if not workflow_graph.edges[edge_node, node_key].get('outputs', []):
-                    nx.set_edge_attributes(
-                        workflow_graph, {(edge_node, node_key): {'outputs': []}}
-                    )
-                workflow_graph.edges[edge_node, node_key]['outputs'].append(input_)
-
-        outputs = node_attrs.pop('outputs', [])
-        for output_ in outputs:
-            edge_nodes = output_.get('in_edge_node', [])
-            if not edge_nodes:
-                edge_nodes.append(len(workflow_graph.nodes))
-                workflow_graph.add_node(edge_nodes[0], type='output', **output_)
-
-            for edge_node in edge_nodes:
-                workflow_graph.add_edge(node_key, edge_node)
-                if not workflow_graph.edges[node_key, edge_node].get('inputs', []):
-                    nx.set_edge_attributes(
-                        workflow_graph, {(node_key, edge_node): {'inputs': []}}
-                    )
-                workflow_graph.edges[node_key, edge_node]['inputs'].append(output_)
 
     # TODO Change the archive building function to loop over nodes and then add the
     # TODO corresponding inputs/outputs from the edges
@@ -473,6 +404,79 @@ class NomadWorkflow(BaseModel):
                     )
                 )
         return archive
+
+
+# TODO Extend the graph to add nodes for the additional default inouts etc
+def nodes_to_graph(node_attributes: dict[int, Any]) -> nx.DiGraph:
+    """_summary_
+
+    Returns:
+        nx.DiGraph: _description_
+    """
+    if not node_attributes:
+        logger.error(
+            'No workflow graph or node attributes provided. Cannot build workflow.'
+        )
+        return None
+
+    workflow_graph = nx.DiGraph()
+    workflow_graph.add_nodes_from(node_attributes.keys())
+    nx.set_node_attributes(workflow_graph, node_attributes)
+
+    for node_key, node_attrs in list(workflow_graph.nodes(data=True)):
+        _add_edges(workflow_graph, node_key, node_attrs)
+        _add_global_inouts(workflow_graph, node_key, node_attrs)
+        _add_task_inouts(workflow_graph, node_key, node_attrs)
+
+    return workflow_graph
+
+
+def _add_edges(workflow_graph, node_key, node_attrs):
+    for edge in node_attrs.get('in_edge_nodes', []):
+        workflow_graph.add_edge(edge, node_key)
+    for edge in node_attrs.get('out_edge_nodes', []):
+        workflow_graph.add_edge(node_key, edge)
+
+
+def _add_global_inouts(workflow_graph, node_key, node_attrs):
+    if node_attrs.get('type', '') == 'input':
+        for edge_node in node_attrs.get('out_edge_nodes', []):
+            workflow_graph.add_edge(node_key, edge_node)
+    elif node_attrs.get('type', '') == 'output':
+        for edge_node in node_attrs.get('in_edge_nodes', []):
+            workflow_graph.add_edge(edge_node, node_key)
+
+
+def _add_task_inouts(workflow_graph, node_key, node_attrs):
+    inputs = node_attrs.pop('inputs', [])
+    for input_ in inputs:
+        edge_nodes = input_.get('out_edge_nodes', [])
+        if not edge_nodes:
+            edge_nodes.append(len(workflow_graph.nodes))
+            workflow_graph.add_node(edge_nodes[0], type='input', **input_)
+
+        for edge_node in edge_nodes:
+            workflow_graph.add_edge(edge_node, node_key)
+            if not workflow_graph.edges[edge_node, node_key].get('outputs', []):
+                nx.set_edge_attributes(
+                    workflow_graph, {(edge_node, node_key): {'outputs': []}}
+                )
+            workflow_graph.edges[edge_node, node_key]['outputs'].append(input_)
+
+    outputs = node_attrs.pop('outputs', [])
+    for output_ in outputs:
+        edge_nodes = output_.get('in_edge_node', [])
+        if not edge_nodes:
+            edge_nodes.append(len(workflow_graph.nodes))
+            workflow_graph.add_node(edge_nodes[0], type='output', **output_)
+
+        for edge_node in edge_nodes:
+            workflow_graph.add_edge(node_key, edge_node)
+            if not workflow_graph.edges[node_key, edge_node].get('inputs', []):
+                nx.set_edge_attributes(
+                    workflow_graph, {(node_key, edge_node): {'inputs': []}}
+                )
+            workflow_graph.edges[node_key, edge_node]['inputs'].append(output_)
 
 
 def build_nomad_workflow(
