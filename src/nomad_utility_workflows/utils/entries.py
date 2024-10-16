@@ -213,7 +213,9 @@ def get_entries_of_my_uploads(
     ]
 
 
-@ttl_cache(maxsize=128, ttl=180)
+# @ttl_cache(maxsize=128, ttl=180)
+# ! Had to remove caching because of the use of dict as input
+# ! which was required to reduce the number of inputs for ruff
 def query_entries(
     query_params: QueryParams = default_query_params.copy(),
     url: str = None,

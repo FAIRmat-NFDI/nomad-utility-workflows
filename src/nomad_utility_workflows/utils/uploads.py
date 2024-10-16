@@ -191,9 +191,10 @@ def edit_upload_metadata(
     url_name = get_nomad_url_name(url)
     logger.info('editing the metadata for upload %s on %s server', upload_id, url_name)
     metadata = {'metadata': {}}
+    if 'dataset_id' in upload_metadata.keys():
+        upload_metadata['datasets'] = upload_metadata.pop('dataset_id')
     for key, value in upload_metadata.items():
         metadata['metadata'][key] = value
-
     response = post_nomad_request(
         RequestOptions(
             section=f'/uploads/{upload_id}/edit',

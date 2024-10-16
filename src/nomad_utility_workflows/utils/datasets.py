@@ -61,7 +61,9 @@ def retrieve_datasets(
     url: str = None,
 ) -> list[NomadDataset]:
     parameters = []
-    max_datasets = dataset_params.pop('max_datasets')
+    max_datasets = dataset_params.pop(
+        'max_datasets', default_dataset_params['max_datasets']
+    )
     for key, value in dataset_params.items():
         parameters.append(f'{key}={value}')
     url = get_nomad_url(url)
