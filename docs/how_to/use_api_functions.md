@@ -342,7 +342,7 @@ For example:
 
 ```python
 metadata_new = {'upload_name': 'Test Upload', 'comment': 'This is a test upload...'}
-edit_upload_metadata(upload_id, url='test', **metadata_new)
+edit_upload_metadata(upload_id, url='test', upload_metadata=metadata_new)
 ```
 
 ??? success "output"
@@ -742,7 +742,7 @@ The returned `dataset_id` can then be used to add individual entries (or all ent
 
 ```python
 metadata_new = {'dataset_id': dataset_id}
-edit_upload_metadata(upload_id, url='test', **metadata_new)
+edit_upload_metadata(upload_id, url='test', upload_metadata=metadata_new)
 ```
 
 ??? success "output"
@@ -828,7 +828,7 @@ Alternatively, you can search for datasets, e.g., by `user_id` or `dataset_name`
 
 ```python
 my_datasets = retrieve_datasets(
-    user_id=nomad_user_me.user_id, url='test', max_datasets=20
+    dataset_params={'user_id': nomad_user_me.user_id, 'max_datasets': 20}, url='test'
 )
 pprint(my_datasets)
 ```
@@ -851,7 +851,7 @@ To get the list of entries contained within a dataset, use `query_entries()`:
 
 
 ```python
-dataset_entries = query_entries(dataset_id=dataset_id, url='test')
+dataset_entries = query_entries(query_params={'dataset_id': dataset_id}, url='test')
 for entry in dataset_entries:
     pprint(f'entry_id={entry.entry_id}, upload_id={entry.upload_id}')
 ```

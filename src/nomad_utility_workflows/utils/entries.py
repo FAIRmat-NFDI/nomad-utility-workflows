@@ -3,13 +3,14 @@ import json
 import logging
 from collections.abc import ByteString
 from dataclasses import field
-from typing import Any, Optional
+from typing import Any, Optional, TypedDict
 
 from cachetools.func import ttl_cache
 from marshmallow import Schema, pre_load
 from marshmallow_dataclass import class_schema, dataclass
 
 from nomad_utility_workflows.utils.core import (
+    RequestOptions,
     get_nomad_base_url,
     get_nomad_request,
     get_nomad_url,
@@ -51,6 +52,25 @@ class NomadEntrySchema(Schema):
             get_user_by_id(user_id=v['user_id']).as_dict() for v in data['viewers']
         ]
         return data
+
+
+class QueryParams(TypedDict, total=False):
+    worfklow_name: str
+    program_name: str
+    dataset_id: str
+    origin: str
+    page_size: int
+    max_entries: int
+
+
+default_query_params = {
+    'worfklow_name': None,
+    'program_name': None,
+    'dataset_id': None,
+    'origin': None,
+    'page_size': 10,
+    'max_entries': 50,
+}
 
 
 # ? Should we just make these all optional to avoid the get functions breaking?
@@ -108,7 +128,10 @@ class NomadEntry:
             raise ValueError(
                 f"missing attributes 'upload_id' or 'entry_id' for entry {self}"
             )
-        return f'{self.base_url}/gui/user/uploads/upload/id/{self.upload_id}/entry/id/{self.entry_id}'
+        return (
+            f'{self.base_url}/gui/user/uploads/upload/id/{self.upload_id}/entry/id/'
+            f'{self.entry_id}'
+        )
 
     @property
     def job_id(self) -> Optional[str]:
@@ -142,10 +165,12 @@ def get_entry_by_id(
     url_name = get_nomad_url_name(url)
     logger.info('retrieving entry %s on %s server', entry_id, url_name)
     response = get_nomad_request(
-        f'/entries/{entry_id}',
-        with_authentication=with_authentication,
-        url=url,
-        timeout_in_sec=timeout_in_sec,
+        RequestOptions(
+            section=f'/entries/{entry_id}',
+            with_authentication=with_authentication,
+            url=url,
+            timeout_in_sec=timeout_in_sec,
+        )
     )
     nomad_entry_schema = class_schema(NomadEntry, base_schema=NomadEntrySchema)
     return nomad_entry_schema().load({**response['data'], 'url': url})
@@ -160,12 +185,14 @@ def get_entries_of_upload(
 ) -> list[NomadEntry]:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
-    logger.info(f'retrieving entries for upload {upload_id} on {url_name} server')
+    logger.info('retrieving entries for upload %s on %s server', upload_id, url_name)
     response = get_nomad_request(
-        f'/uploads/{upload_id}/entries',
-        with_authentication=with_authentication,
-        url=url,
-        timeout_in_sec=timeout_in_sec,
+        RequestOptions(
+            section=f'/uploads/{upload_id}/entries',
+            with_authentication=with_authentication,
+            url=url,
+            timeout_in_sec=timeout_in_sec,
+        )
     )
     nomad_entry_schema = class_schema(NomadEntry, base_schema=NomadEntrySchema)
     return [
@@ -186,38 +213,41 @@ def get_entries_of_my_uploads(
     ]
 
 
-# def get_entries_in_database(database_id: str = DEFAULT_DATABASE, use_prod: bool = DEFAULT_USE_PROD) -> list[NomadEntry]:
-#     return query_entries(dataset_id=database_id, use_prod=use_prod)
-
-
-@ttl_cache(maxsize=128, ttl=180)
+# @ttl_cache(maxsize=128, ttl=180)
+# ! Had to remove caching because of the use of dict as input
+# ! which was required to reduce the number of inputs for ruff
 def query_entries(
-    worfklow_name: str = None,
-    program_name: str = None,
-    dataset_id: str = None,
-    origin: str = None,
-    page_size: int = 10,
-    max_entries: int = 50,
+    query_params: QueryParams = default_query_params.copy(),
     url: str = None,
 ) -> list[NomadEntry]:
     json_dict = {
         'query': {},
-        'pagination': {'page_size': page_size},
+        'pagination': {
+            'page_size': query_params.pop(
+                'page_size', default_query_params['page_size']
+            )
+        },
         'required': {'include': ['entry_id']},
     }
     entries = []
+    max_entries = query_params.pop('max_entries', default_query_params['max_entries'])
     while (max_entries > 0 and len(entries) <= max_entries) or (max_entries < 0):
-        if dataset_id:
-            json_dict['query']['datasets'] = {'dataset_id': dataset_id}
-        if worfklow_name:
-            json_dict['query']['results.method'] = {'workflow_name': worfklow_name}
-        if program_name:
+        if 'dataset_id' in query_params.keys():
+            json_dict['query']['datasets'] = {'dataset_id': query_params['dataset_id']}
+        if 'worfklow_name' in query_params.keys():
             json_dict['query']['results.method'] = {
-                'simulation': {'program_name': program_name}
+                'workflow_name': query_params['worfklow_name']
             }
-        if origin:
-            json_dict['query']['origin'] = origin
-        query = post_nomad_request('/entries/query', json_dict=json_dict, url=url)
+        if 'program_name' in query_params.keys():
+            json_dict['query']['results.method'] = {
+                'simulation': {'program_name': query_params['program_name']}
+            }
+        if 'origin' in query_params.keys():
+            json_dict['query']['origin'] = query_params['origin']
+
+        query = post_nomad_request(
+            RequestOptions(section='/entries/query', url=url), json_dict=json_dict
+        )
         entries.extend([q['entry_id'] for q in query['data']])
         next_page_after_value = query['pagination'].get('next_page_after_value', None)
         if next_page_after_value:
@@ -240,10 +270,12 @@ def download_entry_raw_data_by_id(
     url_name = get_nomad_url_name(url)
     logger.info('retrieving raw data of entry ID %s on %s server', entry_id, url_name)
     response = get_nomad_request(
-        f'/entries/{entry_id}/raw?compress=true',
-        with_authentication=with_authentication,
-        url=url,
-        timeout_in_sec=timeout_in_sec,
+        RequestOptions(
+            section=f'/entries/{entry_id}/raw?compress=true',
+            with_authentication=with_authentication,
+            url=url,
+            timeout_in_sec=timeout_in_sec,
+        ),
         return_json=False,
         accept_field='application/zip',
     )
@@ -267,10 +299,12 @@ def download_entry_by_id(
 
     logger.info('retrieving data of entry ID %s on %s server', entry_id, url_name)
     response = get_nomad_request(
-        f'/entries/{entry_id}/archive/download',
-        with_authentication=with_authentication,
-        url=url,
-        timeout_in_sec=timeout_in_sec,
+        RequestOptions(
+            section=f'/entries/{entry_id}/archive/download',
+            with_authentication=with_authentication,
+            url=url,
+            timeout_in_sec=timeout_in_sec,
+        )
     )
 
     if zip_file_name is not None:

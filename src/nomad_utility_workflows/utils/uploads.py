@@ -1,12 +1,13 @@
 import datetime as dt
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, TypedDict
 
 from cachetools.func import ttl_cache
 from marshmallow import Schema, pre_load
 from marshmallow_dataclass import class_schema, dataclass
 
 from nomad_utility_workflows.utils.core import (
+    RequestOptions,
     delete_nomad_request,
     get_nomad_base_url,
     get_nomad_request,
@@ -29,6 +30,15 @@ class NomadUploadSchema(Schema):
         ]
         data['viewers'] = [get_user_by_id(user_id=v).as_dict() for v in data['viewers']]
         return data
+
+
+class UploadMetadata(TypedDict, total=False):
+    upload_name: str
+    references: list[str]
+    dataset_id: str
+    embargo_length: float
+    coauthors_ids: list[str]
+    comment: str
 
 
 @dataclass(frozen=True)
@@ -85,10 +95,12 @@ def get_all_my_uploads(url: str = None, timeout_in_sec: int = 10) -> list[NomadU
     url_name = get_nomad_url_name(url)
     logger.info('retrieving all uploads on %s server', url_name)
     response = get_nomad_request(
-        '/uploads',
-        url=url,
-        with_authentication=True,
-        timeout_in_sec=timeout_in_sec,
+        RequestOptions(
+            section='/uploads',
+            url=url,
+            with_authentication=True,
+            timeout_in_sec=timeout_in_sec,
+        )
     )
     upload_class_schema = class_schema(NomadUpload, base_schema=NomadUploadSchema)
     return [upload_class_schema().load({**r, 'url': url}) for r in response['data']]
@@ -101,10 +113,12 @@ def get_upload_by_id(
     url_name = get_nomad_url_name(url)
     logger.info('retrieving upload %s on %s server', upload_id, url_name)
     response = get_nomad_request(
-        f'/uploads/{upload_id}',
-        url=url,
-        with_authentication=True,
-        timeout_in_sec=timeout_in_sec,
+        RequestOptions(
+            section=f'/uploads/{upload_id}',
+            url=url,
+            with_authentication=True,
+            timeout_in_sec=timeout_in_sec,
+        )
     )
     upload_class_schema = class_schema(NomadUpload, base_schema=NomadUploadSchema)
     return upload_class_schema().load({**response['data'], 'url': url})
@@ -117,10 +131,12 @@ def delete_upload(
     url_name = get_nomad_url_name(url)
     logger.info(f'deleting upload {upload_id} on {url_name} server')
     response = delete_nomad_request(
-        f'/uploads/{upload_id}',
-        with_authentication=True,
-        url=url,
-        timeout_in_sec=timeout_in_sec,
+        RequestOptions(
+            section=f'/uploads/{upload_id}',
+            with_authentication=True,
+            url=url,
+            timeout_in_sec=timeout_in_sec,
+        )
     )
     upload_class_schema = class_schema(NomadUpload, base_schema=NomadUploadSchema)
     return upload_class_schema().load({**response['data'], 'url': url})
@@ -134,11 +150,13 @@ def upload_files_to_nomad(
     logger.info('uploading file %s on %s server', filename, url_name)
     with open(filename, 'rb') as f:
         response = post_nomad_request(
-            '/uploads',
-            with_authentication=True,
+            RequestOptions(
+                section='/uploads',
+                with_authentication=True,
+                url=url,
+                timeout_in_sec=timeout_in_sec,
+            ),
             data=f,
-            url=url,
-            timeout_in_sec=timeout_in_sec,
         )
     upload_id = response.get('upload_id')
     if upload_id:
@@ -153,22 +171,19 @@ def publish_upload(upload_id: str, url: str = None, timeout_in_sec: int = 10) ->
     url_name = get_nomad_url_name(url)
     logger.info('publishing upload %s on %s server', upload_id, url_name)
     response = post_nomad_request(
-        f'/uploads/{upload_id}/action/publish',
-        with_authentication=True,
-        url=url,
-        timeout_in_sec=timeout_in_sec,
+        RequestOptions(
+            section=f'/uploads/{upload_id}/action/publish',
+            with_authentication=True,
+            url=url,
+            timeout_in_sec=timeout_in_sec,
+        )
     )
     return response
 
 
 def edit_upload_metadata(
     upload_id: str,
-    upload_name: Optional[str] = None,
-    references: Optional[list[str]] = None,
-    dataset_id: Optional[str] = None,
-    embargo_length: Optional[float] = None,
-    coauthors_ids: Optional[list[str]] = None,
-    comment: Optional[str] = None,
+    upload_metadata: UploadMetadata = {},
     url: str = None,
     timeout_in_sec: int = 10,
 ) -> dict:
@@ -176,23 +191,17 @@ def edit_upload_metadata(
     url_name = get_nomad_url_name(url)
     logger.info('editing the metadata for upload %s on %s server', upload_id, url_name)
     metadata = {'metadata': {}}
-    if upload_name:
-        metadata['metadata']['upload_name'] = upload_name
-    if references:
-        metadata['metadata']['references'] = references
-    if dataset_id:
-        metadata['metadata']['datasets'] = dataset_id
-    if embargo_length:
-        metadata['metadata']['embargo_length'] = embargo_length
-    if coauthors_ids:
-        metadata['metadata']['coauthors'] = coauthors_ids
-    if comment:
-        metadata['metadata']['comment'] = comment
+    if 'dataset_id' in upload_metadata.keys():
+        upload_metadata['datasets'] = upload_metadata.pop('dataset_id')
+    for key, value in upload_metadata.items():
+        metadata['metadata'][key] = value
     response = post_nomad_request(
-        f'/uploads/{upload_id}/edit',
-        url=url,
-        with_authentication=True,
+        RequestOptions(
+            section=f'/uploads/{upload_id}/edit',
+            url=url,
+            with_authentication=True,
+            timeout_in_sec=timeout_in_sec,
+        ),
         json_dict=metadata,
-        timeout_in_sec=timeout_in_sec,
     )
     return response

@@ -1,11 +1,12 @@
 import datetime as dt
 import logging
-from typing import Optional
+from typing import Optional, TypedDict
 
 from marshmallow import Schema, pre_load
 from marshmallow_dataclass import class_schema, dataclass
 
 from nomad_utility_workflows.utils.core import (
+    RequestOptions,
     delete_nomad_request,
     get_nomad_request,
     get_nomad_url,
@@ -25,6 +26,23 @@ class NomadDatasetSchema(Schema):
         return data
 
 
+class DatasetParams(TypedDict, total=False):
+    dataset_id: str
+    dataset_name: str
+    user_id: str
+    page_size: int
+    max_datasets: int
+
+
+default_dataset_params = {
+    'dataset_id': None,
+    'dataset_name': None,
+    'user_id': None,
+    'page_size': 10,
+    'max_datasets': 50,
+}
+
+
 @dataclass(frozen=True)
 class NomadDataset:
     dataset_id: str
@@ -39,21 +57,15 @@ class NomadDataset:
 
 
 def retrieve_datasets(
-    dataset_id: str = None,
-    dataset_name: str = None,
-    user_id: str = None,
-    page_size: int = 10,
-    max_datasets: int = 50,
+    dataset_params: DatasetParams = default_dataset_params.copy(),
     url: str = None,
 ) -> list[NomadDataset]:
     parameters = []
-    if dataset_id:
-        parameters.append(f'dataset_id={dataset_id}')
-    if dataset_name:
-        parameters.append(f'dataset_name={dataset_name}')
-    if user_id:
-        parameters.append(f'user_id={user_id}')
-    parameters.append(f'page_size={page_size}')
+    max_datasets = dataset_params.pop(
+        'max_datasets', default_dataset_params['max_datasets']
+    )
+    for key, value in dataset_params.items():
+        parameters.append(f'{key}={value}')
     url = get_nomad_url(url)
     section = '/datasets/'
     if len(parameters) > 0:
@@ -70,7 +82,9 @@ def retrieve_datasets(
             if page_after_value
             else section
         )
-        response = get_nomad_request(section, headers=headers, url=url)
+        response = get_nomad_request(
+            RequestOptions(section=section, headers=headers, url=url)
+        )
         if len(response['data']) == 0:
             break
         datasets.extend([nomad_entry_schema().load(d) for d in response['data']])
@@ -81,7 +95,7 @@ def retrieve_datasets(
 
 
 def get_dataset_by_id(dataset_id: str, url: str = None) -> NomadDataset:
-    datasets = retrieve_datasets(dataset_id=dataset_id, url=url)
+    datasets = retrieve_datasets(DatasetParams(dataset_id=dataset_id), url=url)
     if len(datasets) != 1:
         raise ValueError(f'Problem retrieving dataset {dataset_id}: {datasets}')
     return datasets[0]
@@ -93,11 +107,13 @@ def create_dataset(dataset_name: str, url: str = None, timeout_in_sec: int = 10)
     logger.info('creating dataset name %s on %s server', dataset_name, url_name)
     json_dict = {'dataset_name': dataset_name}
     response = post_nomad_request(
-        '/datasets/',
-        with_authentication=True,
+        RequestOptions(
+            section='/datasets/',
+            with_authentication=True,
+            url=url,
+            timeout_in_sec=timeout_in_sec,
+        ),
         json_dict=json_dict,
-        url=url,
-        timeout_in_sec=timeout_in_sec,
     )
     return response.get('dataset_id')
 
@@ -107,10 +123,12 @@ def delete_dataset(dataset_id: str, url: str = None, timeout_in_sec: int = 10) -
     url_name = get_nomad_url_name(url)
     logger.info('deleting dataset %s on %s server', dataset_id, url_name)
     response = delete_nomad_request(
-        f'/datasets/{dataset_id}',
-        with_authentication=True,
-        url=url,
-        timeout_in_sec=timeout_in_sec,
+        RequestOptions(
+            section=f'/datasets/{dataset_id}',
+            with_authentication=True,
+            url=url,
+            timeout_in_sec=timeout_in_sec,
+        )
     )
     if response.get('dataset_id'):
         logger.info('successfully deleted dataset %s', dataset_id)

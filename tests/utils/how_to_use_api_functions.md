@@ -223,7 +223,9 @@ You can make an upload using the `upload_files_to_nomad()` function with input `
 
 
 ```python
-test_upload_fnm = './test.zip' # a dummy upload file containing a single empty json file
+test_upload_fnm = (
+    './test.zip'  # a dummy upload file containing a single empty json file
+)
 ```
 
 
@@ -235,7 +237,7 @@ upload_id
 
 
 
-    'RdA_3ZsOTMqbtAhYLivVsw'
+    'e2b5o4KSR5yoS1EV9E9jXQ'
 
 
 
@@ -250,13 +252,13 @@ nomad_upload = get_upload_by_id(upload_id, url='test')
 pprint(nomad_upload)
 ```
 
-    NomadUpload(upload_id='RdA_3ZsOTMqbtAhYLivVsw',
-                upload_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 378000),
+    NomadUpload(upload_id='e2b5o4KSR5yoS1EV9E9jXQ',
+                upload_create_time=datetime.datetime(2024, 10, 16, 10, 14, 57, 722000),
                 main_author=NomadUser(name='Joseph Rudzinski'),
-                process_running=False,
+                process_running=True,
                 current_process='process_upload',
-                process_status='SUCCESS',
-                last_status_message='Process process_upload completed successfully',
+                process_status='RUNNING',
+                last_status_message='Cleanup',
                 errors=[],
                 warnings=[],
                 coauthors=[],
@@ -274,7 +276,7 @@ pprint(nomad_upload)
                 license='CC BY 4.0',
                 entries=1,
                 n_entries=None,
-                upload_files_server_path='/nomad/test/fs/staging/R/RdA_3ZsOTMqbtAhYLivVsw',
+                upload_files_server_path='/nomad/test/fs/staging/e/e2b5o4KSR5yoS1EV9E9jXQ',
                 publish_time=None,
                 references=None,
                 datasets=None,
@@ -282,7 +284,7 @@ pprint(nomad_upload)
                 upload_name=None,
                 comment=None,
                 url='https://nomad-lab.eu/prod/v1/test/api/v1',
-                complete_time=datetime.datetime(2024, 10, 15, 20, 2, 11, 320000))
+                complete_time=None)
 
 
 One common usage of this function is to ensure that an upload has been processed successfully before making a subsequent action on it, e.g., editing the metadata or publishing. For this purpose, one could require the `process_running==False` or `process_status='SUCCESS'`, e.g.:
@@ -330,22 +332,22 @@ For example:
 
 ```python
 metadata_new = {'upload_name': 'Test Upload', 'comment': 'This is a test upload...'}
-edit_upload_metadata(upload_id, url='test', **metadata_new)
+edit_upload_metadata(upload_id, url='test', upload_metadata=metadata_new)
 ```
 
 
 
 
-    {'upload_id': 'RdA_3ZsOTMqbtAhYLivVsw',
+    {'upload_id': 'e2b5o4KSR5yoS1EV9E9jXQ',
      'data': {'process_running': True,
       'current_process': 'edit_upload_metadata',
       'process_status': 'PENDING',
       'last_status_message': 'Pending: edit_upload_metadata',
       'errors': [],
       'warnings': [],
-      'complete_time': '2024-10-15T20:02:11.320000',
-      'upload_id': 'RdA_3ZsOTMqbtAhYLivVsw',
-      'upload_create_time': '2024-10-15T20:02:10.378000',
+      'complete_time': '2024-10-16T10:14:58.322000',
+      'upload_id': 'e2b5o4KSR5yoS1EV9E9jXQ',
+      'upload_create_time': '2024-10-16T10:14:57.722000',
       'main_author': '8f052e1f-1906-41fd-b2eb-690c03407788',
       'coauthors': [],
       'coauthor_groups': [],
@@ -361,7 +363,7 @@ edit_upload_metadata(upload_id, url='test', **metadata_new)
       'embargo_length': 0,
       'license': 'CC BY 4.0',
       'entries': 1,
-      'upload_files_server_path': '/nomad/test/fs/staging/R/RdA_3ZsOTMqbtAhYLivVsw'}}
+      'upload_files_server_path': '/nomad/test/fs/staging/e/e2b5o4KSR5yoS1EV9E9jXQ'}}
 
 
 
@@ -439,8 +441,8 @@ for entry in entries:
     pprint(f'entry_id={entry.entry_id}')
 ```
 
-    'Entries within upload_id=RdA_3ZsOTMqbtAhYLivVsw:'
-    'entry_id=Htbl78lHDSNAKbvPjEgEN_6sOcxF'
+    'Entries within upload_id=e2b5o4KSR5yoS1EV9E9jXQ:'
+    'entry_id=u4qPSfILguvJ9fabpklMTxbUJ7x2'
 
 
 To query an entry directly using the `entry_id`, use `get_entry_by_id()`:
@@ -454,7 +456,7 @@ entry
 
 
 
-    NomadEntry(entry_id='Htbl78lHDSNAKbvPjEgEN_6sOcxF', upload_id='RdA_3ZsOTMqbtAhYLivVsw', references=[], origin='Joseph Rudzinski', n_quantities=0, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 378000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 752000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='Htbl78lHDSNAKbvPjEgEN_6sOcxF', published=False, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 543000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=None, entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1')
+    NomadEntry(entry_id='u4qPSfILguvJ9fabpklMTxbUJ7x2', upload_id='e2b5o4KSR5yoS1EV9E9jXQ', references=[], origin='Joseph Rudzinski', n_quantities=0, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 16, 10, 14, 57, 722000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 16, 10, 14, 58, 23000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='u4qPSfILguvJ9fabpklMTxbUJ7x2', published=False, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 16, 10, 14, 57, 855000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=None, entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1')
 
 
 
@@ -463,7 +465,10 @@ You can download the full (meta)data stored in an entry using `download_entry_by
 
 ```python
 test = download_entry_by_id(
-    entry.entry_id, url='test', zip_file_name='./raw_entry_data.zip', with_authentication=True
+    entry.entry_id,
+    url='test',
+    zip_file_name='./raw_entry_data.zip',
+    with_authentication=True,
 )
 test
 ```
@@ -477,9 +482,9 @@ test
        'process_worker_id': 'BOiybXorRqW5XImFf0SyoA',
        'parser': 'parsers/archive',
        'logger': 'nomad.processing',
-       'timestamp': '2024-10-15 20:02.10',
+       'timestamp': '2024-10-16 10:14.57',
        'level': 'DEBUG'},
-      {'exec_time': '0.001298666000366211',
+      {'exec_time': '0.0013990402221679688',
        'input_size': '3',
        'event': 'parser executed',
        'proc': 'Entry',
@@ -488,7 +493,7 @@ test
        'parser': 'parsers/archive',
        'step': 'parsers/archive',
        'logger': 'nomad.processing',
-       'timestamp': '2024-10-15 20:02.10',
+       'timestamp': '2024-10-16 10:14.58',
        'level': 'INFO'},
       {'normalizer': 'MetainfoNormalizer',
        'step': 'MetainfoNormalizer',
@@ -498,9 +503,9 @@ test
        'process_worker_id': 'BOiybXorRqW5XImFf0SyoA',
        'parser': 'parsers/archive',
        'logger': 'nomad.processing',
-       'timestamp': '2024-10-15 20:02.10',
+       'timestamp': '2024-10-16 10:14.58',
        'level': 'INFO'},
-      {'exec_time': '0.0011508464813232422',
+      {'exec_time': '0.0006549358367919922',
        'input_size': '3',
        'event': 'normalizer executed',
        'proc': 'Entry',
@@ -510,7 +515,7 @@ test
        'normalizer': 'MetainfoNormalizer',
        'step': 'MetainfoNormalizer',
        'logger': 'nomad.processing',
-       'timestamp': '2024-10-15 20:02.10',
+       'timestamp': '2024-10-16 10:14.58',
        'level': 'INFO'},
       {'normalizer': 'ResultsNormalizer',
        'step': 'ResultsNormalizer',
@@ -520,9 +525,9 @@ test
        'process_worker_id': 'BOiybXorRqW5XImFf0SyoA',
        'parser': 'parsers/archive',
        'logger': 'nomad.processing',
-       'timestamp': '2024-10-15 20:02.10',
+       'timestamp': '2024-10-16 10:14.58',
        'level': 'INFO'},
-      {'exec_time': '0.0011796951293945312',
+      {'exec_time': '0.0005123615264892578',
        'input_size': '3',
        'event': 'normalizer executed',
        'proc': 'Entry',
@@ -532,32 +537,32 @@ test
        'normalizer': 'ResultsNormalizer',
        'step': 'ResultsNormalizer',
        'logger': 'nomad.processing',
-       'timestamp': '2024-10-15 20:02.10',
+       'timestamp': '2024-10-16 10:14.58',
        'level': 'INFO'},
-      {'exec_time': '0.002213716506958008',
+      {'exec_time': '0.0015552043914794922',
        'event': 'entry metadata saved',
        'proc': 'Entry',
        'process': 'process_entry',
        'process_worker_id': 'BOiybXorRqW5XImFf0SyoA',
        'parser': 'parsers/archive',
        'logger': 'nomad.processing',
-       'timestamp': '2024-10-15 20:02.10',
+       'timestamp': '2024-10-16 10:14.58',
        'level': 'INFO'},
-      {'exec_time': '0.07823586463928223',
+      {'exec_time': '0.09751391410827637',
        'event': 'entry metadata indexed',
        'proc': 'Entry',
        'process': 'process_entry',
        'process_worker_id': 'BOiybXorRqW5XImFf0SyoA',
        'parser': 'parsers/archive',
        'logger': 'nomad.processing',
-       'timestamp': '2024-10-15 20:02.10',
+       'timestamp': '2024-10-16 10:14.58',
        'level': 'INFO'}],
-     'metadata': {'upload_id': 'RdA_3ZsOTMqbtAhYLivVsw',
-      'upload_create_time': '2024-10-15T20:02:10.378000+00:00',
-      'entry_id': 'Htbl78lHDSNAKbvPjEgEN_6sOcxF',
+     'metadata': {'upload_id': 'e2b5o4KSR5yoS1EV9E9jXQ',
+      'upload_create_time': '2024-10-16T10:14:57.722000+00:00',
+      'entry_id': 'u4qPSfILguvJ9fabpklMTxbUJ7x2',
       'entry_name': 'test.archive.json',
       'entry_hash': 't6Zf68GLfrWxWRAIQu7QAY8LVmlL',
-      'entry_create_time': '2024-10-15T20:02:10.543000+00:00',
+      'entry_create_time': '2024-10-16T10:14:57.855000+00:00',
       'parser_name': 'parsers/archive',
       'mainfile': 'test.archive.json',
       'text_search_contents': [],
@@ -567,7 +572,7 @@ test
       'embargo_length': 0,
       'license': 'CC BY 4.0',
       'processed': True,
-      'last_processing_time': '2024-10-15T20:02:10.752287+00:00',
+      'last_processing_time': '2024-10-16T10:14:58.023933+00:00',
       'processing_errors': [],
       'nomad_version': '1.3.7.dev55+ge83de27b3',
       'nomad_commit': '',
@@ -627,9 +632,9 @@ test
        'nomad.datamodel.results.Properties',
        'nomad.datamodel.results.Results'],
       'entry_timestamp': {'token_seed': 't6Zf68GLfrWxWRAIQu7QAY8LVmlL',
-       'token': 'MIIEQwYJKoZIhvcNAQcCoIIENDCCBDACAQMxDTALBglghkgBZQMEAgEwfAYLKoZIhvcNAQkQAQSgbQRrMGkCAQEGDCsGAQQBga0hgiwWATAvMAsGCWCGSAFlAwQCAQQgYnRB2tk2mTRtMamyedr2QFd3bb0lFM56N52xD8rv/OECFFIumicGBkskyLovIs3OBywh3EXbGA8yMDI0MTAxNTIwMDIxMFoxggOcMIIDmAIBATCBnjCBjTELMAkGA1UEBhMCREUxRTBDBgNVBAoMPFZlcmVpbiB6dXIgRm9lcmRlcnVuZyBlaW5lcyBEZXV0c2NoZW4gRm9yc2NodW5nc25ldHplcyBlLiBWLjEQMA4GA1UECwwHREZOLVBLSTElMCMGA1UEAwwcREZOLVZlcmVpbiBHbG9iYWwgSXNzdWluZyBDQQIMKQLVczMPeOL0nrS5MAsGCWCGSAFlAwQCAaCB0TAaBgkqhkiG9w0BCQMxDQYLKoZIhvcNAQkQAQQwHAYJKoZIhvcNAQkFMQ8XDTI0MTAxNTIwMDIxMFowKwYJKoZIhvcNAQk0MR4wHDALBglghkgBZQMEAgGhDQYJKoZIhvcNAQELBQAwLwYJKoZIhvcNAQkEMSIEIMF/vhL+ddm6reCVHQgPz5FLJYZKE3ag+HqzfGTfwTvPMDcGCyqGSIb3DQEJEAIvMSgwJjAkMCIEILYIjb3dCJjTSQeNfCMyp07MhBQMoINZ8CNXJUbPboLkMA0GCSqGSIb3DQEBCwUABIICAJSu4GSAVDGNwuA+Kr5Qhi7rrcQcZpAcA2TOotKVS9b8wDyCE+J7IwobbVDIVURsa0b9QsReNUZHc+U9TmlWGprwY1j1BVy+ccXNg2U2Uf0dMrnOzVWfPNAoMT1iv9tK3kMwq2Gal35yh/Arrp+XYMmLfKFRZpzNcjz0TFokjCFbrPxreLCHgSnPWy3VHncNWghyMg6Nxq0rUwvV7dp7cjt1R9Ky6eHdxQvyMmVuSRbTetg+B43KkrYXoqGNGVEqiaScZWJswM5jFApNquUZnOuRl4/bhABNGWpLXQRxDz2r4Bqvgz4DfQt/8EPg7YvWNWNzfw+oPXgh5dDqKW9DiKoa0U2J1+/YKnBcdJefDsyZHnOcXOAIaX/f8k9Wg90v+c/WrbSjbfYMMhJBGqKYgU6DAeh7p7DZQNeDS4qspVWaTb10zgxmnkCbtqzmlzJvY4pOnjirVHfMFyXxL1rkXG91swhjK6FnL/okQKVT2tGQHC4I15VnEmrhit/ptXJHpWABO6TKJCW4oCgUdxUBPMT3bY7RaT3Fe+XzjjRuau0dVd2bYIbUTlrGFBUjJf+9Zuj145FdqdSjezx7NaIy7zsF1wV/e9feu6vbu3kEu32hZOT7Agw/Ryqrqgx4KuJuelOlwTljeQVHUfblr6yhwNDzdxufsQyAbJAvRUS2tyMk',
+       'token': 'MIIERAYJKoZIhvcNAQcCoIIENTCCBDECAQMxDTALBglghkgBZQMEAgEwfQYLKoZIhvcNAQkQAQSgbgRsMGoCAQEGDCsGAQQBga0hgiwWATAvMAsGCWCGSAFlAwQCAQQgYnRB2tk2mTRtMamyedr2QFd3bb0lFM56N52xD8rv/OECFQDfPonFJHlhxHevtRkQ/Z85hZIntRgPMjAyNDEwMTYxMDE0NTdaMYIDnDCCA5gCAQEwgZ4wgY0xCzAJBgNVBAYTAkRFMUUwQwYDVQQKDDxWZXJlaW4genVyIEZvZXJkZXJ1bmcgZWluZXMgRGV1dHNjaGVuIEZvcnNjaHVuZ3NuZXR6ZXMgZS4gVi4xEDAOBgNVBAsMB0RGTi1QS0kxJTAjBgNVBAMMHERGTi1WZXJlaW4gR2xvYmFsIElzc3VpbmcgQ0ECDCkC1XMzD3ji9J60uTALBglghkgBZQMEAgGggdEwGgYJKoZIhvcNAQkDMQ0GCyqGSIb3DQEJEAEEMBwGCSqGSIb3DQEJBTEPFw0yNDEwMTYxMDE0NTdaMCsGCSqGSIb3DQEJNDEeMBwwCwYJYIZIAWUDBAIBoQ0GCSqGSIb3DQEBCwUAMC8GCSqGSIb3DQEJBDEiBCA6s2JcwOqwu7132Qqq//qLCZ/RvK+vbG2KEmFaDWTOezA3BgsqhkiG9w0BCRACLzEoMCYwJDAiBCC2CI293QiY00kHjXwjMqdOzIQUDKCDWfAjVyVGz26C5DANBgkqhkiG9w0BAQsFAASCAgBq9WFjtr/M3uah2LM9SuT7Mg/clX91fkKHk+/a+Y4gZGzOGdeE4P3AlHKDsNmOqghgvX7EVXgMadc+Hyf72YGNaqrca3BFYivuI4NqbjX7+wC9vq0SZIn+5d3TBCCZisZmAtZHTj7+KZpD071qGLMmsaCi+qOTQExgB0G7DRYeGibq3slZXKTr2wY8frQDB6M36y69nPgovO4azvy+553w2EQQkAGfemSxz78S9A2jcV9frKxOIGXUb5R/FVYGfJfCM/C+d35iUGisi9ZWHl0PvSe2Zzwv+4UQRr4ljEGrnfDkdKrV1ZluxerBNrzxcYU+DpWUPs8NZdfQibSkmc9aMwvznrqB4GL3iW+8RrQrGSgiIm84HKlYp6TNCWldlGlV3Xfgo+6AO3hZv5v7tiM7GWLL6/fFi4IRPaIGCldL9D0Yun6U95vaiy+jRT1yzZx4pPlgM3JbSp4z/BkmTURBhHySUsr91LkB8OAiS5LKEZye7qJTuBdI9Ny7TNB050c5+mmfv/TKmbExIZoYvChXQKCUMCCLLSFmxN4eoVvwULziEaJd+d6e94QoEJjc3Queb/15zT0yP6X/alokIVhi3AhkHUwkFWCJlg/d9UsdiXZYe3JfzAHxwslS204ohwSQ6NhSvKIUN1ybb19ChR+QqA1JEyv33DKGAr5BPpN72A==',
        'tsa_server': 'http://zeitstempel.dfn.de',
-       'timestamp': '2024-10-15T20:02:10+00:00'},
+       'timestamp': '2024-10-16T10:14:57+00:00'},
       'section_defs': [{'definition_qualified_name': 'nomad.datamodel.data.ArchiveSection',
         'definition_id': '7047cbff9980abff17cce4b1b6b0d1c783505b7f',
         'used_directly': True},
@@ -668,17 +673,17 @@ published_upload
 
 
 
-    {'upload_id': 'RdA_3ZsOTMqbtAhYLivVsw',
+    {'upload_id': 'e2b5o4KSR5yoS1EV9E9jXQ',
      'data': {'process_running': True,
       'current_process': 'publish_upload',
       'process_status': 'PENDING',
       'last_status_message': 'Pending: publish_upload',
       'errors': [],
       'warnings': [],
-      'complete_time': '2024-10-15T20:03:51.605000',
-      'upload_id': 'RdA_3ZsOTMqbtAhYLivVsw',
+      'complete_time': '2024-10-16T10:14:59.363000',
+      'upload_id': 'e2b5o4KSR5yoS1EV9E9jXQ',
       'upload_name': 'Test Upload',
-      'upload_create_time': '2024-10-15T20:02:10.378000',
+      'upload_create_time': '2024-10-16T10:14:57.722000',
       'main_author': '8f052e1f-1906-41fd-b2eb-690c03407788',
       'coauthors': [],
       'coauthor_groups': [],
@@ -694,7 +699,7 @@ published_upload
       'embargo_length': 0,
       'license': 'CC BY 4.0',
       'entries': 1,
-      'upload_files_server_path': '/nomad/test/fs/staging/R/RdA_3ZsOTMqbtAhYLivVsw'}}
+      'upload_files_server_path': '/nomad/test/fs/staging/e/e2b5o4KSR5yoS1EV9E9jXQ'}}
 
 
 
@@ -714,7 +719,7 @@ dataset_id
 
 
 
-    'NCKd75f9R9S8rnkd-GBZlg'
+    'EfhadCxpRaGpw50rWzK22w'
 
 
 
@@ -723,23 +728,23 @@ The returned `dataset_id` can then be used to add individual entries (or all ent
 
 ```python
 metadata_new = {'dataset_id': dataset_id}
-edit_upload_metadata(upload_id, url='test', **metadata_new)
+edit_upload_metadata(upload_id, url='test', upload_metadata=metadata_new)
 ```
 
 
 
 
-    {'upload_id': 'RdA_3ZsOTMqbtAhYLivVsw',
+    {'upload_id': 'e2b5o4KSR5yoS1EV9E9jXQ',
      'data': {'process_running': True,
       'current_process': 'edit_upload_metadata',
       'process_status': 'PENDING',
       'last_status_message': 'Pending: edit_upload_metadata',
       'errors': [],
       'warnings': [],
-      'complete_time': '2024-10-15T20:09:28.769000',
-      'upload_id': 'RdA_3ZsOTMqbtAhYLivVsw',
+      'complete_time': '2024-10-16T10:15:04.112000',
+      'upload_id': 'e2b5o4KSR5yoS1EV9E9jXQ',
       'upload_name': 'Test Upload',
-      'upload_create_time': '2024-10-15T20:02:10.378000',
+      'upload_create_time': '2024-10-16T10:14:57.722000',
       'main_author': '8f052e1f-1906-41fd-b2eb-690c03407788',
       'coauthors': [],
       'coauthor_groups': [],
@@ -751,7 +756,7 @@ edit_upload_metadata(upload_id, url='test', **metadata_new)
       'viewer_groups': [],
       'published': True,
       'published_to': [],
-      'publish_time': '2024-10-15T20:09:28.757000',
+      'publish_time': '2024-10-16T10:15:04.099000',
       'with_embargo': False,
       'embargo_length': 0,
       'license': 'CC BY 4.0',
@@ -797,7 +802,7 @@ nomad_dataset
 
 
 
-    NomadDataset(dataset_id='NCKd75f9R9S8rnkd-GBZlg', dataset_create_time=datetime.datetime(2024, 10, 15, 20, 10, 17, 568000), dataset_name='test dataset', dataset_type='owned', dataset_modified_time=datetime.datetime(2024, 10, 15, 20, 10, 17, 568000), user=NomadUser(name='Joseph Rudzinski'), doi=None, pid=None, m_annotations=None)
+    NomadDataset(dataset_id='EfhadCxpRaGpw50rWzK22w', dataset_create_time=datetime.datetime(2024, 10, 16, 10, 15, 5, 240000), dataset_name='test dataset', dataset_type='owned', dataset_modified_time=datetime.datetime(2024, 10, 16, 10, 15, 5, 240000), user=NomadUser(name='Joseph Rudzinski'), doi=None, pid=None, m_annotations=None)
 
 
 
@@ -806,16 +811,16 @@ Alternatively, you can search for datasets, e.g., by `user_id` or `dataset_name`
 
 ```python
 my_datasets = retrieve_datasets(
-    user_id=nomad_user_me.user_id, url='test', max_datasets=20
+    dataset_params={'user_id': nomad_user_me.user_id, 'max_datasets': 20}, url='test'
 )
 pprint(my_datasets)
 ```
 
-    [NomadDataset(dataset_id='NCKd75f9R9S8rnkd-GBZlg',
-                  dataset_create_time=datetime.datetime(2024, 10, 15, 20, 10, 17, 568000),
+    [NomadDataset(dataset_id='EfhadCxpRaGpw50rWzK22w',
+                  dataset_create_time=datetime.datetime(2024, 10, 16, 10, 15, 5, 240000),
                   dataset_name='test dataset',
                   dataset_type='owned',
-                  dataset_modified_time=datetime.datetime(2024, 10, 15, 20, 10, 17, 568000),
+                  dataset_modified_time=datetime.datetime(2024, 10, 16, 10, 15, 5, 240000),
                   user=NomadUser(name='Joseph Rudzinski'),
                   doi=None,
                   pid=None,
@@ -826,12 +831,12 @@ To get the list of entries contained within a dataset, use `query_entries()`:
 
 
 ```python
-dataset_entries = query_entries(dataset_id=dataset_id, url='test')
+dataset_entries = query_entries(query_params={'dataset_id': dataset_id}, url='test')
 for entry in dataset_entries:
     pprint(f'entry_id={entry.entry_id}, upload_id={entry.upload_id}')
 ```
 
-    'entry_id=Htbl78lHDSNAKbvPjEgEN_6sOcxF, upload_id=RdA_3ZsOTMqbtAhYLivVsw'
+    'entry_id=u4qPSfILguvJ9fabpklMTxbUJ7x2, upload_id=e2b5o4KSR5yoS1EV9E9jXQ'
 
 
 There is no "publishing" action for datasets. Instead, when the dataset is complete (i.e., you are ready to lock the contents of the dataset), you can *assign a DOI*. There is currently no API action for this within nomad-utility-workflows. You must go to the GUI of the relevant deployment, go to `PUBLISH > Datasets`, find the dataset, and then click the "assign a DOI" banner icon to the right of the dataset entry.
@@ -881,7 +886,7 @@ except Exception:
     pprint(f'Upload with upload_id={upload_id} was deleted successfully.')
 ```
 
-    'Upload with upload_id=zpq-JTzWQJ63jtSOlbueKA was deleted successfully.'
+    'Upload with upload_id=Mfp1OnhMSY65eZCfNvS8DA was deleted successfully.'
 
 
 **create dataset, check for success, delete, check for success**:
@@ -911,7 +916,7 @@ except Exception:
     pprint(f'Dataset with dataset_id={dataset_id} was deleted successfully.')
 ```
 
-    'Dataset with dataset_id=eT2WPkfCQgmwNadsurYz0A was deleted successfully.'
+    'Dataset with dataset_id=Cke5DQkdQ0qbLOky2zGfLw was deleted successfully.'
 
 
 ## Useful Wrappers
@@ -930,7 +935,12 @@ get_all_my_uploads(url='test')
      NomadUpload(upload_id='DN61X4r7SCyzm5q1kxcEcw', upload_create_time=datetime.datetime(2024, 10, 14, 10, 55, 12, 410000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='publish_upload', process_status='SUCCESS', last_status_message='Process publish_upload completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 14, 10, 55, 23, 52000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 14, 10, 55, 23, 65000)),
      NomadUpload(upload_id='z4QvhZ7qSCmgIFv_qJqlyQ', upload_create_time=datetime.datetime(2024, 10, 14, 20, 20, 38, 757000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='edit_upload_metadata', process_status='SUCCESS', last_status_message='Process edit_upload_metadata completed successfully', errors=[], warnings=[], coauthors=['7c85bdf1-8b53-40a8-81a4-04f26ff56f29'], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski'), NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski'), NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 15, 6, 18, 27, 700000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 15, 6, 22, 33, 45000)),
      NomadUpload(upload_id='GJdVAOCxRVe-Cwo3qMz9Kg', upload_create_time=datetime.datetime(2024, 10, 15, 10, 48, 44, 337000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='edit_upload_metadata', process_status='SUCCESS', last_status_message='Process edit_upload_metadata completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 15, 10, 49, 24, 4000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 15, 10, 49, 30, 962000)),
-     NomadUpload(upload_id='RdA_3ZsOTMqbtAhYLivVsw', upload_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 378000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='edit_upload_metadata', process_status='SUCCESS', last_status_message='Process edit_upload_metadata completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 15, 20, 9, 28, 757000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 15, 20, 10, 33, 141000))]
+     NomadUpload(upload_id='RdA_3ZsOTMqbtAhYLivVsw', upload_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 378000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='edit_upload_metadata', process_status='SUCCESS', last_status_message='Process edit_upload_metadata completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 15, 20, 9, 28, 757000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 15, 20, 10, 33, 141000)),
+     NomadUpload(upload_id='8vViZoL3TYG9fMFibPkjlw', upload_create_time=datetime.datetime(2024, 10, 16, 9, 25, 53, 929000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='publish_upload', process_status='SUCCESS', last_status_message='Process publish_upload completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 16, 9, 43, 18, 243000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 16, 9, 43, 18, 255000)),
+     NomadUpload(upload_id='cP4q5rRsQM-D60Tp3olPdQ', upload_create_time=datetime.datetime(2024, 10, 16, 9, 47, 31, 721000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='publish_upload', process_status='SUCCESS', last_status_message='Process publish_upload completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 16, 9, 47, 46, 247000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 16, 9, 47, 46, 257000)),
+     NomadUpload(upload_id='5ADf3M4uSByqsYpkEB6UEg', upload_create_time=datetime.datetime(2024, 10, 16, 9, 52, 1, 469000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='process_upload', process_status='SUCCESS', last_status_message='Process process_upload completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=False, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path='/nomad/test/fs/staging/5/5ADf3M4uSByqsYpkEB6UEg', publish_time=None, references=None, datasets=None, external_db=None, upload_name=None, comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 16, 9, 52, 2, 94000)),
+     NomadUpload(upload_id='_mZn0RZ8QtmBkcAlPU5bSw', upload_create_time=datetime.datetime(2024, 10, 16, 9, 52, 47, 649000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='edit_upload_metadata', process_status='SUCCESS', last_status_message='Process edit_upload_metadata completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 16, 9, 53, 0, 835000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 16, 9, 53, 4, 791000)),
+     NomadUpload(upload_id='Cntk6OsQTvaZp7r6Jom-3g', upload_create_time=datetime.datetime(2024, 10, 16, 9, 54, 47, 426000), main_author=NomadUser(name='Joseph Rudzinski'), process_running=False, current_process='edit_upload_metadata', process_status='SUCCESS', last_status_message='Process edit_upload_metadata completed successfully', errors=[], warnings=[], coauthors=[], coauthor_groups=[], reviewers=[], reviewer_groups=[], writers=[NomadUser(name='Joseph Rudzinski')], writer_groups=[], viewers=[NomadUser(name='Joseph Rudzinski')], viewer_groups=[], published=True, published_to=[], with_embargo=False, embargo_length=0.0, license='CC BY 4.0', entries=1, n_entries=None, upload_files_server_path=None, publish_time=datetime.datetime(2024, 10, 16, 9, 54, 51, 988000), references=None, datasets=None, external_db=None, upload_name='Test Upload', comment=None, url='https://nomad-lab.eu/prod/v1/test/api/v1', complete_time=datetime.datetime(2024, 10, 16, 9, 54, 53, 838000))]
 
 
 
@@ -946,7 +956,12 @@ get_entries_of_my_uploads(url='test')
      NomadEntry(entry_id='7A6lJb-14xR9lxXO8kjuYt5-vxg2', upload_id='DN61X4r7SCyzm5q1kxcEcw', references=[], origin='Joseph Rudzinski', n_quantities=34, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 14, 10, 55, 12, 410000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 14, 10, 55, 12, 808000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='7A6lJb-14xR9lxXO8kjuYt5-vxg2', published=True, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 14, 10, 55, 12, 563000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=None, entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1'),
      NomadEntry(entry_id='jWSpYURP5GgPtgF9LXZJpNlDv-GL', upload_id='z4QvhZ7qSCmgIFv_qJqlyQ', references=[], origin='Joseph Rudzinski', n_quantities=0, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 14, 20, 20, 38, 757000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 14, 20, 20, 39, 272000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='jWSpYURP5GgPtgF9LXZJpNlDv-GL', published=True, writers=[NomadUser(name='Joseph Rudzinski'), NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 14, 20, 20, 38, 982000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...edited', upload_name='Test Upload', text_search_contents=[], publish_time=datetime.datetime(2024, 10, 15, 6, 18, 27, 700000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1'),
      NomadEntry(entry_id='MVBIMEZOuIzH7-QFU2TtMIM6LLPp', upload_id='GJdVAOCxRVe-Cwo3qMz9Kg', references=[], origin='Joseph Rudzinski', n_quantities=0, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 15, 10, 48, 44, 337000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 15, 10, 48, 45, 206000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='MVBIMEZOuIzH7-QFU2TtMIM6LLPp', published=True, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 15, 10, 48, 44, 741000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=datetime.datetime(2024, 10, 15, 10, 49, 24, 4000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1'),
-     NomadEntry(entry_id='Htbl78lHDSNAKbvPjEgEN_6sOcxF', upload_id='RdA_3ZsOTMqbtAhYLivVsw', references=[], origin='Joseph Rudzinski', n_quantities=0, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 378000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 752000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='Htbl78lHDSNAKbvPjEgEN_6sOcxF', published=True, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 543000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=datetime.datetime(2024, 10, 15, 20, 9, 28, 757000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1')]
+     NomadEntry(entry_id='Htbl78lHDSNAKbvPjEgEN_6sOcxF', upload_id='RdA_3ZsOTMqbtAhYLivVsw', references=[], origin='Joseph Rudzinski', n_quantities=0, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 378000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 752000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='Htbl78lHDSNAKbvPjEgEN_6sOcxF', published=True, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 15, 20, 2, 10, 543000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=datetime.datetime(2024, 10, 15, 20, 9, 28, 757000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1'),
+     NomadEntry(entry_id='zyaF373NIH-igHS3TZN5FW4SaO4d', upload_id='8vViZoL3TYG9fMFibPkjlw', references=[], origin='Joseph Rudzinski', n_quantities=34, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 16, 9, 25, 53, 929000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 16, 9, 25, 54, 274000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='zyaF373NIH-igHS3TZN5FW4SaO4d', published=True, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 16, 9, 25, 54, 111000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=None, entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1'),
+     NomadEntry(entry_id='Xitkh3ZVhRu11LUIk5n0cA2Wtmmy', upload_id='cP4q5rRsQM-D60Tp3olPdQ', references=[], origin='Joseph Rudzinski', n_quantities=34, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 16, 9, 47, 31, 721000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 16, 9, 47, 32, 28000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='Xitkh3ZVhRu11LUIk5n0cA2Wtmmy', published=True, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 16, 9, 47, 31, 857000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=None, entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1'),
+     NomadEntry(entry_id='EaFsd7Ku9IEXOcwTcMqlWd92fZx1', upload_id='5ADf3M4uSByqsYpkEB6UEg', references=[], origin='Joseph Rudzinski', n_quantities=34, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 16, 9, 52, 1, 469000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 16, 9, 52, 1, 752000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='EaFsd7Ku9IEXOcwTcMqlWd92fZx1', published=False, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 16, 9, 52, 1, 595000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment=None, upload_name=None, text_search_contents=[], publish_time=None, entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1'),
+     NomadEntry(entry_id='h3e0Z5FHiUetLmW8kbPW4uwrT0gH', upload_id='_mZn0RZ8QtmBkcAlPU5bSw', references=[], origin='Joseph Rudzinski', n_quantities=0, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 16, 9, 52, 47, 649000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 16, 9, 52, 47, 948000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='h3e0Z5FHiUetLmW8kbPW4uwrT0gH', published=True, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 16, 9, 52, 47, 780000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=datetime.datetime(2024, 10, 16, 9, 53, 0, 835000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1'),
+     NomadEntry(entry_id='lJiZnALI0ad8UKh5nt2FG1rhaZiC', upload_id='Cntk6OsQTvaZp7r6Jom-3g', references=[], origin='Joseph Rudzinski', n_quantities=0, nomad_version='1.3.7.dev55+ge83de27b3', upload_create_time=datetime.datetime(2024, 10, 16, 9, 54, 47, 426000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), nomad_commit='', processing_errors=[], entry_name='test.archive.json', last_processing_time=datetime.datetime(2024, 10, 16, 9, 54, 47, 719000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), parser_name='parsers/archive', calc_id='lJiZnALI0ad8UKh5nt2FG1rhaZiC', published=True, writers=[NomadUser(name='Joseph Rudzinski')], processed=True, mainfile='test.archive.json', main_author=NomadUser(name='Joseph Rudzinski'), entry_create_time=datetime.datetime(2024, 10, 16, 9, 54, 47, 553000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), with_embargo=False, entry_type=None, license='CC BY 4.0', domain=None, comment='This is a test upload...', upload_name='Test Upload', text_search_contents=[], publish_time=datetime.datetime(2024, 10, 16, 9, 54, 51, 988000, tzinfo=datetime.timezone(datetime.timedelta(0), '+0000')), entry_references=None, url='https://nomad-lab.eu/prod/v1/test/api/v1')]
 
 
 
