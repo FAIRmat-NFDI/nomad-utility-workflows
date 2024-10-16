@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any
+from typing import Any, TypedDict
 
 import requests
 from cachetools.func import ttl_cache
@@ -50,12 +50,32 @@ def get_authentication_token(
     return response.json().get('access_token')
 
 
+class RequestOptions(TypedDict, total=False):
+    """_summary_
+
+    Args:
+        TypedDict (_type_): _description_
+        total (bool, optional): _description_. Defaults to False.
+    """
+
+    section: str
+    url: str = None
+    timeout_in_sec: int = TIMEOUT_IN_SEC
+    headers: dict = None
+    with_authentication: bool = False
+
+
+default_request_options = {
+    'section': None,
+    'url': None,
+    'timeout_in_sec': TIMEOUT_IN_SEC,
+    'headers': None,
+    'with_authentication': False,
+}
+
+
 def get_nomad_request(
-    section: str,
-    url: str = None,
-    timeout_in_sec: int = TIMEOUT_IN_SEC,
-    headers: dict = None,
-    with_authentication: bool = False,
+    request_options: RequestOptions = default_request_options.copy(),
     return_json: bool = True,
     accept_field: str = 'application/json',
 ) -> Any:
@@ -76,6 +96,12 @@ def get_nomad_request(
     Returns:
         Any: _description_
     """
+    section = request_options.get('section')
+    url = request_options.get('url')
+    timeout_in_sec = request_options.get('timeout_in_sec')
+    headers = request_options.get('headers')
+    with_authentication = request_options.get('with_authentication')
+
     url_base = get_nomad_url(url)
     url = url_base + f"{'/' if section[0] != '/' else ''}{section}"
     logger.info('Sending get request @ %s', url)
@@ -96,6 +122,14 @@ def get_nomad_request(
 
 
 def get_nomad_url_name(url: str) -> str:
+    """_summary_
+
+    Args:
+        url (str): _description_
+
+    Returns:
+        str: _description_
+    """
     try:
         return url.split('/')[-3]
     except IndexError:
@@ -129,18 +163,41 @@ def get_nomad_url(url: str) -> str:
 
 
 def get_nomad_base_url(url: str) -> str:
+    """_summary_
+
+    Args:
+        url (str): _description_
+
+    Returns:
+        str: _description_
+    """
     return (get_nomad_url(url)).removesuffix('/api/v1')
 
 
 def post_nomad_request(
-    section: str,
-    headers: dict = None,
+    request_options: RequestOptions = default_request_options.copy(),
     data: Any = None,
     json_dict: dict = None,
-    url: str = None,
-    timeout_in_sec: int = TIMEOUT_IN_SEC,
-    with_authentication: bool = False,
 ) -> json:
+    """_summary_
+
+    Args:
+        request_options (RequestOptions, optional): _description_. Defaults to default_request_options.copy().
+        data (Any, optional): _description_. Defaults to None.
+        json_dict (dict, optional): _description_. Defaults to None.
+
+    Raises:
+        ValueError: _description_
+
+    Returns:
+        json: _description_
+    """
+    section = request_options.get('section')
+    url = request_options.get('url')
+    timeout_in_sec = request_options.get('timeout_in_sec')
+    headers = request_options.get('headers')
+    with_authentication = request_options.get('with_authentication')
+
     if headers is None:
         headers = {}
     if with_authentication:
@@ -165,12 +222,25 @@ def post_nomad_request(
 
 
 def delete_nomad_request(
-    section: str,
-    headers: dict = None,
-    url: str = None,
-    timeout_in_sec: int = TIMEOUT_IN_SEC,
-    with_authentication: bool = False,
+    request_options: RequestOptions = default_request_options.copy(),
 ) -> json:
+    """_summary_
+
+    Args:
+        request_options (RequestOptions, optional): _description_. Defaults to default_request_options.copy().
+
+    Raises:
+        ValueError: _description_
+
+    Returns:
+        json: _description_
+    """
+    section = request_options.get('section')
+    url = request_options.get('url')
+    timeout_in_sec = request_options.get('timeout_in_sec')
+    headers = request_options.get('headers')
+    with_authentication = request_options.get('with_authentication')
+
     if headers is None:
         headers = {}
     if with_authentication:
