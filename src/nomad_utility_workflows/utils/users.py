@@ -7,6 +7,7 @@ from cachetools.func import ttl_cache
 from marshmallow_dataclass import class_schema, dataclass
 
 from nomad_utility_workflows.utils.core import (
+    RequestOptions,
     get_nomad_request,
     get_nomad_url,
     get_nomad_url_name,
@@ -42,7 +43,9 @@ def search_users_by_name(
     url_name = get_nomad_url_name(url)
     logger.info('retrieving user %s on %s server', user_name, url_name)
     response = get_nomad_request(
-        f'/users?prefix={user_name}', timeout_in_sec=timeout_in_sec, url=url
+        RequestOptions(
+            section=f'/users?prefix={user_name}', timeout_in_sec=timeout_in_sec, url=url
+        )
     ).get('data', [])
     return [class_schema(NomadUser)().load(user) for user in response]
 
@@ -55,7 +58,9 @@ def get_user_by_id(
     url_name = get_nomad_url_name(url)
     logger.info('retrieving user %s on %s server', user_id, url_name)
     response = get_nomad_request(
-        f'/users/{user_id}', timeout_in_sec=timeout_in_sec, url=url
+        RequestOptions(
+            section=f'/users/{user_id}', timeout_in_sec=timeout_in_sec, url=url
+        )
     )
     user_schema = class_schema(NomadUser)
     return user_schema().load(response)
@@ -67,7 +72,12 @@ def who_am_i(url: str = None, timeout_in_sec: int = 10) -> NomadUser:
     url_name = get_nomad_url_name(url)
     logger.info('retrieving self user info on %s server', url_name)
     response = get_nomad_request(
-        '/users/me', with_authentication=True, timeout_in_sec=timeout_in_sec, url=url
+        RequestOptions(
+            section='/users/me',
+            with_authentication=True,
+            timeout_in_sec=timeout_in_sec,
+            url=url,
+        )
     )
     user_schema = class_schema(NomadUser)
     return user_schema().load(response)

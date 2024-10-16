@@ -182,7 +182,8 @@ def post_nomad_request(
     """_summary_
 
     Args:
-        request_options (RequestOptions, optional): _description_. Defaults to default_request_options.copy().
+        request_options (RequestOptions, optional): _description_.
+            Defaults to default_request_options.copy().
         data (Any, optional): _description_. Defaults to None.
         json_dict (dict, optional): _description_. Defaults to None.
 
@@ -227,7 +228,8 @@ def delete_nomad_request(
     """_summary_
 
     Args:
-        request_options (RequestOptions, optional): _description_. Defaults to default_request_options.copy().
+        request_options (RequestOptions, optional): _description_.
+            Defaults to default_request_options.copy().
 
     Raises:
         ValueError: _description_
