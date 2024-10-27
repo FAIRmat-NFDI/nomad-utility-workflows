@@ -229,6 +229,10 @@ class NomadWorkflow(BaseModel):
     node_attributes: dict[int, Any] = {}
     workflow_graph: nx.DiGraph = None
     task_elements: dict[str, NomadSection] = Field(default_factory=dict)
+    simulation_defaults: dict[str, dict[str, str]] = Field(
+        default_factory=dict,
+        description='Default inputs and outputs for simulation tasks',
+    )
 
     class Config:
         arbitrary_types_allowed = True
@@ -240,14 +244,21 @@ class NomadWorkflow(BaseModel):
             self.workflow_graph = nodes_to_graph(self.node_attributes)
         self.fill_workflow_graph()
 
+        self.simulation_defaults = {
+            'inputs': {
+                'section': 'system',
+            },
+            'outputs': {
+                'section': 'calculation',
+            },
+        }
+
     def register_section(
         self, node_key: Union[int, str, tuple], node_attrs: dict[str, Any]
     ) -> None:
         section = NomadSection(**node_attrs)
         self.task_elements[node_key] = section  # ! build the tasks section by section
 
-    # TODO Change the archive building function to loop over nodes and then add the
-    # TODO corresponding inputs/outputs from the edges
     def fill_workflow_graph(self) -> None:
         """_summary_"""
         for node_source, node_dest, edge in self.workflow_graph.edges(data=True):
@@ -325,10 +336,20 @@ class NomadWorkflow(BaseModel):
                 'section': 'calculation',
             },
         }
+
+        # set the partner_node, i.e., the node who's mainfile will be used in the path
         partner_node = node_source
         node_source_type = self.workflow_graph.nodes[node_source].get('type', '')
         if node_source_type == 'input':
             partner_node = node_dest
+
+        # defaults = {}
+        # if self.workflow_graph.nodes[node_source].get('entry_type', '') == 'simulation':
+        # defaults = self.simulation_defaults
+        # # ! add more defaults here
+
+        # if not defaults:
+        #     return []
 
         default_section = defaults[inout_type]['section']
         flag_defaults = False
@@ -501,11 +522,6 @@ def build_nomad_workflow(
 # TODO create docs with some examples for dict and graph input types
 # TODO add to readme/docs that this is not currently using NOMAD, but could be linked
 # later?
-
 # TODO add some text to the test notebooks
-
 # TODO change the rest of the functions to pydantic -- not sure if I really want to
 # tackle this now
-
-# TODO should nodes_to_graph() be an external function from the class? So, that the user
-# can call it, but also add attributes from there?
