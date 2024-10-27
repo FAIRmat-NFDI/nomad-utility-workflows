@@ -240,10 +240,6 @@ class NomadWorkflow(BaseModel):
     def __init__(self, **data):
         super().__init__(**data)
         self.task_elements = {}
-        if self.workflow_graph is None:
-            self.workflow_graph = nodes_to_graph(self.node_attributes)
-        self.fill_workflow_graph()
-
         self.simulation_defaults = {
             'inputs': {
                 'section': 'system',
@@ -252,6 +248,10 @@ class NomadWorkflow(BaseModel):
                 'section': 'calculation',
             },
         }
+        # ! add more defaults here
+        if self.workflow_graph is None:
+            self.workflow_graph = nodes_to_graph(self.node_attributes)
+        self.fill_workflow_graph()
 
     def register_section(
         self, node_key: Union[int, str, tuple], node_attrs: dict[str, Any]
@@ -328,28 +328,21 @@ class NomadWorkflow(BaseModel):
     def _get_defaults(
         self, inout_type: Literal['inputs', 'outputs'], node_source, node_dest
     ) -> list:
-        defaults = {
-            'inputs': {
-                'section': 'system',
-            },
-            'outputs': {
-                'section': 'calculation',
-            },
-        }
-
         # set the partner_node, i.e., the node who's mainfile will be used in the path
         partner_node = node_source
         node_source_type = self.workflow_graph.nodes[node_source].get('type', '')
         if node_source_type == 'input':
             partner_node = node_dest
 
-        # defaults = {}
-        # if self.workflow_graph.nodes[node_source].get('entry_type', '') == 'simulation':
-        # defaults = self.simulation_defaults
-        # # ! add more defaults here
-
-        # if not defaults:
-        #     return []
+        defaults = {}
+        if (
+            self.workflow_graph.nodes[partner_node].get('entry_type', '')
+            == 'simulation'
+        ):
+            defaults = self.simulation_defaults
+        # ! add more defaults here
+        if not defaults:
+            return []
 
         default_section = defaults[inout_type]['section']
         flag_defaults = False
@@ -517,7 +510,7 @@ def build_nomad_workflow(
     return workflow.workflow_graph
 
 
-# TODO add is_simulation, is_nomad_entry as flags
+# TODO is_nomad_entry as flags
 # TODO test this code on a number of already existing examples
 # TODO create docs with some examples for dict and graph input types
 # TODO add to readme/docs that this is not currently using NOMAD, but could be linked
