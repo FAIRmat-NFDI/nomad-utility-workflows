@@ -10,8 +10,10 @@ from pydantic import BaseModel, Field
 logger = get_logger(__name__)
 TASK_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
 WORKFLOW_M_DEF = 'nomad.datamodel.metainfo.workflow.Workflow'
+# TODO not yet sure about the specification of actual tasks, need to test
 
-SectionType = Literal['task', 'workflow', 'input', 'output']
+SectionType = Literal['task', 'workflow', 'input', 'output', 'other']
+# TODO check/implement functionality of "other" type
 
 
 # Define a custom representer for OrderedDict
@@ -510,7 +512,6 @@ def build_nomad_workflow(
     return workflow.workflow_graph
 
 
-# TODO is_nomad_entry as flags
 # TODO test this code on a number of already existing examples
 # TODO create docs with some examples for dict and graph input types
 # TODO add to readme/docs that this is not currently using NOMAD, but could be linked
