@@ -69,9 +69,7 @@ class NomadSection(BaseModel):
         archive_path = ''
         if not self.path_info:
             logger.warning(
-                'No path info provided for %s-%s. Section reference will be missing.',
-                self.type,
-                self.name,
+                f'No path info provided for {self.type}-{self.name}. Section reference will be missing.'
             )
             return archive_path
 
@@ -89,25 +87,33 @@ class NomadSection(BaseModel):
                     # add supersection index when given, else supersection is assumed
                     # to be nonrepeating
                     archive_path += f'/{self.path_info.get("supersection_index")}'
-            elif self.path_info.get('section_type') in [
-                'system',
-                'calculation',
-                'method',
-            ]:  # case 2 - no supersection path, but section type is contained in run
-                run_index = self.path_info.get('supersection_index')
-                run_index = run_index if run_index is not None else -1
-                # add run index when given, else use last run section
-                archive_path = f'run/{run_index}'
-            elif self.path_info.get('section_type') in ['results']:
-                archive_path = 'workflow2'
+            elif self.path_info.get('section_type'):
+                if (
+                    self.path_info.get('section_type')
+                    in [
+                        'system',
+                        'calculation',
+                        'method',
+                    ]
+                ):  # case 2 - no supersection path, but section type is contained in run
+                    run_index = self.path_info.get('supersection_index')
+                    run_index = run_index if run_index is not None else -1
+                    # add run index when given, else use last run section
+                    archive_path = f'run/{run_index}'
+                elif self.path_info.get('section_type') in ['results']:
+                    archive_path = 'workflow2'
+                else:
+                    archive_path += f'/{self.path_info.get("section_type")}'
+                    if self.path_info.get('section_index') is not None:
+                        # add section index when given, else supersection is assumed
+                        # to be nonrepeating
+                        archive_path += f'/{self.path_info.get("section_index")}'
             else:
                 logger.warning(
                     (
-                        'No supersection path provided for %s-%s. '
-                        'Section reference may be incorrect.'
+                        'No supersection path or section type provided for '
+                        f'{self.type}-{self.name}. Section reference may be incorrect.'
                     ),
-                    self.type,
-                    self.name,
                 )
 
             # SECTION
@@ -118,11 +124,9 @@ class NomadSection(BaseModel):
             else:
                 logger.warning(
                     (
-                        'No section type provided for %s-%s. '
+                        f'No section type provided for {self.type}-{self.name}. '
                         'Section reference may be incorrect.'
                     ),
-                    self.type,
-                    self.name,
                 )
 
         return archive_path
@@ -131,10 +135,8 @@ class NomadSection(BaseModel):
     def upload_prefix(self) -> str:
         if not self.path_info['mainfile_path']:
             logger.warning(
-                'No mainfile path provided for %s-%s. '
-                'Section reference will be missing.',
-                self.type,
-                self.name,
+                f'No mainfile path provided for {self.type}-{self.name}. '
+                'Section reference will be missing.'
             )
             return ''
 
@@ -448,10 +450,23 @@ def nodes_to_graph(node_attributes: dict[int, Any]) -> nx.DiGraph:
 
 
 def _add_edges(workflow_graph, node_key, node_attrs):
+    def set_mainfile_path(workflow_graph, edge, node_attrs) -> None:
+        parent_mainfile_path = (
+            workflow_graph.nodes[edge].get('path_info', '').get('mainfile_path', None)
+        )
+        if not node_attrs.get('path_info'):
+            node_attrs['path_info'] = {'mainfile_path': parent_mainfile_path}
+        else:
+            node_attrs['path_info']['mainfile_path'] = node_attrs['path_info'].get(
+                'mainfile_path', parent_mainfile_path
+            )
+
     for edge in node_attrs.get('in_edge_nodes', []):
         workflow_graph.add_edge(edge, node_key)
+        set_mainfile_path(workflow_graph, edge, node_attrs)
     for edge in node_attrs.get('out_edge_nodes', []):
         workflow_graph.add_edge(node_key, edge)
+        set_mainfile_path(workflow_graph, edge, node_attrs)
 
 
 def _add_global_inouts(workflow_graph, node_key, node_attrs):
@@ -512,6 +527,7 @@ def build_nomad_workflow(
     return workflow.workflow_graph
 
 
+# TODO add worklow name and any other global attributes to input of `build_nomad_workflow()`
 # TODO test this code on a number of already existing examples
 # TODO create docs with some examples for dict and graph input types
 # TODO add to readme/docs that this is not currently using NOMAD, but could be linked
