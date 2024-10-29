@@ -1,0 +1,22 @@
+workflow2:
+  name: SinglePoint
+  inputs:
+    - name: Input structure
+      section: '../upload/archive/mainfile/pressure1/dft_p1.xml#/run/0/system/-1'
+    - name: Input methodology parameters
+      section: '../upload/archive/mainfile/pressure1/dft_p1.xml#/run/0/method/-1'
+  outputs:
+    - name: Output calculation
+      section: '../upload/archive/mainfile/pressure1/dft_p1.xml#/run/0/calculation/-1'
+  tasks:
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: '../upload/archive/mainfile/pressure1/dft_p1.xml#/workflow2'
+      name: DFT at Pressure P1
+      inputs:
+        - name: Input structure
+          section: '../upload/archive/mainfile/pressure1/dft_p1.xml#/run/0/system/-1'
+        - name: Input methodology parameters
+          section: '../upload/archive/mainfile/pressure1/dft_p1.xml#/run/0/method/-1'
+      outputs:
+        - name: Output calculation
+          section: '../upload/archive/mainfile/pressure1/dft_p1.xml#/run/0/calculation/-1'

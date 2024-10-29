@@ -1,0 +1,55 @@
+workflow2:
+  name: XAS Calculation
+  inputs:
+  - name: Output CoreHole SCF site=0
+    section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/es_0.out#/run/0/calculation/-1
+  - name: Input CoreHole excitations methodology kgrid=4-3-3 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole1/xanes.out#/run/0/method/-1
+  outputs:
+  - name: Output spectra polarization 1 kgrid=4-3-3 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole1/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 2 kgrid=4-3-3 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole2/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 3 kgrid=4-3-3 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  tasks:
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+    task: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole1/xanes.out#/workflow2
+    name: Polarization 1 kgrid=4-3-3 site=0
+    inputs:
+    - name: Output CoreHole SCF site=0
+      section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/es_0.out#/run/0/calculation/-1
+    - name: Input photon parameters
+      section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole1/xanes.out#/run/0/method/0
+    - name: Input CoreHole excitations methodology kgrid=4-3-3 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole1/xanes.out#/run/0/method/-1
+    outputs:
+    - name: Output spectra polarization 1 kgrid=4-3-3 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole1/xanes.out#/run/0/calculation/-1
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+    task: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole2/xanes.out#/workflow2
+    name: Polarization 2 kgrid=4-3-3 site=0
+    inputs:
+    - name: Output CoreHole SCF site=0
+      section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/es_0.out#/run/0/calculation/-1
+    - name: Input photon parameters
+      section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole2/xanes.out#/run/0/method/0
+    - name: Input CoreHole excitations methodology kgrid=4-3-3 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole1/xanes.out#/run/0/method/-1
+    outputs:
+    - name: Output spectra polarization 2 kgrid=4-3-3 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole2/xanes.out#/run/0/calculation/-1
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+    task: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole3/xanes.out#/workflow2
+    name: Polarization 3 kgrid=4-3-3 site=0
+    inputs:
+    - name: Output CoreHole SCF site=0
+      section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/es_0.out#/run/0/calculation/-1
+    - name: Input photon parameters
+      section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole3/xanes.out#/run/0/method/0
+    - name: Input CoreHole excitations methodology kgrid=4-3-3 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole1/xanes.out#/run/0/method/-1
+    outputs:
+    - name: Output spectra polarization 3 kgrid=4-3-3 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-430/XSPECTRA/Spectra-4-3-3/0/dipole3/xanes.out#/run/0/calculation/-1

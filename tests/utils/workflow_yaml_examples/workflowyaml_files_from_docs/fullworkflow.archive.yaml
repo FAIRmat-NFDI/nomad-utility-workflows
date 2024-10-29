@@ -1,0 +1,39 @@
+workflow2:
+  name: Full calculation at different pressures for SrVO3
+  inputs:
+    - name: Input structure at P1
+      section: '../upload/archive/mainfile/pressure1/dft_p1.xml#/run/0/system/-1'
+    - name: Input structure at P2
+      section: '../upload/archive/mainfile/pressure2/dft_p2.xml#/run/0/system/-1'
+  outputs:
+    - name: Output DMFT at P1, T1 calculation
+      section: '../upload/archive/mainfile/pressure1/temperature1/dmft_p1_t1.hdf5#/run/0/calculation/-1'
+    - name: Output DMFT at P1, T2 calculation
+      section: '../upload/archive/mainfile/pressure1/temperature2/dmft_p1_t2.hdf5#/run/0/calculation/-1'
+    - name: Output DMFT at P2, T1 calculation
+      section: '../upload/archive/mainfile/pressure2/temperature1/dmft_p2_t1.hdf5#/run/0/calculation/-1'
+    - name: Output DMFT at P2, T2 calculation
+      section: '../upload/archive/mainfile/pressure2/temperature2/dmft_p2_t2.hdf5#/run/0/calculation/-1'
+  tasks:
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: '../upload/archive/mainfile/pressure1.archive.yaml#/workflow2'
+      name: DFT+TB+DMFT at P1
+      inputs:
+        - name: Input structure at P1
+          section: '../upload/archive/mainfile/pressure1/dft_p1.xml#/run/0/system/-1'
+      outputs:
+        - name: Output DMFT at P1, T1 calculation
+          section: '../upload/archive/mainfile/pressure1/temperature1/dmft_p1_t1.hdf5#/run/0/calculation/-1'
+        - name: Output DMFT at P1, T2 calculation
+          section: '../upload/archive/mainfile/pressure1/temperature2/dmft_p1_t2.hdf5#/run/0/calculation/-1'
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: '../upload/archive/mainfile/pressure2.archive.yaml#/workflow2'
+      name: DFT+TB+DMFT at P2
+      inputs:
+        - name: Input structure at P2
+          section: '../upload/archive/mainfile/pressure2/dft_p2.xml#/run/0/system/-1'
+      outputs:
+        - name: Output DMFT at P2, T1 calculation
+          section: '../upload/archive/mainfile/pressure2/temperature1/dmft_p2_t1.hdf5#/run/0/calculation/-1'
+        - name: Output DMFT at P2, T2 calculation
+          section: '../upload/archive/mainfile/pressure2/temperature2/dmft_p2_t2.hdf5#/run/0/calculation/-1'

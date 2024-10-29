@@ -20,7 +20,7 @@ workflow2:
     outputs:
     - name: output calculation from 1
       section: ../upload/archive/mainfile/<task_1_mainfile>#/run/0/calculation/-1
-  - m_def: nomad.datamodel.metainfo.workflow.Workflow
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
     name: '2'
     task: ../upload/archive/mainfile/<task_2_mainfile>#/workflow2
     inputs:
@@ -29,7 +29,7 @@ workflow2:
     outputs:
     - name: output calculation from 2
       section: ../upload/archive/mainfile/<task_2_mainfile>#/run/0/calculation/-1
-  - m_def: nomad.datamodel.metainfo.workflow.Workflow
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
     name: '3'
     task: ../upload/archive/mainfile/<task_3_mainfile>#/workflow2
     inputs:

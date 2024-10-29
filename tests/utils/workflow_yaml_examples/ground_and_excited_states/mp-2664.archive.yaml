@@ -1,0 +1,197 @@
+workflow2:
+  name: Ground State + Excited State
+  inputs:
+  - name: Input structure
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/gs.out#/run/0/system/-1
+  - name: Ground State SCF methodology
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/gs.out#/run/0/method/-1
+  - name: CoreHole SCF methodology site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/es_0.out#/run/0/method/-1
+  outputs:
+  - name: Output Ground State SCF
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/gs.out#/run/0/calculation/-1
+
+  - name: Output spectra polarization 1 kgrid=1-1-1 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-1-1-1/0/dipole1/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 2 kgrid=1-1-1 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-1-1-1/0/dipole2/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 3 kgrid=1-1-1 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-1-1-1/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  - name: Output spectra polarization 1 kgrid=2-2-2 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-2-2-2/0/dipole1/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 2 kgrid=2-2-2 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-2-2-2/0/dipole2/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 3 kgrid=2-2-2 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-2-2-2/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  - name: Output spectra polarization 1 kgrid=3-3-3 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-3-3-3/0/dipole1/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 2 kgrid=3-3-3 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-3-3-3/0/dipole2/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 3 kgrid=3-3-3 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-3-3-3/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  - name: Output spectra polarization 1 kgrid=4-4-4 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-4-4-4/0/dipole1/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 2 kgrid=4-4-4 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-4-4-4/0/dipole2/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 3 kgrid=4-4-4 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-4-4-4/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  - name: Output spectra polarization 1 kgrid=5-5-5 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-5-5-5/0/dipole1/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 2 kgrid=5-5-5 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-5-5-5/0/dipole2/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 3 kgrid=5-5-5 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-5-5-5/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  - name: Output spectra polarization 1 kgrid=6-6-6 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-6-6-6/0/dipole1/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 2 kgrid=6-6-6 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-6-6-6/0/dipole2/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 3 kgrid=6-6-6 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-6-6-6/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  - name: Output spectra polarization 1 kgrid=7-7-7 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-7-7-7/0/dipole1/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 2 kgrid=7-7-7 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-7-7-7/0/dipole2/xanes.out#/run/0/calculation/-1
+  - name: Output spectra polarization 3 kgrid=7-7-7 site=0
+    section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-7-7-7/0/dipole3/xanes.out#/run/0/calculation/-1
+  tasks:
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+    task: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/gs.out#/workflow2
+    name: Ground State
+    inputs:
+    - name: Input structure
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/gs.out#/run/0/system/-1
+    - name: Ground State SCF methodology
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/gs.out#/run/0/method/-1
+    outputs:
+    - name: Output Ground State
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/gs.out#/run/0/calculation/-1
+
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+    task: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/es_0.out#/workflow2
+    name: CoreHole SCF site=0
+    inputs:
+    - name: Input structure
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/gs.out#/run/0/system/-1
+    - name: Input CoreHole SCF methodology site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/es_0.out#/run/0/method/-1
+    outputs:
+    - name: CoreHole SCF output site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/es_0.out#/run/0/calculation/-1
+
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+    task: ../upload/archive/mainfile/XSPECTRA_yaml/mp-2664.level0_1-1-1-0.archive.yaml#/workflow2
+    name: Level 0 kgrid=1-1-1 site=0
+    inputs:
+    - name: CoreHole SCF output site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/es_0.out#/run/0/calculation/-1
+    - name: Input CoreHole excitation methodology kgrid=1-1-1 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-1-1-1/0/dipole1/xanes.out#/run/0/method/-1
+    outputs:
+    - name: Output spectra polarization 1 kgrid=1-1-1 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-1-1-1/0/dipole1/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 2 kgrid=1-1-1 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-1-1-1/0/dipole2/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 3 kgrid=1-1-1 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-1-1-1/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+    task: ../upload/archive/mainfile/XSPECTRA_yaml/mp-2664.level0_2-2-2-0.archive.yaml#/workflow2
+    name: Level 0 kgrid=2-2-2 site=0
+    inputs:
+    - name: CoreHole SCF output site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/es_0.out#/run/0/calculation/-1
+    - name: Input CoreHole excitation methodology kgrid=2-2-2 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-2-2-2/0/dipole1/xanes.out#/run/0/method/-1
+    outputs:
+    - name: Output spectra polarization 1 kgrid=2-2-2 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-2-2-2/0/dipole1/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 2 kgrid=2-2-2 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-2-2-2/0/dipole2/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 3 kgrid=2-2-2 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-2-2-2/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+    task: ../upload/archive/mainfile/XSPECTRA_yaml/mp-2664.level0_3-3-3-0.archive.yaml#/workflow2
+    name: Level 0 kgrid=3-3-3 site=0
+    inputs:
+    - name: CoreHole SCF output site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/es_0.out#/run/0/calculation/-1
+    - name: Input CoreHole excitation methodology kgrid=3-3-3 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-3-3-3/0/dipole1/xanes.out#/run/0/method/-1
+    outputs:
+    - name: Output spectra polarization 1 kgrid=3-3-3 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-3-3-3/0/dipole1/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 2 kgrid=3-3-3 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-3-3-3/0/dipole2/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 3 kgrid=3-3-3 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-3-3-3/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+    task: ../upload/archive/mainfile/XSPECTRA_yaml/mp-2664.level0_4-4-4-0.archive.yaml#/workflow2
+    name: Level 0 kgrid=4-4-4 site=0
+    inputs:
+    - name: CoreHole SCF output site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/es_0.out#/run/0/calculation/-1
+    - name: Input CoreHole excitation methodology kgrid=4-4-4 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-4-4-4/0/dipole1/xanes.out#/run/0/method/-1
+    outputs:
+    - name: Output spectra polarization 1 kgrid=4-4-4 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-4-4-4/0/dipole1/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 2 kgrid=4-4-4 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-4-4-4/0/dipole2/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 3 kgrid=4-4-4 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-4-4-4/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+    task: ../upload/archive/mainfile/XSPECTRA_yaml/mp-2664.level0_5-5-5-0.archive.yaml#/workflow2
+    name: Level 0 kgrid=5-5-5 site=0
+    inputs:
+    - name: CoreHole SCF output site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/es_0.out#/run/0/calculation/-1
+    - name: Input CoreHole excitation methodology kgrid=5-5-5 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-5-5-5/0/dipole1/xanes.out#/run/0/method/-1
+    outputs:
+    - name: Output spectra polarization 1 kgrid=5-5-5 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-5-5-5/0/dipole1/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 2 kgrid=5-5-5 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-5-5-5/0/dipole2/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 3 kgrid=5-5-5 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-5-5-5/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+    task: ../upload/archive/mainfile/XSPECTRA_yaml/mp-2664.level0_6-6-6-0.archive.yaml#/workflow2
+    name: Level 0 kgrid=6-6-6 site=0
+    inputs:
+    - name: CoreHole SCF output site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/es_0.out#/run/0/calculation/-1
+    - name: Input CoreHole excitation methodology kgrid=6-6-6 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-6-6-6/0/dipole1/xanes.out#/run/0/method/-1
+    outputs:
+    - name: Output spectra polarization 1 kgrid=6-6-6 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-6-6-6/0/dipole1/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 2 kgrid=6-6-6 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-6-6-6/0/dipole2/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 3 kgrid=6-6-6 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-6-6-6/0/dipole3/xanes.out#/run/0/calculation/-1
+
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+    task: ../upload/archive/mainfile/XSPECTRA_yaml/mp-2664.level0_7-7-7-0.archive.yaml#/workflow2
+    name: Level 0 kgrid=7-7-7 site=0
+    inputs:
+    - name: CoreHole SCF output site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/es_0.out#/run/0/calculation/-1
+    - name: Input CoreHole excitation methodology kgrid=7-7-7 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-7-7-7/0/dipole1/xanes.out#/run/0/method/-1
+    outputs:
+    - name: Output spectra polarization 1 kgrid=7-7-7 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-7-7-7/0/dipole1/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 2 kgrid=7-7-7 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-7-7-7/0/dipole2/xanes.out#/run/0/calculation/-1
+    - name: Output spectra polarization 3 kgrid=7-7-7 site=0
+      section: ../upload/archive/mainfile/materials_final/mp-2664/XSPECTRA/Spectra-7-7-7/0/dipole3/xanes.out#/run/0/calculation/-1

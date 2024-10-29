@@ -1,0 +1,47 @@
+workflow2:
+  name: DFT+TB+DMFT at P1
+  inputs:
+    - name: Input structure
+      section: '../upload/archive/mainfile/pressure1/dft_p1.xml#/run/0/system/-1'
+  outputs:
+    - name: Output DMFT at P1, T1 calculation
+      section: '../upload/archive/mainfile/pressure1/temperature1/dmft_p1_t1.hdf5#/run/0/calculation/-1'
+    - name: Output DMFT at P1, T2 calculation
+      section: '../upload/archive/mainfile/pressure1/temperature2/dmft_p1_t2.hdf5#/run/0/calculation/-1'
+  tasks:
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: '../upload/archive/mainfile/pressure1/dft_p1.xml#/workflow2'
+      name: DFT at P1
+      inputs:
+        - name: Input structure
+          section: '../upload/archive/mainfile/pressure1/dft_p1.xml#/run/0/system/-1'
+      outputs:
+        - name: Output DFT at P1 calculation
+          section: '../upload/archive/mainfile/pressure1/dft_p1.xml#/run/0/calculation/-1'
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: '../upload/archive/mainfile/pressure1/tb_p1.wout#/workflow2'
+      name: TB at P1
+      inputs:
+        - name: Input DFT at P1 calculation
+          section: '../upload/archive/mainfile/pressure1/dft_p1.xml#/run/0/calculation/-1'
+      outputs:
+        - name: Output TB at P1 calculation
+          section: '../upload/archive/mainfile/pressure1/tb_p1.wout#/run/0/calculation/-1'
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: '../upload/archive/mainfile/pressure1/temperature1/dmft_p1_t1.hdf5#/workflow2'
+      name: DMFT at P1 and T1
+      inputs:
+        - name: Input TB at P1 calculation
+          section: '../upload/archive/mainfile/pressure1/tb_p1.wout#/run/0/calculation/-1'
+      outputs:
+        - name: Output DMFT at P1, T1 calculation
+          section: '../upload/archive/mainfile/pressure1/temperature1/dmft_p1_t1.hdf5#/run/0/calculation/-1'
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: '../upload/archive/mainfile/pressure1/temperature2/dmft_p1_t2.hdf5#/workflow2'
+      name: DMFT at P1 and T2
+      inputs:
+        - name: Input TB at P1 calculation
+          section: '../upload/archive/mainfile/pressure1/tb_p1.wout#/run/0/calculation/-1'
+      outputs:
+        - name: Output DMFT at P1, T2 calculation
+          section: '../upload/archive/mainfile/pressure1/temperature2/dmft_p1_t2.hdf5#/run/0/calculation/-1'

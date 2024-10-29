@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 # logger = logging.getLogger(__name__)  # ! this is not functional I think
 logger = get_logger(__name__)
 TASK_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
-WORKFLOW_M_DEF = 'nomad.datamodel.metainfo.workflow.Workflow'
+WORKFLOW_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
 # TODO not yet sure about the specification of actual tasks, need to test
 
 SectionType = Literal['task', 'workflow', 'input', 'output', 'other']
@@ -207,21 +207,41 @@ class NomadTask(BaseModel):
 
 
 class NomadWorkflowArchive(BaseModel):
-    name: str = 'workflow2'
+    archive_section: str = None
+    name: str = None
     inputs: list[NomadSection] = Field(default_factory=list)
     outputs: list[NomadSection] = Field(default_factory=list)
     tasks: list[NomadTask] = Field(default_factory=list)
 
+    def remove_duplicate_ios(self) -> None:
+        def remove_duplicates(ios):
+            seen = set()
+            trimmed = []
+            for io in ios:
+                if io.full_path not in seen:
+                    trimmed.append(io)
+                    seen.add(io.full_path)
+            return trimmed
+
+        self.inputs = remove_duplicates(self.inputs)
+        self.outputs = remove_duplicates(self.outputs)
+
     def to_dict(self) -> dict:
-        return {
-            self.name: OrderedDict(
-                {
-                    'inputs': [i.to_dict() for i in self.inputs],
-                    'outputs': [o.to_dict() for o in self.outputs],
-                    'tasks': [t.to_dict() for t in self.tasks],
-                }
-            ),
-        }
+        yaml_dict = {self.archive_section: OrderedDict({})}
+        if self.name:
+            yaml_dict[self.archive_section]['name'] = self.name
+        if self.inputs:
+            yaml_dict[self.archive_section]['inputs'] = [
+                i.to_dict() for i in self.inputs
+            ]
+        if self.outputs:
+            yaml_dict[self.archive_section]['outputs'] = [
+                o.to_dict() for o in self.outputs
+            ]
+        if self.tasks:
+            yaml_dict[self.archive_section]['tasks'] = [t.to_dict() for t in self.tasks]
+
+        return yaml_dict
 
     def to_yaml(self, destination_filename: str) -> None:
         with open(destination_filename, 'w') as f:
@@ -230,6 +250,8 @@ class NomadWorkflowArchive(BaseModel):
 
 class NomadWorkflow(BaseModel):
     destination_filename: str
+    archive_section: str
+    name: str
     node_attributes: dict[int, Any] = {}
     workflow_graph: nx.DiGraph = None
     task_elements: dict[str, NomadSection] = Field(default_factory=dict)
@@ -389,10 +411,13 @@ class NomadWorkflow(BaseModel):
             self.register_section(node_key, node_attrs)
 
         archive = self.generate_archive()
+        archive.remove_duplicate_ios()
         archive.to_yaml(self.destination_filename)
 
     def generate_archive(self) -> NomadWorkflowArchive:
-        archive = NomadWorkflowArchive()
+        archive = NomadWorkflowArchive(
+            archive_section=self.archive_section, name=self.name
+        )
         archive.inputs = []
         archive.outputs = []
 
@@ -512,12 +537,16 @@ def _add_task_inouts(workflow_graph, node_key, node_attrs):
 
 def build_nomad_workflow(
     destination_filename: str = './nomad_workflow.archive.yaml',
+    archive_section: str = 'workflow2',
+    workflow_name: str = '',
     node_attributes: dict[int, Any] = {},
     workflow_graph: nx.DiGraph = None,
     write_to_yaml: bool = False,
 ) -> nx.DiGraph:
     workflow = NomadWorkflow(
         destination_filename=destination_filename,
+        archive_section=archive_section,
+        name=workflow_name,
         node_attributes=node_attributes,
         workflow_graph=workflow_graph,
     )
@@ -527,7 +556,6 @@ def build_nomad_workflow(
     return workflow.workflow_graph
 
 
-# TODO add worklow name and any other global attributes to input of `build_nomad_workflow()`
 # TODO test this code on a number of already existing examples
 # TODO create docs with some examples for dict and graph input types
 # TODO add to readme/docs that this is not currently using NOMAD, but could be linked
