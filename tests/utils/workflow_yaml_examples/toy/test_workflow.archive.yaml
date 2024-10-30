@@ -1,4 +1,5 @@
 workflow2:
+  name: toy_workflow
   inputs:
   - name: global workflow input
     section: /uploads/<input_upload_id>/archive/mainfile/<input_mainfile>#/run/0/method/0
@@ -7,10 +8,8 @@ workflow2:
   outputs:
   - name: global workflow output
     section: ../upload/archive/mainfile/<output_mainfile>#/workflow2/results/-1
-  - name: output calculation from 1
-    section: ../upload/archive/mainfile/<task_1_mainfile>#/run/0/calculation/-1
-  - name: output calculation from 2
-    section: ../upload/archive/mainfile/<task_2_mainfile>#/run/0/calculation/-1
+  - name: output calculation from 3
+    section: ../upload/archive/mainfile/<task_3_mainfile>#/run/-1/calculation/-1
   tasks:
   - m_def: nomad.datamodel.metainfo.workflow.TaskReference
     name: '1'
@@ -20,7 +19,7 @@ workflow2:
     outputs:
     - name: output calculation from 1
       section: ../upload/archive/mainfile/<task_1_mainfile>#/run/0/calculation/-1
-  - m_def: nomad.datamodel.metainfo.workflow.Workflow
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
     name: '2'
     task: ../upload/archive/mainfile/<task_2_mainfile>#/workflow2
     inputs:
@@ -29,12 +28,12 @@ workflow2:
     outputs:
     - name: output calculation from 2
       section: ../upload/archive/mainfile/<task_2_mainfile>#/run/0/calculation/-1
-  - m_def: nomad.datamodel.metainfo.workflow.Workflow
+  - m_def: nomad.datamodel.metainfo.workflow.TaskReference
     name: '3'
     task: ../upload/archive/mainfile/<task_3_mainfile>#/workflow2
     inputs:
-    - name: DEFAULT input system from 2
+    - name: input system from 2
       section: ../upload/archive/mainfile/<task_2_mainfile>#/run/-1/system/-1
     outputs:
-    - name: DEFAULT output calculation from 3
+    - name: output calculation from 3
       section: ../upload/archive/mainfile/<task_3_mainfile>#/run/-1/calculation/-1

@@ -20,6 +20,17 @@ def represent_ordereddict(dumper, data):
     return dumper.represent_dict(data.items())
 
 
+class SingleQuotedScalarString(str):
+    pass
+
+
+def single_quoted_scalar_representer(dumper, data):
+    return dumper.represent_scalar('tag:yaml.org,2002:str', data, style="'")
+
+
+yaml.add_representer(SingleQuotedScalarString, single_quoted_scalar_representer)
+yaml.add_representer(str, single_quoted_scalar_representer)
+
 # Register the custom representer
 yaml.add_representer(OrderedDict, represent_ordereddict)
 
@@ -85,7 +96,7 @@ class NomadSection(BaseModel):
                 if self.path_info.get('supersection_index') is not None:
                     # add supersection index when given, else supersection is assumed
                     # to be nonrepeating
-                    archive_path += f'/{self.path_info.get("supersection_index")}'
+                    archive_path += f"/{self.path_info.get('supersection_index')}"
             elif self.path_info.get('section_type'):
                 if (
                     self.path_info.get('section_type')
@@ -96,17 +107,19 @@ class NomadSection(BaseModel):
                     ]
                 ):  # case 2 - no supersection path, but section type is contained in run
                     run_index = self.path_info.get('supersection_index')
-                    run_index = run_index if run_index is not None else -1
+                    run_index = (
+                        run_index if run_index is not None else 0
+                    )  #! -1 notation currently not functional for supersection!
                     # add run index when given, else use last run section
                     archive_path = f'run/{run_index}'
                 elif self.path_info.get('section_type') in ['results']:
                     archive_path = 'workflow2'
                 else:
-                    archive_path += f'/{self.path_info.get("section_type")}'
+                    archive_path += f"/{self.path_info.get('section_type')}"
                     if self.path_info.get('section_index') is not None:
                         # add section index when given, else supersection is assumed
                         # to be nonrepeating
-                        archive_path += f'/{self.path_info.get("section_index")}'
+                        archive_path += f"/{self.path_info.get('section_index')}"
             else:
                 logger.warning(
                     (
@@ -117,9 +130,9 @@ class NomadSection(BaseModel):
 
             # SECTION
             if self.path_info.get('section_type') is not None:
-                archive_path += f'/{self.path_info["section_type"]}'
+                archive_path += f"/{self.path_info['section_type']}"
                 if self.path_info.get('section_index') is not None:
-                    archive_path += f'/{self.path_info["section_index"]}'
+                    archive_path += f"/{self.path_info['section_index']}"
             else:
                 logger.warning(
                     (
@@ -144,7 +157,7 @@ class NomadSection(BaseModel):
         elif self.path_info.get('upload_id'):
             upload_prefix = f"/uploads/{self.path_info.get('upload_id')}"
         else:
-            upload_prefix = '../upload'
+            upload_prefix = f"../upload{''}"
 
         return f"{upload_prefix}/archive/mainfile/{self.path_info['mainfile_path']}"
 
@@ -153,10 +166,12 @@ class NomadSection(BaseModel):
         if not self.upload_prefix or not self.archive_path:
             return ''
 
-        return f'{self.upload_prefix}#/{self.archive_path}'
+        return f"{self.upload_prefix}#/{self.archive_path}{''}"
 
     def to_dict(self) -> dict:
-        return OrderedDict({'name': self.name, 'section': self.full_path})
+        return OrderedDict(
+            {'name': self.name, 'section': SingleQuotedScalarString(self.full_path)}
+        )
 
 
 class NomadTask(BaseModel):
@@ -241,7 +256,13 @@ class NomadWorkflowArchive(BaseModel):
 
     def to_yaml(self, destination_filename: str) -> None:
         with open(destination_filename, 'w') as f:
-            yaml.dump(self.to_dict(), f, default_flow_style=False)
+            yaml.dump(
+                self.to_dict(),
+                f,
+                default_flow_style=False,
+                allow_unicode=True,
+                width=80,
+            )
 
 
 class NomadWorkflow(BaseModel):
@@ -251,9 +272,9 @@ class NomadWorkflow(BaseModel):
     node_attributes: dict[int, Any] = {}
     workflow_graph: nx.DiGraph = None
     task_elements: dict[str, NomadSection] = Field(default_factory=dict)
-    simulation_defaults: dict[str, dict[str, str]] = Field(
+    simulation_default_sections: dict[str, list[str]] = Field(
         default_factory=dict,
-        description='Default inputs and outputs for simulation tasks',
+        description='Default input and output sections for simulation tasks',
     )
 
     class Config:
@@ -262,13 +283,9 @@ class NomadWorkflow(BaseModel):
     def __init__(self, **data):
         super().__init__(**data)
         self.task_elements = {}
-        self.simulation_defaults = {
-            'inputs': {
-                'section': 'system',
-            },
-            'outputs': {
-                'section': 'calculation',
-            },
+        self.simulation_default_sections = {
+            'inputs': ['system'],
+            'outputs': ['system', 'calculation'],
         }
         # ! add more defaults here
         if self.workflow_graph is None:
@@ -370,44 +387,54 @@ class NomadWorkflow(BaseModel):
         if node_source_type == 'input':
             partner_node = node_dest
 
-        defaults = {}
+        default_sections = {}
         if (
             self.workflow_graph.nodes[partner_node].get('entry_type', '')
             == 'simulation'
         ):
-            defaults = self.simulation_defaults
+            default_sections = self.simulation_default_sections
         # ! add more defaults here
-        if not defaults:
+        if not default_sections:
             return []
 
-        default_section = defaults[inout_type]['section']
-        flag_defaults = False
-        if inout_type == 'outputs':
-            for _, _, edge2 in self.workflow_graph.out_edges(node_source, data=True):
-                if self._check_for_defaults(inout_type, default_section, edge2):
-                    flag_defaults = True
+        inouts = []
+        for default_section in default_sections[inout_type]:
+            flag_defaults = False
+            if inout_type == 'outputs':
+                for _, _, edge2 in self.workflow_graph.out_edges(
+                    node_source, data=True
+                ):
+                    if self._check_for_defaults(inout_type, default_section, edge2):
+                        flag_defaults = True
+                        break
+            elif inout_type == 'inputs':
+                # don't add input defaults for edge input node
+                in_tasks = [
+                    edge[0]
+                    for edge in self.workflow_graph.in_edges(node_dest)
+                    if self.workflow_graph.nodes[edge[0]].get('type', '')
+                    in ['task', 'workflow']
+                ]
+                if not in_tasks:
                     break
-        elif inout_type == 'inputs':
-            for _, _, edge2 in self.workflow_graph.in_edges(node_dest, data=True):
-                if self._check_for_defaults(inout_type, default_section, edge2):
-                    flag_defaults = True
-                    break
-        if flag_defaults:
-            return []
-
-        partner_name = self.workflow_graph.nodes[partner_node].get('name', '')
-        inouts = [
-            {
-                'name': (
-                    f'DEFAULT {inout_type[:-1]} {default_section} '
-                    f'from {partner_name}'
-                ),
-                'path_info': {
-                    'section_type': default_section,
-                    'mainfile_path': self._get_mainfile_path(partner_node),
-                },
-            },
-        ]
+                for _, _, edge2 in self.workflow_graph.in_edges(node_dest, data=True):
+                    if self._check_for_defaults(inout_type, default_section, edge2):
+                        flag_defaults = True
+                        break
+            if not flag_defaults:
+                partner_name = self.workflow_graph.nodes[partner_node].get('name', '')
+                inouts.append(
+                    {
+                        'name': (
+                            f'{inout_type[:-1]} {default_section} '
+                            f'from {partner_name}'
+                        ),
+                        'path_info': {
+                            'section_type': default_section,
+                            'mainfile_path': self._get_mainfile_path(partner_node),
+                        },
+                    },
+                )
 
         return inouts
 
@@ -431,7 +458,6 @@ class NomadWorkflow(BaseModel):
         archive.inputs = []
         archive.outputs = []
 
-        #! Here I want to only add ios that are on the edge nodes of the subgraph!
         # get the input task nodes
         task_nodes = [
             n
@@ -586,7 +612,9 @@ def build_nomad_workflow(
     return workflow.workflow_graph
 
 
-# TODO need to adjust the workflow graph along with the yaml and then spit out the final version that matches...
+# TODO I need to check that the defaults are generated properly when you have multiple input or output task nodes.
+# TODO we need to fix the default inputs, so that system[-1] is not added, and instead either the global input or possibly system[0] only
+# TODO -1 notation doesn't work for run for connections!!
 # TODO test this code on a number of already existing examples
 # TODO create docs with some examples for dict and graph input types
 # TODO add to readme/docs that this is not currently using NOMAD, but could be linked

@@ -1,0 +1,49 @@
+
+workflow2:
+  name: Equilibration Procedure
+  inputs:
+    - name: input system
+      section: '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/0'
+  outputs:
+    - name: output system
+      section: '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/run/0/system/-1'
+    - name: output properties
+      section: '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/run/0/calculation/-1'
+  tasks:
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: ../upload/archive/mainfile/Emin/mdrun_Emin.log#/workflow2
+      name: Geometry Optimization
+      inputs:
+        - name: input system
+          section: '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/0'
+      outputs:
+        - name: relaxed system
+          section: '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/-1'
+        - name: energies of the relaxed system
+          section: '../upload/archive/mainfile/Equil_NPT/mdrun_Equil-NPT.log#/run/0/calculation/-1/energy'
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: ../upload/archive/mainfile/Equil_NPT/mdrun_Equil-NPT.log#/workflow2
+      name: Equilibration NPT Molecular Dynamics
+      inputs:
+        - name: input system
+          section: '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/-1'
+      outputs:
+        - name: output system
+          section: '../upload/archive/mainfile/Equil_NPT/mdrun_Equil-NPT.log#/run/0/system/-1'
+        - name: output properties
+          section: '../upload/archive/mainfile/Equil_NPT/mdrun_Equil-NPT.log#/run/0/calculation/-1'
+        - name: MD workflow properties (structural and dynamical)
+          section: '../upload/archive/mainfile/Equil_NPT/mdrun_Equil-NPT.log#/workflow2/results'
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: ../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/workflow2
+      name: Production NVT Molecular Dynamics
+      inputs:
+        - name: input system
+          section: '../upload/archive/mainfile/Equil_NPT/mdrun_Equil-NPT.log#/run/0/system/-1'
+      outputs:
+        - name: output system
+          section: '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/run/0/system/-1'
+        - name: output properties
+          section: '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/run/0/calculation/-1'
+        - name: MD workflow properties (structural and dynamical)
+          section: '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/workflow2/results'
