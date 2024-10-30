@@ -13,7 +13,7 @@ While effective, the creation of this yaml file requires some a priori knowledge
 networkx directed graph:
 ```python
 import networkx as nx
-workflow_graph = nx.DiGraph
+workflow_graph = nx.DiGraph()
 ```
 
 
@@ -105,11 +105,7 @@ The following attributes can be added to each node in the graph:
         e.g., "run/0/system/2"
         """
 )
-```
 
-`node_to_attributes()`:
-
-```python
 'inputs': list(dict)
 """
 a list of input nodes to be added to the graph with in_edges to the parent node.
@@ -144,8 +140,45 @@ a list of output nodes to be added to the graph with out_edges from the parent n
             """
     }
 ],
+}
+```
 
+This can be achieved in practice with:
 
+```python
+node_attributes = {
+    0: {'<key, value pairs as defined above>'},
+    1: {'<key, value pairs as defined above>'},
+    ...
+}
+```
+
+1. For a dictionary containing all nodes and attributes
+
+```python
+workflow_graph.add_nodes_from(node_attributes.keys())
+nx.set_node_attributes(workflow_graph, node_attributes)
+```
+
+2. For each node attribute dictionary separately:
+
+```python
+for node_index, node_attribute_dict in node_attributes.items():
+    workflow_graph.add_node(node_index, **node_attribute_dict)
+```
+
+Then, the appropriate edges need to be added to the graph (no edge attributes are necessary). For each source to destination edge:
+
+```python
+workflow_graph.add_edge(
+    node_source, node_destination
+)
+```
+
+Alternatively, `nomad-utility-workflows` provides a functionality to automatically create an initial workflow graph automatically from a dictionary of node attributes as defined above with the function `node_to_attributes()`. In this case, the edges are specified with the following additional attributes (duplicate edges do not have an effect):
+
+```python
+{
 'in_edge_nodes': list(int)
     """
     a list of integers specifying the node keys which contain in-edges to this node.
@@ -157,169 +190,3 @@ a list of output nodes to be added to the graph with out_edges from the parent n
     """
 }
 ```
-
-
-
-node_attributes = {
-    0: {
-        'name': 'global workflow input',
-        'type': 'input',
-        'entry_type': 'simulation',
-        'path_info': {
-            'upload_id': '<input_upload_id>',
-            'entry_id': None,
-            'mainfile_path': '<input_mainfile>',
-            # ! Global inputs must reference the mainfile explicitly (i.e., not inferred
-            # from the edge node)
-            'supersection_index': 0,
-            'section_index': 0,
-            'section_type': 'method',
-            # 'archive_path': 'run/0/method/0',
-        },
-        'out_edge_nodes': [1],
-    },
-    1: {
-        'name': '1',
-        'type': 'task',
-        'entry_type': 'simulation',
-        'path_info': {
-            'upload_id': None,
-            'entry_id': '<task_1_entry_id>',
-            'mainfile_path': '<task_1_mainfile>',
-            'section_type': 'workflow2',
-            # 'archive_path': 'workflow2',
-        },
-        'inputs': [
-            {
-                'name': 'input system from 0',
-                'path_info': {
-                    'section_type': 'system',
-                    'supersection_index': 0,
-                    'section_index': 0,
-                    # 'archive_path': 'run/0/system/0'
-                },
-            }
-        ],
-        'outputs': [
-            {
-                'name': 'output calculation from 1',
-                'path_info': {
-                    'section_type': 'calculation',
-                    'supersection_index': 0,
-                    'calculation_index': -1,
-                    # 'archive_path': 'run/0/calculation/-1',
-                },
-            }
-        ],
-        # TODO In case of node reference, I should connect the mainfile inside
-        # archive_path_info
-    },
-    2: {
-        'name': '2',
-        'type': 'workflow',
-        'entry_type': 'simulation',
-        'path_info': {
-            'upload_id': None,
-            'entry_id': None,
-            'mainfile_path': '<task_2_mainfile>',
-            # 'archive_path': 'workflow2',
-        },
-        'inputs': [
-            {
-                'name': 'input system from 1',
-                'path_info': {
-                    'section_type': 'system',
-                    'supersection_index': 0,
-                    'section_index': -1,
-                    # 'archive_path': 'run/0/system/-1',
-                },
-                'out_edge_nodes': [1],
-            }
-        ],
-        'outputs': [
-            {
-                'name': 'output calculation from 2',
-                'path_info': {
-                    'section_type': 'calculation',
-                    'supersection_index': 0,
-                    'calculation_index': -1,
-                    # 'archive_path': 'run/0/calculation/-1'
-                },
-            }
-        ],
-    },
-    3: {
-        'name': '3',
-        'type': 'workflow',
-        'entry_type': 'simulation',
-        'path_info': {
-            'upload_id': None,
-            'entry_id': None,
-            'mainfile_path': '<task_3_mainfile>',
-            # 'archive_path': 'workflow2',
-        },
-        'in_edge_nodes': [2],
-        'out_edge_nodes': [],
-    },
-    4: {
-        'name': 'global workflow output',
-        'type': 'output',
-        'entry_type': 'simulation',
-        'path_info': {
-            'upload_id': None,
-            'entry_id': None,
-            'mainfile_path': '<output_mainfile>',
-            'supersection_index': -1,
-            'section_type': 'results',
-            # 'archive_path': 'workflow2/results/0',
-        },
-        'in_edge_nodes': [
-            3
-        ],
-        # TODO if this is an output and connected node is a workflow, automatically
-        # reference workflow results? Or somehow need to know to put in workflow2?
-    },
-}
-
-# workflow_graph = build_nomad_workflow(
-#     destination_filename='test_workflow.archive.yaml',
-#     node_attributes=node_attributes,
-#     write_to_yaml=True,
-# )
-# gv.d3(
-#     workflow_graph,
-#     node_label_data_source='name',
-#     edge_label_data_source='name',
-#     zoom_factor=1.5,
-#     node_hover_tooltip=True,
-# )
-
-
-edges and attributes
-
-0 1 []
-0 1 []
-1 6 [{'name': 'output calculation from 1', 'path_info': {'section_type': 'calculation', 'supersection_index': 0, 'calculation_index': -1, 'mainfile_path': '<task_1_mainfile>'}}]
-1 6 []
-1 2 []
-1 2 [{'name': 'input system from 1', 'path_info': {'section_type': 'system', 'supersection_index': 0, 'section_index': -1, 'mainfile_path': '<task_1_mainfile>'}, 'out_edge_nodes': [1]}]
-2 7 [{'name': 'output calculation from 2', 'path_info': {'section_type': 'calculation', 'supersection_index': 0, 'calculation_index': -1, 'mainfile_path': '<task_2_mainfile>'}}]
-2 7 []
-2 3 []
-2 3 [{'name': 'DEFAULT input system from 2', 'path_info': {'section_type': 'system', 'mainfile_path': '<task_2_mainfile>'}}]
-3 4 [{'name': 'DEFAULT output calculation from 3', 'path_info': {'section_type': 'calculation', 'mainfile_path': '<task_3_mainfile>'}}]
-3 4 []
-5 1 []
-5 1 [{'name': 'input system from 0', 'path_info': {'section_type': 'system', 'supersection_index': 0, 'section_index': 0, 'mainfile_path': '<task_1_mainfile>'}}]
-
-
-
-0 {'name': 'global workflow input', 'type': 'input', 'entry_type': 'simulation', 'path_info': {'upload_id': '<input_upload_id>', 'entry_id': None, 'mainfile_path': '<input_mainfile>', 'supersection_index': 0, 'section_index': 0, 'section_type': 'method'}, 'out_edge_nodes': [1]}
-1 {'name': '1', 'type': 'task', 'entry_type': 'simulation', 'path_info': {'upload_id': None, 'entry_id': '<task_1_entry_id>', 'mainfile_path': '<task_1_mainfile>', 'section_type': 'workflow2'}}
-2 {'name': '2', 'type': 'workflow', 'entry_type': 'simulation', 'path_info': {'upload_id': None, 'entry_id': None, 'mainfile_path': '<task_2_mainfile>'}}
-3 {'name': '3', 'type': 'workflow', 'entry_type': 'simulation', 'path_info': {'upload_id': None, 'entry_id': None, 'mainfile_path': '<task_3_mainfile>'}, 'in_edge_nodes': [2], 'out_edge_nodes': []}
-4 {'name': 'global workflow output', 'type': 'output', 'entry_type': 'simulation', 'path_info': {'upload_id': None, 'entry_id': None, 'mainfile_path': '<output_mainfile>', 'supersection_index': -1, 'section_type': 'results'}, 'in_edge_nodes': [3]}
-5 {'type': 'input', 'name': 'input system from 0', 'path_info': {'section_type': 'system', 'supersection_index': 0, 'section_index': 0, 'mainfile_path': '<task_1_mainfile>'}}
-6 {'type': 'output', 'name': 'output calculation from 1', 'path_info': {'section_type': 'calculation', 'supersection_index': 0, 'calculation_index': -1, 'mainfile_path': '<task_1_mainfile>'}}
-7 {'type': 'output', 'name': 'output calculation from 2', 'path_info': {'section_type': 'calculation', 'supersection_index': 0, 'calculation_index': -1, 'mainfile_path': '<task_2_mainfile>'}}
-
