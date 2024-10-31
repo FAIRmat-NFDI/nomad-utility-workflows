@@ -12,6 +12,7 @@ WORKFLOW_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
 # TODO not yet sure about the specification of actual tasks, need to test
 
 SectionType = Literal['task', 'workflow', 'input', 'output', 'other']
+EntryType = Literal['simulation']
 # TODO check/implement functionality of "other" type
 
 
@@ -504,7 +505,11 @@ class NomadWorkflow(BaseModel):
 
 
 def nodes_to_graph(node_attributes: dict[int, Any]) -> nx.DiGraph:
-    """_summary_
+    """Builds a workflow graph (nx.DiGraph) from a dictionary of node attributes
+    as specified below.
+
+    Args:
+        node_attributes (dict[int, Any]): _description_
 
     Returns:
         nx.DiGraph: _description_
@@ -588,14 +593,121 @@ def _add_task_inouts(workflow_graph, node_key, node_attrs):
             workflow_graph.edges[node_key, edge_node]['inputs'].append(output_)
 
 
+class NodeAttributes(TypedDict, total=False):
+    """
+    NodeAttributes represents the attributes of a node in the NOMAD workflow graph.
+
+    Attributes:
+        name (str): A free-form string describing this node, which will be used as a
+                    label in the NOMAD workflow graph visualizer.
+
+        type (Literal['input', 'output', 'workflow', 'task', 'other']):
+            Specifies the type of node. Must be one of the specified options.
+
+            - input: (meta)data taken as input for the entire workflow or a specific
+                    task. For simulations, often corresponds to a section within the
+                    archive (e.g., system, method).
+
+            - output: (meta)data produced as output for the entire workflow or a
+                    specific task. For simulations, often corresponds to a section
+                    within the archive (e.g., calculation).
+
+            - workflow: A node in the workflow which itself contains an internal
+                    (sub)workflow, that is recognized by NOMAD. Such nodes can be
+                    linked to existing workflows within NOMAD, providing
+                    functionalities within NOMAD's interactive workflow graphs.
+
+            - task: A node in the workflow which represents an individual task
+                    (i.e., no underlying workflow), that is recognized by NOMAD.
+
+            - other: A node in the workflow which represents either a (sub)workflow
+                    or individual task that is not supported by NOMAD.
+
+        entry_type (Literal['simulation']): Specifies the type of node in terms of
+            tasks or workflows recognized by NOMAD. Functionally, this attribute is
+            used to create default inputs and outputs that are required for properly
+            creating the edge visualizations in the NOMAD GUI.
+
+        path_info (dict): Information for generating the NOMAD archive section paths
+            (i.e., connections between nodes in terms of the NOMAD MetaInfo sections).
+
+            - upload_id (str): NOMAD PID for the upload, if exists.
+
+            - entry_id (str): NOMAD PID for the entry, if exists.
+
+            - mainfile_path (str): Local (relative to the native upload) path to the
+                mainfile, including the mainfile name with extension.
+
+            - supersection_path (str): Archive path to the supersection, e.g.,
+                "run" or "workflow2/method".
+
+            - supersection_index (int): The relevant index for the supersection, if it
+                is a repeating subsection.
+
+            - section_type (str): The name of the section for an input or output node,
+                e.g., "system", "method", or "calculation".
+
+            - section_index (int): The relevant index for the section, if it is a
+                repeating subsection.
+
+            - archive_path (str): Specifies the entire archive path to the section,
+                e.g., "run/0/system/2".
+
+        inputs (list[dict]): A list of input nodes to be added to the graph with
+            in_edges to the parent node.
+
+            - name (str): Will be set as the name for the input node created.
+
+            - path_info (dict): Path information for the input node created, as
+                specified for the node attributes above.
+
+        outputs (list[dict]): A list of output nodes to be added to the graph with
+            out_edges from the parent node.
+
+            - name (str): Will be set as the name for the output node created.
+
+            - path_info (dict): Path information for the output node created, as
+                specified for the node attributes above.
+
+        in_edge_nodes (list[int]): A list of integers specifying the node keys which
+            contain in-edges to this node.
+
+        out_edge_nodes (list[int]): A list of integers specifying the node keys which
+            contain out-edges to this node.
+    """
+
+    name: str
+    type: SectionType
+    entry_type: EntryType
+    path_info: PathInfo
+    inputs: list[dict[str, Any]]
+    outputs: list[dict[str, Any]]
+    in_edge_nodes: list[int]
+    out_edge_nodes: list[int]
+
+
 def build_nomad_workflow(
-    destination_filename: str = './nomad_workflow.archive.yaml',
-    archive_section: str = 'workflow2',
-    workflow_name: str = '',
-    node_attributes: dict[int, Any] = {},
+    workflow_metadata: dict[str, str] = {},
+    node_attributes: NodeAttributes = {},
     workflow_graph: nx.DiGraph = None,
     write_to_yaml: bool = False,
 ) -> nx.DiGraph:
+    """_summary_
+
+    Args:
+        workflow_metadata (dict[str, str], optional): _description_. Defaults to {}.
+        node_attributes (NodeAttributes, optional): _description_. Defaults to {}.
+        workflow_graph (nx.DiGraph, optional): _description_. Defaults to None.
+        write_to_yaml (bool, optional): _description_. Defaults to False.
+
+    Returns:
+        nx.DiGraph: _description_
+    """
+    destination_filename = workflow_metadata.get(
+        'destination_filename', './nomad_workflow.archive.yaml'
+    )
+    archive_section = workflow_metadata.get('archive_section', 'workflow2')
+    workflow_name = workflow_metadata.get('workflow_name', '')
     workflow = NomadWorkflow(
         destination_filename=destination_filename,
         archive_section=archive_section,

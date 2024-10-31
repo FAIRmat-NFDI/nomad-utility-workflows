@@ -20,9 +20,17 @@ nav:
       - Workflow - Water Equilibration: examples/workflow_water_equilibration.md
   - Explanation:
     - Workflows: explanation/workflows.md
-  - Reference: reference/references.md
+  - Reference:
+    - Workflows: reference/workflows.md
 plugins:
   - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: false
+            heading_level: 2
 theme:
   name: material
   palette:

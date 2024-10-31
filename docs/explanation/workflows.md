@@ -10,6 +10,7 @@ While effective, the creation of this yaml file requires some a priori knowledge
 
 `nomad-utility-workflows` attempts to simplify the creation of the custom workflow yaml files by allowing users instead to supply a networkx graph with a set of minimal node attributes that are then used to create the appropriate connections within the yaml file automatically.
 
+
 networkx directed graph:
 ```python
 import networkx as nx
