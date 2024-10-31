@@ -1,9 +1,9 @@
-from nomad.utils import get_logger
 from collections import OrderedDict
 from typing import Any, Literal, Optional, TypedDict, Union
 
 import networkx as nx
 import yaml
+from nomad.utils import get_logger
 from pydantic import BaseModel, Field
 
 logger = get_logger(__name__)
@@ -74,73 +74,135 @@ class NomadSection(BaseModel):
         super().__init__(**data)
         self.path_info = {**default_path_info, **self.path_info}
 
+    # @property
+    # def archive_path(self) -> str:
+    #     archive_path = ''
+    #     if not self.path_info:
+    #         logger.warning(
+    #             f'No path info provided for {self.type}-{self.name}.'
+    #             ' Section reference will be missing.'
+    #         )
+    #         return archive_path
+
+    #     if self.path_info.get('archive_path'):
+    #         archive_path = self.path_info['archive_path']
+    #     elif self.type == 'workflow':
+    #         archive_path = 'workflow2'
+    #     else:
+    #         # SUPERSECTION
+    #         if self.path_info[
+    #             'supersection_path'
+    #         ]:  # case 1 - supersection path is given
+    #             archive_path = self.path_info['supersection_path']
+    #             if self.path_info.get('supersection_index') is not None:
+    #                 # add supersection index when given, else supersection is assumed
+    #                 # to be nonrepeating
+    #                 archive_path += f"/{self.path_info.get('supersection_index')}"
+    #         elif self.path_info.get('section_type'):
+    #             if self.path_info.get('section_type') in [
+    #                 'system',
+    #                 'calculation',
+    #                 'method',
+    #             ]:  # case 2 - no supersection path, but section type is in run
+    #                 run_index = self.path_info.get('supersection_index')
+    #                 run_index = (
+    #                     run_index if run_index is not None else 0
+    #                 )  #! -1 notation currently not functional for supersection!
+    #                 # add run index when given, else use last run section
+    #                 archive_path = f'run/{run_index}'
+    #             elif self.path_info.get('section_type') in ['results']:
+    #                 archive_path = 'workflow2'
+    #             else:
+    #                 archive_path += f"/{self.path_info.get('section_type')}"
+    #                 if self.path_info.get('section_index') is not None:
+    #                     # add section index when given, else supersection is assumed
+    #                     # to be nonrepeating
+    #                     archive_path += f"/{self.path_info.get('section_index')}"
+    #         else:
+    #             logger.warning(
+    #                 (
+    #                     'No supersection path or section type provided for '
+    #                     f'{self.type}-{self.name}. Section reference may be incorrect.'
+    #                 ),
+    #             )
+
+    #         # SECTION
+    #         if self.path_info.get('section_type') is not None:
+    #             archive_path += f"/{self.path_info['section_type']}"
+    #             if self.path_info.get('section_index') is not None:
+    #                 archive_path += f"/{self.path_info['section_index']}"
+    #         else:
+    #             logger.warning(
+    #                 (
+    #                     f'No section type provided for {self.type}-{self.name}. '
+    #                     'Section reference may be incorrect.'
+    #                 ),
+    #             )
+
+    #     return archive_path
+
     @property
     def archive_path(self) -> str:
-        archive_path = ''
         if not self.path_info:
             logger.warning(
-                f'No path info provided for {self.type}-{self.name}. Section reference will be missing.'
+                f'No path info provided for {self.type}-{self.name}.'
+                ' Section reference will be missing.'
             )
-            return archive_path
+            return ''
 
         if self.path_info.get('archive_path'):
-            archive_path = self.path_info['archive_path']
+            return self.path_info['archive_path']
         elif self.type == 'workflow':
+            return 'workflow2'
+        else:
+            return self._get_supersection_path()
+
+    def _get_supersection_path(self) -> str:
+        archive_path = ''
+        if self.path_info.get('supersection_path'):
+            archive_path = self._get_supersection_path_with_index()
+        elif self.path_info.get('section_type'):
+            archive_path = self._get_section_type_path()
+        else:
+            logger.warning(
+                (
+                    'No supersection path or section type provided for '
+                    f'{self.type}-{self.name}. Section reference may be incorrect.'
+                ),
+            )
+        return self._get_section_path(archive_path)
+
+    def _get_supersection_path_with_index(self) -> str:
+        archive_path = self.path_info['supersection_path']
+        if self.path_info.get('supersection_index') is not None:
+            archive_path += f"/{self.path_info.get('supersection_index')}"
+        return archive_path
+
+    def _get_section_type_path(self) -> str:
+        archive_path = ''
+        if self.path_info.get('section_type') in ['system', 'calculation', 'method']:
+            run_index = self.path_info.get('supersection_index', 0)
+            archive_path = f'run/{run_index}'
+        elif self.path_info.get('section_type') in ['results']:
             archive_path = 'workflow2'
         else:
-            # SUPERSECTION
-            if self.path_info[
-                'supersection_path'
-            ]:  # case 1 - supersection path is given
-                archive_path = self.path_info['supersection_path']
-                if self.path_info.get('supersection_index') is not None:
-                    # add supersection index when given, else supersection is assumed
-                    # to be nonrepeating
-                    archive_path += f"/{self.path_info.get('supersection_index')}"
-            elif self.path_info.get('section_type'):
-                if (
-                    self.path_info.get('section_type')
-                    in [
-                        'system',
-                        'calculation',
-                        'method',
-                    ]
-                ):  # case 2 - no supersection path, but section type is contained in run
-                    run_index = self.path_info.get('supersection_index')
-                    run_index = (
-                        run_index if run_index is not None else 0
-                    )  #! -1 notation currently not functional for supersection!
-                    # add run index when given, else use last run section
-                    archive_path = f'run/{run_index}'
-                elif self.path_info.get('section_type') in ['results']:
-                    archive_path = 'workflow2'
-                else:
-                    archive_path += f"/{self.path_info.get('section_type')}"
-                    if self.path_info.get('section_index') is not None:
-                        # add section index when given, else supersection is assumed
-                        # to be nonrepeating
-                        archive_path += f"/{self.path_info.get('section_index')}"
-            else:
-                logger.warning(
-                    (
-                        'No supersection path or section type provided for '
-                        f'{self.type}-{self.name}. Section reference may be incorrect.'
-                    ),
-                )
+            archive_path += f"/{self.path_info.get('section_type')}"
+            if self.path_info.get('section_index') is not None:
+                archive_path += f"/{self.path_info.get('section_index')}"
+        return archive_path
 
-            # SECTION
-            if self.path_info.get('section_type') is not None:
-                archive_path += f"/{self.path_info['section_type']}"
-                if self.path_info.get('section_index') is not None:
-                    archive_path += f"/{self.path_info['section_index']}"
-            else:
-                logger.warning(
-                    (
-                        f'No section type provided for {self.type}-{self.name}. '
-                        'Section reference may be incorrect.'
-                    ),
-                )
-
+    def _get_section_path(self, archive_path: str) -> str:
+        if self.path_info.get('section_type') is not None:
+            archive_path += f"/{self.path_info['section_type']}"
+            if self.path_info.get('section_index') is not None:
+                archive_path += f"/{self.path_info['section_index']}"
+        else:
+            logger.warning(
+                (
+                    f'No section type provided for {self.type}-{self.name}. '
+                    'Section reference may be incorrect.'
+                ),
+            )
         return archive_path
 
     @property
@@ -469,7 +531,8 @@ class NomadWorkflow(BaseModel):
 
         # select input nodes from task graph that have no incoming edges
         for node in [n for n, d in task_graph.in_degree if d == 0]:
-            # get the inputs from the incoming edges of these nodes within the full graph (should be inputs!)
+            # get the inputs from the incoming edges of these nodes within
+            # the full graph (should be inputs!)
             for edge in self.workflow_graph.in_edges(node, data=True):
                 if self.workflow_graph.nodes[edge[0]].get('type', '') != 'input':
                     continue
@@ -477,7 +540,8 @@ class NomadWorkflow(BaseModel):
                 archive.inputs.append(element)
         # select output nodes from task graph that have no outgoing edges
         for node in [n for n, d in task_graph.out_degree if d == 0]:
-            # get the outputs from the outgoing edges of these nodes within the full graph (should be outputs!)
+            # get the outputs from the outgoing edges of these nodes within
+            # the full graph (should be outputs!)
             for edge in self.workflow_graph.out_edges(node, data=True):
                 if self.workflow_graph.nodes[edge[1]].get('type', '') != 'output':
                     continue
@@ -612,8 +676,10 @@ def build_nomad_workflow(
     return workflow.workflow_graph
 
 
-# TODO I need to check that the defaults are generated properly when you have multiple input or output task nodes.
-# TODO we need to fix the default inputs, so that system[-1] is not added, and instead either the global input or possibly system[0] only
+# TODO I need to check that the defaults are generated properly when you have multiple
+# input or output task nodes.
+# TODO we need to fix the default inputs, so that system[-1] is not added, and instead
+# either the global input or possibly system[0] only
 # TODO -1 notation doesn't work for run for connections!!
 # TODO test this code on a number of already existing examples
 # TODO create docs with some examples for dict and graph input types
