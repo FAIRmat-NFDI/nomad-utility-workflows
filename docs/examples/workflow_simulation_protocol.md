@@ -130,10 +130,14 @@ There are no necessary attributes to add to the graph. `nomad-utility-workflows`
 Now that we have generated the input workflow graph, we can use `nomad-utility-workflows`'s `build_nomad_workflow()` function to create the `workflow.archive.yaml` file that will connect our individual simulations within NOMAD:
 
 ```python
+workflow_metadata = {
+    'destination_filename': './workflow_minimal.archive.yaml',
+    'workflow_name': 'Equilibration Procedure',
+}
+
 workflow_graph_output = build_nomad_workflow(
-    destination_filename='./workflow.archive.yaml',
-    workflow_name='Equilibration Procedure',
-    workflow_graph=workflow_graph_input,
+    workflow_metadata=workflow_metadata,
+    workflow_graph=nx.DiGraph(workflow_graph_input),
     write_to_yaml=True,
 )
 ```

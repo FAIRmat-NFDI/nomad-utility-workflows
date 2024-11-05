@@ -17,7 +17,8 @@ nav:
       # - Contribute to the documentation: how_to/contribute_to_the_documentation.md
   - Examples:
       - Workflow - Proof of Concept: examples/workflow_proof_of_concept.md
-      - Workflow - Water Equilibration: examples/workflow_water_equilibration.md
+      - Workflow - Simulation Protocol: examples/workflow_water_equilibration.md
+      - Workflow - Adding Custom Tasks: examples/workflow_custom_tasks.md
   - Explanation:
     - Workflows: explanation/workflows.md
   - Reference:
