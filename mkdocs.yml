@@ -17,7 +17,7 @@ nav:
       # - Contribute to the documentation: how_to/contribute_to_the_documentation.md
   - Examples:
       - Workflow - Proof of Concept: examples/workflow_proof_of_concept.md
-      - Workflow - Simulation Protocol: examples/workflow_water_equilibration.md
+      - Workflow - Simulation Protocol: examples/workflow_simulation_protocol.md
       - Workflow - Adding Custom Tasks: examples/workflow_custom_tasks.md
   - Explanation:
     - Workflows: explanation/workflows.md
@@ -28,6 +28,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
+          paths: [src]
           options:
             docstring_style: google
             show_source: false
