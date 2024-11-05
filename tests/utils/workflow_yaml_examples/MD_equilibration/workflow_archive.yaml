@@ -1,0 +1,67 @@
+workflow2:
+  inputs:
+    - name: input system
+      section: '../upload/archive/mainfile/MOL0_160_MOL1_240/minimEQ1.log#/run/0/system/0'
+
+  outputs:
+    - name: final system of production trajectory
+      section: '../upload/archive/mainfile/MOL0_160_MOL1_240/PD1.log#/run/0/system/-1'
+    - name: final calculation of production trajectory
+      section: '../upload/archive/mainfile/MOL0_160_MOL1_240/PD1.log#/run/0/calculation/-1'
+
+  tasks:
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: '../upload/archive/mainfile/MOL0_160_MOL1_240/minimEQ1.log#/workflow2'
+      name: GeometryOpt
+      inputs:
+        - name: input system
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/minimEQ1.log#/run/0/system/0'
+      outputs:
+        - name: relaxed system
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/minimEQ1.log#/run/0/system/-1'
+        - name: energy and pressure of the relaxed system
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/minimEQ1.log#/run/0/calculation/-1'
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: '../upload/archive/mainfile/MOL0_160_MOL1_240/EQ1.log#/workflow2'
+      name: MolecularDynamics
+      inputs:
+        - name: input system
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/minimEQ1.log#/run/0/system/-1'
+      outputs:
+        - name: final system from  high temp NVT equilibration
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/EQ1.log#/run/0/system/-1'
+        - name: final thermodynamic quantities of  high temp NVT equilibration
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/EQ1.log#/run/0/calculation/-1'
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: '../upload/archive/mainfile/MOL0_160_MOL1_240/EQ2.log#/workflow2'
+      name: MolecularDynamics
+      inputs:
+        - name: input system
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/EQ1.log#/run/0/system/-1'
+      outputs:
+        - name: final system from  NVT cool down to 300k
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/EQ2.log#/run/0/system/-1'
+        - name: final thermodynamic quantities of  NVT cool down to 300k
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/EQ2.log#/run/0/calculation/-1'
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: '../upload/archive/mainfile/MOL0_160_MOL1_240/EQ3.log#/workflow2'
+      name: MolecularDynamics
+      inputs:
+        - name: input system
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/EQ2.log#/run/0/system/-1'
+      outputs:
+        - name: final system from  NPT equilibration
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/EQ3.log#/run/0/system/-1'
+        - name: final thermodynamic quantities of  NPT equilibration
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/EQ3.log#/run/0/calculation/-1'
+    - m_def: nomad.datamodel.metainfo.workflow.TaskReference
+      task: '../upload/archive/mainfile/MOL0_160_MOL1_240/PD1.log#/workflow2'
+      name: MolecularDynamics
+      inputs:
+        - name: input system
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/EQ3.log#/run/0/system/-1'
+      outputs:
+        - name: final system from NPT production run
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/PD1.log#/run/0/system/-1'
+        - name: final thermodynamic quantities of NPT production run
+          section: '../upload/archive/mainfile/MOL0_160_MOL1_240/PD1.log#/run/0/calculation/-1'

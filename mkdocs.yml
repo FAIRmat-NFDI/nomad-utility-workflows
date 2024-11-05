@@ -10,14 +10,28 @@ nav:
   # - Tutorial: tutorial/tutorial.md
   - How-to guides:
       - API Functions: how_to/use_api_functions.md
+      - Custom Workflows: how_to/create_custom_workflows.md
       # - Install this Plugin: how_to/install_this_plugin.md
       # - Use this Plugin: how_to/use_this_plugin.md
       # - Contribute to this plugin: how_to/contribute_to_this_plugin.md
       # - Contribute to the documentation: how_to/contribute_to_the_documentation.md
-  # - Explanation: explanation/explanation.md
-  - Reference: reference/references.md
+  - Examples:
+      - Workflow - Proof of Concept: examples/workflow_proof_of_concept.md
+      - Workflow - Simulation Protocol: examples/workflow_water_equilibration.md
+      - Workflow - Adding Custom Tasks: examples/workflow_custom_tasks.md
+  - Explanation:
+    - Workflows: explanation/workflows.md
+  - Reference:
+    - Workflows: reference/workflows.md
 plugins:
   - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: false
+            heading_level: 2
 theme:
   name: material
   palette:
