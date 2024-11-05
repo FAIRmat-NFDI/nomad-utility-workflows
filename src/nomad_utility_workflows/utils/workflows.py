@@ -116,6 +116,7 @@ class NomadSection(BaseModel):
         archive_path = ''
         if self.path_info.get('section_type') in ['system', 'calculation', 'method']:
             run_index = self.path_info.get('supersection_index', 0)
+            run_index = run_index if run_index is not None else 0
             archive_path = f'run/{run_index}'
         elif self.path_info.get('section_type') in ['results']:
             archive_path = 'workflow2'
@@ -197,6 +198,8 @@ class NomadTask(BaseModel):
     def task(self) -> Optional[str]:
         if self.task_section.type == 'workflow' and self.task_section.upload_prefix:
             return self.task_section.upload_prefix + '#/workflow2'
+        elif self.task_section.type == 'task' and self.task_section.full_path:
+            return self.task_section.full_path
         else:
             return None
 
@@ -721,6 +724,9 @@ def build_nomad_workflow(
     return workflow.workflow_graph
 
 
+# TODO the input from in edge task nodes are automatically added to the global inputs...
+# TODO but not vice versa, the reverse should be done...
+# TODO also prevent that the same ios are added 2x
 # TODO I need to check that the defaults are generated properly when you have multiple
 # input or output task nodes.
 # TODO we need to fix the default inputs, so that system[-1] is not added, and instead

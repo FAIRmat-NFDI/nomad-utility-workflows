@@ -29,37 +29,37 @@ workflow2:
     name: update_topology_file
     outputs:
     - name: output
-      section: ../upload/archive/mainfile/c4edc61adf6fed591056333d61b7aceb/solute_in_bilayer_minimize-1.85.log#/run/0/calculation/0
+      section: ../upload/archive/mainfile/41eaec4191bf1515bbb9595cd7c0db57/solute_in_bilayer_minimize.log#/run/0/calculation/0
   - inputs:
     - name: input
-      section: ../upload/archive/mainfile/c4edc61adf6fed591056333d61b7aceb/solute_in_bilayer_minimize-1.85.log#/run/0/calculation/0
+      section: ../upload/archive/mainfile/41eaec4191bf1515bbb9595cd7c0db57/solute_in_bilayer_minimize.log#/run/0/calculation/0
     m_def: nomad.datamodel.metainfo.workflow.TaskReference
     name: minimize
     outputs:
     - name: output
-      section: ../upload/archive/mainfile/c4edc61adf6fed591056333d61b7aceb/solute_in_bilayer_minimize-1.85.log#/run/0/calculation/-1
-    task: ../upload/archive/mainfile/c4edc61adf6fed591056333d61b7aceb/solute_in_bilayer_minimize-1.85.log#/workflow2
+      section: ../upload/archive/mainfile/41eaec4191bf1515bbb9595cd7c0db57/solute_in_bilayer_minimize.log#/run/0/calculation/-1
+    task: ../upload/archive/mainfile/41eaec4191bf1515bbb9595cd7c0db57/solute_in_bilayer_minimize.log#/workflow2
   - inputs:
     - name: input
-      section: ../upload/archive/mainfile/c4edc61adf6fed591056333d61b7aceb/solute_in_bilayer_minimize-1.85.log#/run/0/calculation/-1
+      section: ../upload/archive/mainfile/41eaec4191bf1515bbb9595cd7c0db57/solute_in_bilayer_minimize.log#/run/0/calculation/-1
     m_def: nomad.datamodel.metainfo.workflow.TaskReference
     name: equilibrate
     outputs:
     - name: output
-      section: ../upload/archive/mainfile/c4edc61adf6fed591056333d61b7aceb/solute_in_bilayer_equilibrate-1.85.log#/run/0/calculation/-1
-    task: ../upload/archive/mainfile/c4edc61adf6fed591056333d61b7aceb/solute_in_bilayer_equilibrate-1.85.log#/workflow2
+      section: ../upload/archive/mainfile/41eaec4191bf1515bbb9595cd7c0db57/solute_in_bilayer_equilibrate.log#/run/0/calculation/-1
+    task: ../upload/archive/mainfile/41eaec4191bf1515bbb9595cd7c0db57/solute_in_bilayer_equilibrate.log#/workflow2
   - inputs:
     - name: input
-      section: ../upload/archive/mainfile/c4edc61adf6fed591056333d61b7aceb/solute_in_bilayer_equilibrate-1.85.log#/run/0/calculation/-1
+      section: ../upload/archive/mainfile/41eaec4191bf1515bbb9595cd7c0db57/solute_in_bilayer_equilibrate.log#/run/0/calculation/-1
     m_def: nomad.datamodel.metainfo.workflow.TaskReference
     name: production
     outputs:
     - name: output
-      section: ../upload/archive/mainfile/c4edc61adf6fed591056333d61b7aceb/solute_in_bilayer_production-1.85.log#/run/0/calculation/-1
-    task: ../upload/archive/mainfile/c4edc61adf6fed591056333d61b7aceb/solute_in_bilayer_production-1.85.log#/workflow2
+      section: ../upload/archive/mainfile/41eaec4191bf1515bbb9595cd7c0db57/solute_in_bilayer_production.log#/run/0/calculation/-1
+    task: ../upload/archive/mainfile/41eaec4191bf1515bbb9595cd7c0db57/solute_in_bilayer_production.log#/workflow2
   - inputs:
     - name: input
-      section: ../upload/archive/mainfile/c4edc61adf6fed591056333d61b7aceb/solute_in_bilayer_production-1.85.log#/run/0/calculation/-1
+      section: ../upload/archive/mainfile/41eaec4191bf1515bbb9595cd7c0db57/solute_in_bilayer_production.log#/run/0/calculation/-1
     m_def: nomad.datamodel.metainfo.workflow.TaskReference
     name: compute_wham
     outputs:
