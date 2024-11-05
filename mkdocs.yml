@@ -16,7 +16,7 @@ nav:
       # - Contribute to this plugin: how_to/contribute_to_this_plugin.md
       # - Contribute to the documentation: how_to/contribute_to_the_documentation.md
   - Examples:
-      - Workflow - Toy: examples/workflow_toy.md
+      - Workflow - Proof of Concept: examples/workflow_proof_of_concept.md
       - Workflow - Water Equilibration: examples/workflow_water_equilibration.md
   - Explanation:
     - Workflows: explanation/workflows.md

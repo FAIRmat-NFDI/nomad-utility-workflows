@@ -1,4 +1,4 @@
-# 3 step linear toy workflow
+# 3 step linear proof of concept workflow
 
 ```python
 import gravis as gv
