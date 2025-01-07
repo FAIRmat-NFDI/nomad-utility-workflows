@@ -9,8 +9,9 @@ nav:
   - Home: index.md
   # - Tutorial: tutorial/tutorial.md
   - How-to guides:
+      - Install: how_to/install_this_plugin.md
       - API Functions: how_to/use_api_functions.md
-      - Custom Workflows: how_to/create_custom_workflows.md
+      # - Custom Workflows: how_to/create_custom_workflows.md
       # - Install this Plugin: how_to/install_this_plugin.md
       # - Use this Plugin: how_to/use_this_plugin.md
       # - Contribute to this plugin: how_to/contribute_to_this_plugin.md
