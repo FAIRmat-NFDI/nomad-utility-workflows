@@ -1,4 +1,4 @@
-# How to install This Plugin
+# How to install this utility module
 
 
 ## Development

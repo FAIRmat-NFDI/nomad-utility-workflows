@@ -15,7 +15,7 @@ classifiers = [
 ]
 name = "nomad-utility-workflows"
 description = "A module with utilities for interacting with NOMAD via, e.g., a workflow manager."
-version = "0.1.0"
+version = "0.0.1"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [
