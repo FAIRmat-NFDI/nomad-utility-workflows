@@ -1,10 +1,15 @@
 # 3 step linear proof of concept workflow
 
+> See also: [Explanation > Workflows](../explanation/workflows.md)
+
+This is not a working example, but rather more of a template to demonstrate the overall idea of the functionalities for generating NOMAD's custom workflow files, and to showcase some options which may not be used in the working examples.
+
 ```python
 import gravis as gv
 from nomad_utility_workflows.utils.workflows import build_nomad_workflow, nodes_to_graph
 ```
 
+We have a workflow
 ```python
 node_attributes = {
     0: {

@@ -10,13 +10,17 @@ While effective, the creation of this yaml file requires some a priori knowledge
 
 `nomad-utility-workflows` attempts to simplify the creation of the custom workflow yaml files by allowing users instead to supply a networkx graph with a set of minimal node attributes that are then used to create the appropriate connections within the yaml file automatically.
 
+## NetworkX DiGraphs
 
-networkx directed graph:
+A networkx directed graph is instantiated as follows:
 ```python
 import networkx as nx
 workflow_graph = nx.DiGraph()
 ```
 
+see [NetworkX Docs > DiGraph](https://networkx.org/documentation/stable/reference/classes/digraph.html) for more information.
+
+## Node Attributes
 
 The following attributes can be added to each node in the graph:
 
@@ -175,6 +179,8 @@ workflow_graph.add_edge(
     node_source, node_destination
 )
 ```
+
+## Generating the initial workflow graph
 
 Alternatively, `nomad-utility-workflows` provides a functionality to automatically create an initial workflow graph automatically from a dictionary of node attributes as defined above with the function `node_to_attributes()`. In this case, the edges are specified with the following additional attributes (duplicate edges do not have an effect):
 
