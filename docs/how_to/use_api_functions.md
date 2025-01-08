@@ -1,4 +1,4 @@
-# How to use nomad-utility-workflows to perform NOMAD API Calls
+# How to perform NOMAD API Calls
 
 Imports for the following examples:
 
@@ -47,7 +47,7 @@ By default, nomad-utility-workflows uses the Test deployment of NOMAD to make AP
 All API functions allow the user to specify the URL with the optional keyword argument `url`. If you want to use the central NOMAD URLs, you can simply set `url` equal to "prod", "staging", or "test", which correspond to the following deployments (see full URLs below):
 
 - prod: the official NOMAD deployment.
-    - Updated most infrequently (as advertised in #software-updates on the NOMAD Discord Server)
+    - Updated most infrequently (as advertised in [#software-updates](https://discordapp.com/channels/1201445470485106719/1275764272122826752) on the NOMAD Discord Server&mdash;If you are not yet a member of the NOMAD server use [Invitation to Discord](https://discord.gg/Gyzx3ukUw8))
 - staging: the beta version of NOMAD.
     - Updated more frequently than prod in order to integrate and test new features.
 - test: a test NOMAD deployment.
@@ -78,7 +78,7 @@ print(NOMAD_PROD_URL, NOMAD_STAGING_URL, NOMAD_TEST_URL)
 
 ## Authentication
 
-Some API calls, e.g., making uploads or accessing your own non-published uploads, require an authentication token. To generate this token, nomad-utility-workflows expects that your NOMAD credentials are stored in a `.env` file in the plugin root directory in the format:
+Some API calls, e.g., making uploads or accessing your own non-published uploads, require an authentication token. To generate this token, `nomad-utility-workflows` expects that your NOMAD credentials are stored in a `.env` file in your working directory or in a directory included in your `PYTHONPATH`:
 
 ```bash
 NOMAD_USERNAME="<your_nomad_username>"
@@ -99,6 +99,8 @@ NOMAD_USERNAME
     'JFRudzinski'
     ```
 
+!!! Warning "CAUTION FOR DEVELOPERS"
+    Never push your `.env` file to a repository. This would expose your password.
 
 Use `get_authentication_token()` with your credentials to explicitly obtain and store a token:
 
@@ -119,11 +121,11 @@ token
     ```
 
 
-In practice, you do not need to obtain a token yourself when using nomad-utility-workflows. A token will automatically be obtained for API calls that require authentication. However, you may want to do the token generation yourself for custom API calls (see `Writing your own wrappers` below.)
+In practice, you do not need to obtain a token yourself when using `nomad-utility-workflows`. A token will automatically be obtained for API calls that require authentication. However, you may want to do the token generation yourself for custom API calls (see [Writing your own wrappers](#writing-your-own-wrappers) below.)
 
 ### NOMAD User Metadata
 
-nomad-utility-workflows uses the `NomadUser()` class to store the following user metadata:
+`nomad-utility-workflows` uses the `NomadUser()` class to store the following user metadata:
 
 ```python
 class NomadUser:
@@ -189,7 +191,7 @@ nomad_user
 
 ### Uploading Data
 
-nomad-utility-workflows uses the `NomadUpload()` class to store the following upload metadata:
+`nomad-utility-workflows` uses the `NomadUpload()` class to store the following upload metadata:
 
 ```python
 class NomadUpload:
@@ -398,7 +400,7 @@ pprint(nomad_upload.process_running is False)
 
 During the upload process, NOMAD automatically identfies representative files that indicate the presence of data that can be parsed with the plugins included within a given deployment. This means that each upload can contain multiple *entries*&mdash;the fundamental unit storage within the NOMAD database.
 
-You can query the individual entries within a known upload with `get_entries_of_upload()`, which then returns the metadata within the `NomadEntry()` class of nomad-utility-worklfows:
+You can query the individual entries within a known upload with `get_entries_of_upload()`, which then returns the metadata within the `NomadEntry()` class of `nomad-utility-workflows`:
 
 ```python
 class NomadEntry:
@@ -862,7 +864,7 @@ for entry in dataset_entries:
     'entry_id=Htbl78lHDSNAKbvPjEgEN_6sOcxF, upload_id=RdA_3ZsOTMqbtAhYLivVsw'
     ```
 
-There is no "publishing" action for datasets. Instead, when the dataset is complete (i.e., you are ready to lock the contents of the dataset), you can *assign a DOI*. There is currently no API action for this within nomad-utility-workflows. You must go to the GUI of the relevant deployment, go to `PUBLISH > Datasets`, find the dataset, and then click the "assign a DOI" banner icon to the right of the dataset entry.
+There is no "publishing" action for datasets. Instead, when the dataset is complete (i.e., you are ready to lock the contents of the dataset), you can *assign a DOI*. There is currently no API action for this within `nomad-utility-workflows`. You must go to the GUI of the relevant deployment, go to `PUBLISH > Datasets`, find the dataset, and then click the "assign a DOI" banner icon to the right of the dataset entry.
 
 ## Deleting Uploads and Datasets
 
@@ -950,7 +952,7 @@ except Exception:
 
 ## Useful Wrappers
 
-nomad-utility-workflows contains a few useful wrapper functions to help users query all of their uploads and corresponding entries:
+`nomad-utility-workflows` contains a few useful wrapper functions to help users query all of their uploads and corresponding entries:
 
 
 ```python
