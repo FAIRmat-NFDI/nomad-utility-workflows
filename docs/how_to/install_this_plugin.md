@@ -5,7 +5,7 @@
 For direct usage and integrating the utility module into other plugins or codes, `nomad-utility-workflows` is available as a PyPI package:
 
 ```bash
-pip install nomad-utility-workflows>=0.0.8
+pip install nomad-utility-workflows>=0.0.9
 ```
 
 ### Linking to your NOMAD account
