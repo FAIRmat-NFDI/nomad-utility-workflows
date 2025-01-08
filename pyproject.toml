@@ -123,6 +123,8 @@ line-ending = "auto"
 [tool.setuptools]
 package-dir = { "" = "src" }
 
+[tool.setuptools_scm]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
