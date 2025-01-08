@@ -16,21 +16,9 @@ How-to guides provide step-by-step instructions for a wide range of tasks, with 
 
 - [Install this plugin](how_to/install_this_plugin.md)
 - [Use API functions](how_to/use_api_functions.md)
-<!-- - [Create custom workflows](how_to/create_custom_workflows.md) -->
-<!-- - [Contribute to this plugin](how_to/contribute_to_this_plugin.md)
-- [Contribute to the documentation](how_to/contribute_to_the_documentation.md) -->
+- [Create Custom Workflows](how_to/create_custom_workflows.md)
+- [Add Custom Tasks](how_to/add_custom_tasks.md)
 
-</div>
-
-<div markdown="block">
-
-### Examples
-
-The following examples are available for demonstration purposes:
-
-- [Workflows - Proof of Concept](examples/workflow_proof_of_concept.md)
-- [Workflows - Simulation Protocol](examples/workflow_simulation_protocol.md)
-- [Workflows - Adding Custom Tasks](examples/workflow_custom_tasks.md)
 
 </div>
 
@@ -53,3 +41,8 @@ The reference section includes specifications for the relevant user-callable fun
 
 </div>
 </div>
+
+## Main contributors
+| Name | E-mail     |
+|------|------------|
+| Joseph F. Rudzinski | [joseph.rudzinski@physik.hu-berlin.de](mailto:joseph.rudzinski@physik.hu-berlin.de)
