@@ -127,7 +127,3 @@ To run the test notebooks, create a jupyter kernel using your venv:
 python -m ipykernel install --user --name=nomad_utility_workflows
 ```
 
-## Main contributors
-| Name | E-mail     |
-|------|------------|
-| Joseph F. Rudzinski | [joseph.rudzinski@physik.hu-berlin.de](mailto:joseph.rudzinski@physik.hu-berlin.de)
