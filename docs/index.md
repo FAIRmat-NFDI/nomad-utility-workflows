@@ -4,8 +4,7 @@ A module with utilities for interacting with NOMAD via, e.g., a workflow manager
 
 ## Introduction
 
-!!! note "Attention"
-    TODO
+NOMAD's API and workflow functionalities provide users with a route to FAIR data management of complex and highthroughput processes. However, the overhead for leveraging these capabilities remains rather large. This utility module assists lowers the barrier to these tools, currently with 2 distinct sets of tools: 1. python API wrappers, and 2. automated workflow yaml generation for building custom workflows.
 
 <div markdown="block" class="home-grid">
 
@@ -29,9 +28,9 @@ How-to guides provide step-by-step instructions for a wide range of tasks, with 
 
 The following examples are available for demonstration purposes:
 
-- [Workflow - Proof of Concept](examples/workflow_proof_of_concept.md)
-- [Workflow - Simulation Protocol](examples/workflow_simulation_protocol.md)
-- [Workflow - Adding Custom Tasks](examples/workflow_custom_tasks.md)
+- [Workflows - Proof of Concept](examples/workflow_proof_of_concept.md)
+- [Workflows - Simulation Protocol](examples/workflow_simulation_protocol.md)
+- [Workflows - Adding Custom Tasks](examples/workflow_custom_tasks.md)
 
 </div>
 
