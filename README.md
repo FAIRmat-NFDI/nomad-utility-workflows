@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/872288935.svg)](https://zenodo.org/badge/latestdoi/872288935)
+
 # nomad-utility-workflows plugin
 
 Utilities for interfacing with NOMAD within workflows, e.g., via a workflow manager, including python API functions for uploading to NOMAD and querying the repository as well as automated generation of NOMAD custom workflow yaml file ([NOMAD workflow data models](https://github.com/nomad-coe/nomad-schema-plugin-simulation-workflow)).
@@ -131,6 +133,8 @@ To run the test notebooks, create a jupyter kernel using your venv:
 python -m ipykernel install --user --name=nomad_utility_workflows
 ```
 
+## How to cite this work
+Rudzinski, J.F., NOMAD Utility Workflows [Computer software]. https://zenodo.org/doi/xxx
 
 ## Main contributors
 | Name | E-mail     |
