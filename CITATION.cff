@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+title: NOMAD Utility Workflows
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Joseph F.
+    family-names: Rudzinski
+    orcid: 'https://orcid.org/0000-0003-3403-640X'
+doi: 10.5281/zenodo.xxx
+repository-code: 'https://github.com/FAIRmat-NFDI/nomad-utility-workflows'
+url: 'https://fairmat-nfdi.github.io/nomad-utility-workflows/'
+abstract: >-
+  `nomad-utility-workflows` is a utilities module for interfacing with the NOMAD
+  software (https://zenodo.org/doi/10.5281/zenodo.8366162) within workflows,
+  e.g., via a workflow manager, including python API functions for uploading to NOMAD and
+  querying the repository as well as automated generation of NOMAD custom workflow yaml files.
+
+license: Apache-2.0
