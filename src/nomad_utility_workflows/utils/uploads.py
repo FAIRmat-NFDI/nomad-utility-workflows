@@ -3,7 +3,7 @@ import logging
 from typing import Any, Optional, TypedDict
 
 from cachetools.func import ttl_cache
-from marshmallow import Schema, pre_load, EXCLUDE
+from marshmallow import EXCLUDE, Schema, pre_load
 from marshmallow_dataclass import class_schema, dataclass
 
 from nomad_utility_workflows.utils.core import (

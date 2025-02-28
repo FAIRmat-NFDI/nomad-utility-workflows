@@ -2,7 +2,7 @@ import datetime as dt
 import logging
 from typing import Optional, TypedDict
 
-from marshmallow import Schema, pre_load, EXCLUDE
+from marshmallow import EXCLUDE, Schema, pre_load
 from marshmallow_dataclass import class_schema, dataclass
 
 from nomad_utility_workflows.utils.core import (
