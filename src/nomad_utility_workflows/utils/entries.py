@@ -6,7 +6,7 @@ from dataclasses import field
 from typing import Any, Optional, TypedDict
 
 from cachetools.func import ttl_cache
-from marshmallow import Schema, pre_load
+from marshmallow import Schema, pre_load, EXCLUDE
 from marshmallow_dataclass import class_schema, dataclass
 
 from nomad_utility_workflows.utils.core import (
@@ -35,8 +35,9 @@ class NomadSectionDefinition:
 
 
 class NomadEntrySchema(Schema):
-    # class Meta:
-    #     unknown = EXCLUDE
+    class Meta:
+        unknown = EXCLUDE
+
     @pre_load
     def convert_users(self, data, **kwargs):
         data['main_author'] = get_user_by_id(
@@ -76,6 +77,9 @@ default_query_params = {
 # ? Should we just make these all optional to avoid the get functions breaking?
 @dataclass(frozen=True)
 class NomadEntry:
+    class Meta:
+        unknown = EXCLUDE
+
     entry_id: str
     upload_id: str
     references: list[str]

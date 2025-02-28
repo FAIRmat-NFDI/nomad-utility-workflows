@@ -3,7 +3,7 @@ import logging
 from typing import Any, Optional, TypedDict
 
 from cachetools.func import ttl_cache
-from marshmallow import Schema, pre_load
+from marshmallow import Schema, pre_load, EXCLUDE
 from marshmallow_dataclass import class_schema, dataclass
 
 from nomad_utility_workflows.utils.core import (
@@ -33,6 +33,9 @@ class NomadUploadSchema(Schema):
 
 
 class UploadMetadata(TypedDict, total=False):
+    class Meta:
+        unknown = EXCLUDE
+
     upload_name: str
     references: list[str]
     dataset_id: str
@@ -43,6 +46,9 @@ class UploadMetadata(TypedDict, total=False):
 
 @dataclass(frozen=True)
 class NomadUpload:
+    class Meta:
+        unknown = EXCLUDE
+
     upload_id: str
     upload_create_time: dt.datetime
     main_author: NomadUser

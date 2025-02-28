@@ -4,6 +4,7 @@ from dataclasses import asdict, field
 from typing import Optional
 
 from cachetools.func import ttl_cache
+from marshmallow import EXCLUDE
 from marshmallow_dataclass import class_schema, dataclass
 
 from nomad_utility_workflows.utils.core import (
@@ -18,6 +19,9 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class NomadUser:
+    class Meta:
+        unknown = EXCLUDE
+
     user_id: str = field(repr=False)
     name: str
     first_name: str = field(repr=False)
