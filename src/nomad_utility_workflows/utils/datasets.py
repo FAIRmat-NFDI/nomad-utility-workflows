@@ -2,7 +2,7 @@ import datetime as dt
 import logging
 from typing import Optional, TypedDict
 
-from marshmallow import Schema, pre_load
+from marshmallow import EXCLUDE, Schema, pre_load
 from marshmallow_dataclass import class_schema, dataclass
 
 from nomad_utility_workflows.utils.core import (
@@ -45,6 +45,9 @@ default_dataset_params = {
 
 @dataclass(frozen=True)
 class NomadDataset:
+    class Meta:
+        unknown = EXCLUDE
+
     dataset_id: str
     dataset_create_time: dt.datetime
     dataset_name: str
@@ -90,7 +93,7 @@ def retrieve_datasets(
         datasets.extend([nomad_entry_schema().load(d) for d in response['data']])
         if response['pagination']['page'] == response['pagination']['total']:
             break
-        page_after_value = response['pagination']['next_page_after_value']
+        page_after_value = response['pagination'].get('next_page_after_value')
     return datasets
 
 
