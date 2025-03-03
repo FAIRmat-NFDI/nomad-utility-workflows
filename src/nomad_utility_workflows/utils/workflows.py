@@ -385,12 +385,12 @@ class NomadWorkflow(BaseModel):
     def _get_defaults(
         self, inout_type: Literal['inputs', 'outputs'], node_source, node_dest
     ) -> list:
-        entry_type = ''
-        partner_node = node_source
         entry_type_source = self.workflow_graph.nodes[node_source].get('entry_type', '')
         node_source_type = self.workflow_graph.nodes[node_source].get('type', '')
         entry_type_dest = self.workflow_graph.nodes[node_dest].get('entry_type', '')
         node_dest_type = self.workflow_graph.nodes[node_dest].get('type', '')
+        entry_type = ''
+        partner_node = node_source
         if entry_type_source == 'simulation':
             entry_type = 'simulation'
         elif entry_type_dest == 'simulation' and node_source_type == 'input':
@@ -399,33 +399,12 @@ class NomadWorkflow(BaseModel):
         elif node_dest_type == 'ouput':
             partner_node = node_dest
 
-        ## SIM
-        # set the partner_node, i.e., the node who's mainfile will be used in the path
-        # partner_node = node_source
-        # node_source_type = self.workflow_graph.nodes[node_source].get('type', '')
-        # if node_source_type == 'input':
-        #     partner_node = node_dest  # ? breaks sim defaults?
-        # entry_type = self.workflow_graph.nodes[partner_node].get('entry_type', '')
-
-        ## NO DEFAULTS
-        # set the partner_node, i.e., the node who's mainfile will be used in the path
-        # partner_node = node_source
-        # node_source_type = self.workflow_graph.nodes[node_source].get('type', '')
-        # if node_source_type == 'input':
-        #     print(node_source, node_dest)
-        #     partner_node = node_source  # ? breaks sim defaults?
-        # node_dest_type = self.workflow_graph.nodes[node_dest].get('type', '')
-        # if node_dest_type == 'output':
-        #     partner_node = node_dest  # ? breaks sim defaults?
-
         # TODO - unify this with the simulation defaults case
+        # TODO - for sim case, fix prefix to full path by copying path_info, like in general case
         default_sections = {}
-        # entry_type = self.workflow_graph.nodes[partner_node].get('entry_type', '')
         if not entry_type:
             section = NomadSection(**self.workflow_graph.nodes[partner_node])
-            print(section)
             archive_path = section.archive_path
-            print(archive_path)
             default_sections = {
                 'inputs': [archive_path],
                 'outputs': [archive_path],
@@ -442,15 +421,6 @@ class NomadWorkflow(BaseModel):
                             flag_defaults = True
                             break
                 elif inout_type == 'inputs':
-                    # don't add input defaults for edge input node
-                    # in_tasks = [
-                    #     edge[0]
-                    #     for edge in self.workflow_graph.in_edges(node_dest)
-                    #     if self.workflow_graph.nodes[edge[0]].get('type', '')
-                    #     in ['task', 'workflow']
-                    # ]
-                    # if not in_tasks:
-                    #     break
                     for _, _, edge2 in self.workflow_graph.in_edges(
                         node_dest, data=True
                     ):
@@ -464,9 +434,7 @@ class NomadWorkflow(BaseModel):
                     path_info = self.workflow_graph.nodes[partner_node].get(
                         'path_info', {}
                     )
-                    print(path_info)
                     path_info['supersection_path'] = default_section
-                    print(path_info)
                     inouts.append(
                         {
                             'name': (
@@ -475,17 +443,13 @@ class NomadWorkflow(BaseModel):
                             ),
                             'path_info': path_info,
                             'is_default': True,
-                            #     'section_type': default_section,
-                            #     'mainfile_path': self._get_mainfile_path(partner_node),
-                            # },
                         },
                     )
-
+        # ! add more defaults here
+        # elfif entry_type == '<default_type>':
+        #     ...
         elif entry_type == 'simulation':
             default_sections = self.simulation_default_sections
-            # ! add more defaults here
-            # if not default_sections:
-            #     return []
 
             inouts = []
             for default_section in default_sections[inout_type]:
@@ -499,6 +463,7 @@ class NomadWorkflow(BaseModel):
                             break
                 elif inout_type == 'inputs':
                     # don't add input defaults for edge input node
+                    # ? Is this still relevant with the current setting of partner_node?
                     in_tasks = [
                         edge[0]
                         for edge in self.workflow_graph.in_edges(node_dest)
