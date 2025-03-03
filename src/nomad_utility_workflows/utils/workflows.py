@@ -132,6 +132,7 @@ class NomadSection(BaseModel):
             if self.path_info.get('section_index') is not None:
                 archive_path += f"/{self.path_info['section_index']}"
         else:
+            # TODO: this may be is a false warning if the subsection_path is given
             logger.warning(
                 (
                     f'No section type provided for {self.type}-{self.name}. '
