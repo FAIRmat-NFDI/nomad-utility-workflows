@@ -385,6 +385,20 @@ class NomadWorkflow(BaseModel):
     def _get_defaults(
         self, inout_type: Literal['inputs', 'outputs'], node_source, node_dest
     ) -> list:
+        entry_type, partner_node = self._determine_entry_type_and_partner_node(
+            node_source, node_dest
+        )
+
+        if entry_type == 'simulation':
+            return self._get_simulation_defaults(
+                inout_type, partner_node, node_source, node_dest
+            )
+        else:
+            return self._get_general_defaults(
+                inout_type, partner_node, node_source, node_dest
+            )
+
+    def _determine_entry_type_and_partner_node(self, node_source, node_dest):
         entry_type_source = self.workflow_graph.nodes[node_source].get('entry_type', '')
         node_source_type = self.workflow_graph.nodes[node_source].get('type', '')
         entry_type_dest = self.workflow_graph.nodes[node_dest].get('entry_type', '')
@@ -396,106 +410,199 @@ class NomadWorkflow(BaseModel):
         elif entry_type_dest == 'simulation' and node_source_type == 'input':
             entry_type = 'simulation'
             partner_node = node_dest
-        elif node_dest_type == 'ouput':
+        elif node_dest_type == 'output':
             partner_node = node_dest
+        return entry_type, partner_node
 
-        # TODO - unify this with the simulation defaults case
-        # TODO - for sim case, fix prefix to full path by copying path_info, like in general case
-        default_sections = {}
-        if not entry_type:
-            section = NomadSection(**self.workflow_graph.nodes[partner_node])
-            archive_path = section.archive_path
-            default_sections = {
-                'inputs': [archive_path],
-                'outputs': [archive_path],
-            }
+    def _get_general_defaults(self, inout_type, partner_node, node_source, node_dest):
+        section = NomadSection(**self.workflow_graph.nodes[partner_node])
+        archive_path = section.archive_path
+        default_sections = {
+            'inputs': [archive_path],
+            'outputs': [archive_path],
+        }
 
-            inouts = []
-            for default_section in default_sections[inout_type]:
-                flag_defaults = False
-                if inout_type == 'outputs':
-                    for _, _, edge2 in self.workflow_graph.out_edges(
-                        node_source, data=True
-                    ):
-                        if self._check_for_defaults(inout_type, default_section, edge2):
-                            flag_defaults = True
-                            break
-                elif inout_type == 'inputs':
-                    for _, _, edge2 in self.workflow_graph.in_edges(
-                        node_dest, data=True
-                    ):
-                        if self._check_for_defaults(inout_type, default_section, edge2):
-                            flag_defaults = True
-                            break
-                if not flag_defaults:
-                    partner_name = self.workflow_graph.nodes[partner_node].get(
-                        'name', ''
-                    )
-                    path_info = self.workflow_graph.nodes[partner_node].get(
-                        'path_info', {}
-                    )
-                    path_info['supersection_path'] = default_section
-                    inouts.append(
-                        {
-                            'name': (
-                                f'{inout_type[:-1]} {default_section} '
-                                f'from {partner_name}'
-                            ),
-                            'path_info': path_info,
-                            'is_default': True,
-                        },
-                    )
-        # ! add more defaults here
-        # elfif entry_type == '<default_type>':
-        #     ...
-        elif entry_type == 'simulation':
-            default_sections = self.simulation_default_sections
-
-            inouts = []
-            for default_section in default_sections[inout_type]:
-                flag_defaults = False
-                if inout_type == 'outputs':
-                    for _, _, edge2 in self.workflow_graph.out_edges(
-                        node_source, data=True
-                    ):
-                        if self._check_for_defaults(inout_type, default_section, edge2):
-                            flag_defaults = True
-                            break
-                elif inout_type == 'inputs':
-                    # don't add input defaults for edge input node
-                    # ? Is this still relevant with the current setting of partner_node?
-                    in_tasks = [
-                        edge[0]
-                        for edge in self.workflow_graph.in_edges(node_dest)
-                        if self.workflow_graph.nodes[edge[0]].get('type', '')
-                        in ['task', 'workflow']
-                    ]
-                    if not in_tasks:
-                        break
-                    for _, _, edge2 in self.workflow_graph.in_edges(
-                        node_dest, data=True
-                    ):
-                        if self._check_for_defaults(inout_type, default_section, edge2):
-                            flag_defaults = True
-                            break
-                if not flag_defaults:
-                    partner_name = self.workflow_graph.nodes[partner_node].get(
-                        'name', ''
-                    )
-                    inouts.append(
-                        {
-                            'name': (
-                                f'{inout_type[:-1]} {default_section} '
-                                f'from {partner_name}'
-                            ),
-                            'path_info': {
-                                'section_type': default_section,
-                                'mainfile_path': self._get_mainfile_path(partner_node),
-                            },
-                        },
-                    )
-
+        inouts = []
+        for default_section in default_sections[inout_type]:
+            if not self._flag_defaults(
+                inout_type, default_section, node_source, node_dest
+            ):
+                partner_name = self.workflow_graph.nodes[partner_node].get('name', '')
+                path_info = self.workflow_graph.nodes[partner_node].get('path_info', {})
+                path_info['supersection_path'] = default_section
+                inouts.append(
+                    {
+                        'name': (
+                            f'{inout_type[:-1]} {default_section} '
+                            f'from {partner_name}'
+                        ),
+                        'path_info': path_info,
+                        'is_default': True,
+                    },
+                )
         return inouts
+
+    def _get_simulation_defaults(
+        self, inout_type, partner_node, node_source, node_dest
+    ):
+        default_sections = self.simulation_default_sections
+        inouts = []
+        for default_section in default_sections[inout_type]:
+            if not self._flag_defaults(
+                inout_type, default_section, node_source, node_dest
+            ):
+                partner_name = self.workflow_graph.nodes[partner_node].get('name', '')
+                inouts.append(
+                    {
+                        'name': (
+                            f'{inout_type[:-1]} {default_section} '
+                            f'from {partner_name}'
+                        ),
+                        'path_info': {
+                            'section_type': default_section,
+                            'mainfile_path': self._get_mainfile_path(partner_node),
+                        },
+                    },
+                )
+        return inouts
+
+    def _flag_defaults(self, inout_type, default_section, node_source, node_dest):
+        flag_defaults = False
+        if inout_type == 'outputs':
+            for _, _, edge2 in self.workflow_graph.out_edges(node_source, data=True):
+                if self._check_for_defaults(inout_type, default_section, edge2):
+                    flag_defaults = True
+                    break
+        elif inout_type == 'inputs':
+            for _, _, edge2 in self.workflow_graph.in_edges(node_dest, data=True):
+                if self._check_for_defaults(inout_type, default_section, edge2):
+                    flag_defaults = True
+                    break
+        return flag_defaults
+
+    #! Keep the below old implementation until full testing for ruff refactoring above!
+    # def _get_defaults(
+    #     self, inout_type: Literal['inputs', 'outputs'], node_source, node_dest
+    # ) -> list:
+    #     entry_type_source = self.workflow_graph.nodes[node_source].get('entry_type',
+    # '')
+    #     node_source_type = self.workflow_graph.nodes[node_source].get('type', '')
+    #     entry_type_dest = self.workflow_graph.nodes[node_dest].get('entry_type', '')
+    #     node_dest_type = self.workflow_graph.nodes[node_dest].get('type', '')
+    #     entry_type = ''
+    #     partner_node = node_source
+    #     if entry_type_source == 'simulation':
+    #         entry_type = 'simulation'
+    #     elif entry_type_dest == 'simulation' and node_source_type == 'input':
+    #         entry_type = 'simulation'
+    #         partner_node = node_dest
+    #     elif node_dest_type == 'ouput':
+    #         partner_node = node_dest
+
+    #     # TODO - unify this with the simulation defaults case
+    #     # TODO - for sim case, fix prefix to full path by copying path_info,
+    #     # TODO - like in general case
+    #     default_sections = {}
+    #     if not entry_type:
+    #         section = NomadSection(**self.workflow_graph.nodes[partner_node])
+    #         archive_path = section.archive_path
+    #         default_sections = {
+    #             'inputs': [archive_path],
+    #             'outputs': [archive_path],
+    #         }
+
+    #         inouts = []
+    #         for default_section in default_sections[inout_type]:
+    #             flag_defaults = False
+    #             if inout_type == 'outputs':
+    #                 for _, _, edge2 in self.workflow_graph.out_edges(
+    #                     node_source, data=True
+    #                 ):
+    #                     if self._check_for_defaults(inout_type, default_section,
+    # edge2):
+    #                         flag_defaults = True
+    #                         break
+    #             elif inout_type == 'inputs':
+    #                 for _, _, edge2 in self.workflow_graph.in_edges(
+    #                     node_dest, data=True
+    #                 ):
+    #                     if self._check_for_defaults(inout_type, default_section,
+    # edge2):
+    #                         flag_defaults = True
+    #                         break
+    #             if not flag_defaults:
+    #                 partner_name = self.workflow_graph.nodes[partner_node].get(
+    #                     'name', ''
+    #                 )
+    #                 path_info = self.workflow_graph.nodes[partner_node].get(
+    #                     'path_info', {}
+    #                 )
+    #                 path_info['supersection_path'] = default_section
+    #                 inouts.append(
+    #                     {
+    #                         'name': (
+    #                             f'{inout_type[:-1]} {default_section} '
+    #                             f'from {partner_name}'
+    #                         ),
+    #                         'path_info': path_info,
+    #                         'is_default': True,
+    #                     },
+    #                 )
+    #     # ! add more defaults here
+    #     # elfif entry_type == '<default_type>':
+    #     #     ...
+    #     elif entry_type == 'simulation':
+    #         default_sections = self.simulation_default_sections
+
+    #         inouts = []
+    #         for default_section in default_sections[inout_type]:
+    #             flag_defaults = False
+    #             if inout_type == 'outputs':
+    #                 for _, _, edge2 in self.workflow_graph.out_edges(
+    #                     node_source, data=True
+    #                 ):
+    #                     if self._check_for_defaults(inout_type, default_section,
+    # edge2):
+    #                         flag_defaults = True
+    #                         break
+    #             elif inout_type == 'inputs':
+    #                 # don't add input defaults for edge input node
+    #                 # ? Is this still relevant with the current setting of
+    # partner_node?
+    #                 in_tasks = [
+    #                     edge[0]
+    #                     for edge in self.workflow_graph.in_edges(node_dest)
+    #                     if self.workflow_graph.nodes[edge[0]].get('type', '')
+    #                     in ['task', 'workflow']
+    #                 ]
+    #                 if not in_tasks:
+    #                     break
+    #                 for _, _, edge2 in self.workflow_graph.in_edges(
+    #                     node_dest, data=True
+    #                 ):
+    #                     if self._check_for_defaults(inout_type, default_section,
+    # edge2):
+    #                         flag_defaults = True
+    #                         break
+    #             if not flag_defaults:
+    #                 partner_name = self.workflow_graph.nodes[partner_node].get(
+    #                     'name', ''
+    #                 )
+    #                 inouts.append(
+    #                     {
+    #                         'name': (
+    #                             f'{inout_type[:-1]} {default_section} '
+    #                             f'from {partner_name}'
+    #                         ),
+    #                         'path_info': {
+    #                             'section_type': default_section,
+    #                             'mainfile_path':
+    # self._get_mainfile_path(partner_node),
+    #                         },
+    #                     },
+    #                 )
+
+    #     return inouts
 
     def build_workflow_yaml(self) -> None:
         # register the sections and build task_elements
@@ -517,40 +624,48 @@ class NomadWorkflow(BaseModel):
         archive.inputs = []
         archive.outputs = []
 
-        # get the input task nodes
+        task_graph = self._create_task_graph()
+        self._add_inputs_to_archive(archive, task_graph)
+        self._add_outputs_to_archive(archive, task_graph)
+        self._add_tasks_to_archive(archive, task_graph)
+
+        return archive
+
+    def _create_task_graph(self) -> nx.DiGraph:
         task_nodes = [
             n
             for n, attr in self.workflow_graph.nodes(data=True)
             if attr.get('type', '') in ['task', 'workflow']
         ]
-        # Create a subgraph with only task nodes
-        task_graph = self.workflow_graph.subgraph(task_nodes)
+        return self.workflow_graph.subgraph(task_nodes)
 
-        # select input nodes from task graph that have no incoming edges
+    def _add_inputs_to_archive(
+        self, archive: NomadWorkflowArchive, task_graph: nx.DiGraph
+    ) -> None:
         for node in [n for n, d in task_graph.in_degree if d == 0]:
-            # get the inputs from the incoming edges of these nodes within
-            # the full graph (should be inputs!)
             for edge in self.workflow_graph.in_edges(node, data=True):
                 if self.workflow_graph.nodes[edge[0]].get('type', '') != 'input':
                     continue
-                # don't add generic defaults to global in/out
                 if self.workflow_graph.nodes[edge[0]].get('is_default', '') is True:
                     continue
                 element = self.task_elements[edge[0]]
                 archive.inputs.append(element)
-        # select output nodes from task graph that have no outgoing edges
+
+    def _add_outputs_to_archive(
+        self, archive: NomadWorkflowArchive, task_graph: nx.DiGraph
+    ) -> None:
         for node in [n for n, d in task_graph.out_degree if d == 0]:
-            # get the outputs from the outgoing edges of these nodes within
-            # the full graph (should be outputs!)
             for edge in self.workflow_graph.out_edges(node, data=True):
                 if self.workflow_graph.nodes[edge[1]].get('type', '') != 'output':
                     continue
-                # don't add generic defaults to global in/out
                 if self.workflow_graph.nodes[edge[1]].get('is_default', '') is True:
                     continue
                 element = self.task_elements[edge[1]]
                 archive.outputs.append(element)
-        # add the tasks
+
+    def _add_tasks_to_archive(
+        self, archive: NomadWorkflowArchive, task_graph: nx.DiGraph
+    ) -> None:
         for node_key, node in task_graph.nodes(data=True):
             inputs = []
             outputs = []
@@ -570,7 +685,68 @@ class NomadWorkflow(BaseModel):
                 )
             )
 
-        return archive
+    #! Keep the below old implementation until full testing for ruff refactoring above!
+    # def generate_archive(self) -> NomadWorkflowArchive:
+    #     archive = NomadWorkflowArchive(
+    #         archive_section=self.archive_section, name=self.name
+    #     )
+    #     archive.inputs = []
+    #     archive.outputs = []
+
+    #     # get the input task nodes
+    #     task_nodes = [
+    #         n
+    #         for n, attr in self.workflow_graph.nodes(data=True)
+    #         if attr.get('type', '') in ['task', 'workflow']
+    #     ]
+    #     # Create a subgraph with only task nodes
+    #     task_graph = self.workflow_graph.subgraph(task_nodes)
+
+    #     # select input nodes from task graph that have no incoming edges
+    #     for node in [n for n, d in task_graph.in_degree if d == 0]:
+    #         # get the inputs from the incoming edges of these nodes within
+    #         # the full graph (should be inputs!)
+    #         for edge in self.workflow_graph.in_edges(node, data=True):
+    #             if self.workflow_graph.nodes[edge[0]].get('type', '') != 'input':
+    #                 continue
+    #             # don't add generic defaults to global in/out
+    #             if self.workflow_graph.nodes[edge[0]].get('is_default', '') is True:
+    #                 continue
+    #             element = self.task_elements[edge[0]]
+    #             archive.inputs.append(element)
+    #     # select output nodes from task graph that have no outgoing edges
+    #     for node in [n for n, d in task_graph.out_degree if d == 0]:
+    #         # get the outputs from the outgoing edges of these nodes within
+    #         # the full graph (should be outputs!)
+    #         for edge in self.workflow_graph.out_edges(node, data=True):
+    #             if self.workflow_graph.nodes[edge[1]].get('type', '') != 'output':
+    #                 continue
+    #             # don't add generic defaults to global in/out
+    #             if self.workflow_graph.nodes[edge[1]].get('is_default', '') is True:
+    #                 continue
+    #             element = self.task_elements[edge[1]]
+    #             archive.outputs.append(element)
+    #     # add the tasks
+    #     for node_key, node in task_graph.nodes(data=True):
+    #         inputs = []
+    #         outputs = []
+    #         for _, _, edge in self.workflow_graph.out_edges(node_key, data=True):
+    #             if edge.get('inputs'):
+    #                 outputs.extend(edge.get('inputs'))
+    #         for _, _, edge in self.workflow_graph.in_edges(node_key, data=True):
+    #             if edge.get('outputs'):
+    #                 inputs.extend(edge.get('outputs'))
+
+    #         archive.tasks.append(
+    #             NomadTask(
+    #                 name=node.get('name', ''),
+    #                 inputs=inputs,
+    #                 outputs=outputs,
+    #                 task_section=self.task_elements[node_key],
+    #             )
+    #         )
+
+    #     return archive
 
 
 def nodes_to_graph(node_attributes: dict[int, Any]) -> nx.DiGraph:
