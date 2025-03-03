@@ -5,7 +5,7 @@ from typing import Optional
 
 from cachetools.func import ttl_cache
 from marshmallow import EXCLUDE
-from marshmallow_dataclass import class_schema, dataclass, EXCLUDE
+from marshmallow_dataclass import class_schema, dataclass
 
 from nomad_utility_workflows.utils.core import (
     RequestOptions,
