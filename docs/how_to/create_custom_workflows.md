@@ -63,90 +63,65 @@ We'll define our workflow structure using a dictionary of node attributes:
 
 ```python
 node_attributes = {
-    0: {'name': 'input system',
-        'type': 'input',
-        'path_info': {
-            'mainfile_path': 'Emin/mdrun_Emin.log',
-            'supersection_index': 0,
-            'section_index': 0,
-            'section_type': 'system'
-        },
-        'out_edge_nodes': [1],  # Connect to node 1
+0: {'name': 'input system',
+    'type': 'input',
+    'path_info': {
+        'mainfile_path': 'Emin/mdrun_Emin.log',
+        'supersection_index': 0,
+        'section_index': 0,
+        'section_type': 'system'
     },
+    'out_edge_nodes': [1],
+},
 
-    1: {'name': 'Geometry Optimization',
-        'type': 'workflow',
-        'entry_type': 'simulation',
-        'path_info': {
-            'mainfile_path': 'Emin/mdrun_Emin.log'
-        },
-        'outputs': [
-            {
-                'name': 'energies of the relaxed system',
-                'path_info': {
-                    'section_type': 'energy',
-                    'supersection_path': 'run/0/calculation',
-                    'supersection_index': -1,
-                },
-            }
-        ],
-        'out_edge_nodes': [2],  # Connect to node 2
-    },
-
-    2: {'name': 'Equilibration NPT Molecular Dynamics',
-        'type': 'workflow',
-        'entry_type': 'simulation',
-        'path_info': {
-            'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'
-        },
-        'outputs': [
-            {
-                'name': 'MD workflow properties (structural and dynamical)',
-                'path_info': {
-                    'section_type': 'results',
-                },
-            }
-        ],
-        'out_edge_nodes': [3],  # Connect to node 3
-    },
-
-    3: {'name': 'Production NVT Molecular Dynamics',
-        'type': 'workflow',
-        'entry_type': 'simulation',
-        'path_info': {
-            'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'
-        },
-        'outputs': [
-            {
-                'name': 'MD workflow properties (structural and dynamical)',
-                'path_info': {
-                    'section_type': 'results',
-                },
-            }
-        ],
-        'out_edge_nodes': [4, 5],  # Connect to output nodes
-    },
-
-    4: {'name': 'output system',
-        'type': 'output',
-        'path_info': {
-            'section_type': 'system',
-            'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'
-        },
-    },
-
-    5: {'name': 'output properties',
-        'type': 'output',
-        'path_info': {
-            'section_type': 'calculation',
-            'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'
-        },
+1: {'name': 'Geometry Optimization',
+    'type': 'workflow',
+    'entry_type': 'simulation',
+    'path_info': {
+        'mainfile_path': 'Emin/mdrun_Emin.log'
     }
+},
+
+2: {'name': 'Equilibration NPT Molecular Dynamics',
+    'type': 'workflow',
+    'entry_type': 'simulation',
+    'path_info': {
+        'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'
+    },
+    'in_edge_nodes': [1],
+},
+
+3: {'name': 'Production NVT Molecular Dynamics',
+    'type': 'workflow',
+    'entry_type': 'simulation',
+    'path_info': {
+        'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'
+    },
+    'in_edge_nodes': [2],
+},
+
+4: {'name': 'output system',
+    'type': 'output',
+    'path_info': {
+        'section_type': 'system',
+        'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'
+    },
+    'in_edge_nodes': [3],
+},
+
+5: {'name': 'output properties',
+    'type': 'output',
+    'path_info': {
+        'section_type': 'calculation',
+        'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'
+    },
+    'in_edge_nodes': [3],
+}
 }
 ```
 
 !!! Note "IMPORTANT"
-    To ensure that all functionalities work correctly, the node keys **must** be unique integers that index the nodes. For example, `node_keys = [0, 1, 2, 3, 4, 5]` for a graph with 6 nodes.
+To ensure that all functionalities work correctly, the node keys **must** be unique integers that index the nodes. For example, `node_keys = [0, 1, 2, 3, 4, 5]` for a graph with 6 nodes.
 
 ### Step 2: Create the workflow graph
 
