@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Any, Literal, Optional, TypedDict, Union
+from typing import Any, Literal, Optional, TypedDict, Union, Dict
 
 import networkx as nx
 import yaml
@@ -12,7 +12,7 @@ WORKFLOW_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
 # TODO not yet sure about the specification of actual tasks, need to test
 
 SectionType = Literal['task', 'workflow', 'input', 'output', 'other']
-EntryType = Literal['simulation']
+EntryType = Literal['simulation', 'other']
 # TODO check/implement functionality of "other" type
 
 
@@ -269,7 +269,7 @@ class NomadWorkflow(BaseModel):
     destination_filename: str
     archive_section: str
     name: str
-    node_attributes: dict[int, Any] = {}
+    node_attributes: dict[int, Any] = Field(default_factory=dict)
     workflow_graph: nx.DiGraph = None
     task_elements: dict[str, NomadSection] = Field(default_factory=dict)
     simulation_default_sections: dict[str, list[str]] = Field(
@@ -750,25 +750,24 @@ class NomadWorkflow(BaseModel):
     #     return archive
 
 
-def nodes_to_graph(node_attributes: dict[int, Any]) -> nx.DiGraph:
-    """Builds a workflow graph (nx.DiGraph) from a dictionary of node attributes
+def nodes_to_graph(node_attributes_universe: "NodeAttributesUniverse") -> nx.DiGraph:
+    """Builds a workflow graph (nx.DiGraph) from a NodeAttributesUniverse of node attributes
     as specified below.
 
     Args:
-        node_attributes (dict[int, Any]): _description_
+        node_attributes_universe: A NodeAttributesUniverse object containing the node
 
     Returns:
         nx.DiGraph: _description_
     """
-    if not node_attributes:
-        logger.error(
+    if not node_attributes_universe:
+        raise TypeError(
             'No workflow graph or node attributes provided. Cannot build workflow.'
         )
-        return None
 
     workflow_graph = nx.DiGraph()
-    workflow_graph.add_nodes_from(node_attributes.keys())
-    nx.set_node_attributes(workflow_graph, node_attributes)
+    workflow_graph.add_nodes_from(node_attributes_universe.nodes.keys())
+    nx.set_node_attributes(workflow_graph, node_attributes_universe.nodes)
 
     for node_key, node_attrs in list(workflow_graph.nodes(data=True)):
         _add_edges(workflow_graph, node_key, node_attrs)
@@ -839,7 +838,7 @@ def _add_task_inouts(workflow_graph, node_key, node_attrs):
             workflow_graph.edges[node_key, edge_node]['inputs'].append(output_)
 
 
-class NodeAttributes(TypedDict, total=False):
+class NodeAttributes(BaseModel):
     """
     NodeAttributes represents the attributes of a node in the NOMAD workflow graph.
 
@@ -921,15 +920,24 @@ class NodeAttributes(TypedDict, total=False):
         out_edge_nodes (list[int]): A list of integers specifying the node keys which
             contain out-edges to this node.
     """
+    name: str = Field(None, description='A free-form string describing this node.')
+    type: SectionType = Field(None, description='The type of node.')
+    entry_type: EntryType = Field(None, description='The type of node recognized by NOMAD.')
+    path_info: PathInfo = Field(None, description='Information for generating the NOMAD archive section paths.')
+    inputs: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description='A list of input nodes to be added to the graph.'
+    )
+    outputs: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description='A list of output nodes to be added to the graph.'
+    )
+    in_edge_nodes: list[int] = Field(default_factory=list, description='Nodes with in-edges to this node.')
+    out_edge_nodes: list[int] = Field(default_factory=list, description='Nodes with out-edges to this node.')
 
-    name: str
-    type: SectionType
-    entry_type: EntryType
-    path_info: PathInfo
-    inputs: list[dict[str, Any]]
-    outputs: list[dict[str, Any]]
-    in_edge_nodes: list[int]
-    out_edge_nodes: list[int]
+
+class NodeAttributesUniverse(BaseModel):
+    nodes: Dict[int, NodeAttributes]
 
 
 def build_nomad_workflow(
