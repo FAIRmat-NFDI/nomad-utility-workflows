@@ -43,7 +43,8 @@ dependencies = [
     "isort>=5.8.0",
     "insane>=1.2.0",
     "anyio>=3.0.0,<4.0",
-    "gravis>=0.1.0"
+    "gravis>=0.1.0",
+    "pydantic==1.10.18",
 ]
 
 [project.urls]
