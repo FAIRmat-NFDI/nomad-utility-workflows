@@ -9,7 +9,7 @@ def test_main_path():
             'mainfile_path': 'vibrational_analysis.archive.yaml',
             'upload_id': upload_id,
             'entry_id': entry_id,
-            'archive_path': 'data'
-        },        
+            'archive_path': 'data',
+        },
     )
     assert ns.full_path == f'/uploads/{upload_id}/archive/{entry_id}#/data'

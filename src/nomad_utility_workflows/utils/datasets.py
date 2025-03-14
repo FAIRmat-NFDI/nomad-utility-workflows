@@ -1,6 +1,6 @@
 import datetime as dt
 import logging
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from marshmallow import EXCLUDE, Schema, pre_load
 from marshmallow_dataclass import class_schema, dataclass
@@ -51,12 +51,12 @@ class NomadDataset:
     dataset_id: str
     dataset_create_time: dt.datetime
     dataset_name: str
-    dataset_type: Optional[str] = None
-    dataset_modified_time: Optional[dt.datetime] = None
-    user: Optional[NomadUser] = None
-    doi: Optional[str] = None
-    pid: Optional[int] = None
-    m_annotations: Optional[dict] = None
+    dataset_type: str | None = None
+    dataset_modified_time: dt.datetime | None = None
+    user: NomadUser | None = None
+    doi: str | None = None
+    pid: int | None = None
+    m_annotations: dict | None = None
 
 
 def retrieve_datasets(

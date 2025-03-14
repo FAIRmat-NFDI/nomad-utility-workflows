@@ -3,7 +3,7 @@ import json
 import logging
 from collections.abc import ByteString
 from dataclasses import field
-from typing import Any, Optional, TypedDict
+from typing import Any, TypedDict
 
 from cachetools.func import ttl_cache
 from marshmallow import EXCLUDE, Schema, pre_load
@@ -107,22 +107,22 @@ class NomadEntry:
     entry_create_time: dt.datetime
     with_embargo: bool
     files: list[str] = field(repr=False)
-    entry_type: Optional[str]
+    entry_type: str | None
     authors: list[NomadUser] = field(repr=False)
     license: str
-    domain: Optional[str] = None
-    optimade: Optional[dict] = field(repr=False, default=None)
-    comment: Optional[str] = None
-    upload_name: Optional[str] = None
-    viewer_groups: Optional[list[Any]] = field(repr=False, default=None)
-    writer_groups: Optional[list[Any]] = field(repr=False, default=None)
-    text_search_contents: Optional[list[str]] = None
-    publish_time: Optional[dt.datetime] = None
-    entry_references: Optional[list[dict]] = None
-    url: Optional[str] = None
+    domain: str | None = None
+    optimade: dict | None = field(repr=False, default=None)
+    comment: str | None = None
+    upload_name: str | None = None
+    viewer_groups: list[Any] | None = field(repr=False, default=None)
+    writer_groups: list[Any] | None = field(repr=False, default=None)
+    text_search_contents: list[str] | None = None
+    publish_time: dt.datetime | None = None
+    entry_references: list[dict] | None = None
+    url: str | None = None
 
     @property
-    def base_url(self) -> Optional[str]:
+    def base_url(self) -> str | None:
         url = get_nomad_url(self.url)
         return get_nomad_base_url(url)
 
@@ -138,11 +138,11 @@ class NomadEntry:
         )
 
     @property
-    def job_id(self) -> Optional[str]:
+    def job_id(self) -> str | None:
         return self._comment_dict.get('job_id', None)
 
     @property
-    def workflow_name(self) -> Optional[str]:
+    def workflow_name(self) -> str | None:
         return self._comment_dict.get('workflow_name', None)
 
     @property
@@ -150,7 +150,7 @@ class NomadEntry:
         return self._comment_dict.get('state_point', {})
 
     @property
-    def mdp_files(self) -> Optional[str]:
+    def mdp_files(self) -> str | None:
         return self._comment_dict.get('mdp_files', None)
 
     @property

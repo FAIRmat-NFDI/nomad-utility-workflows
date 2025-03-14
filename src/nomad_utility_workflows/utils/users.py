@@ -1,7 +1,6 @@
 import datetime as dt
 import logging
 from dataclasses import asdict, field
-from typing import Optional
 
 from cachetools.func import ttl_cache
 from marshmallow import EXCLUDE
@@ -27,13 +26,13 @@ class NomadUser:
     first_name: str = field(repr=False)
     last_name: str = field(repr=False)
     username: str = field(repr=False)
-    affiliation: Optional[str] = field(repr=False, default=None)
-    affiliation_address: Optional[str] = field(repr=False, default=None)
-    email: Optional[str] = field(repr=False, default=None)
-    is_oasis_admin: Optional[bool] = field(repr=False, default=None)
-    is_admin: Optional[bool] = field(repr=False, default=None)
-    repo_user_id: Optional[str] = field(repr=False, default=None)
-    created: Optional[dt.datetime] = field(repr=False, default=None)
+    affiliation: str | None = field(repr=False, default=None)
+    affiliation_address: str | None = field(repr=False, default=None)
+    email: str | None = field(repr=False, default=None)
+    is_oasis_admin: bool | None = field(repr=False, default=None)
+    is_admin: bool | None = field(repr=False, default=None)
+    repo_user_id: str | None = field(repr=False, default=None)
+    created: dt.datetime | None = field(repr=False, default=None)
 
     def as_dict(self) -> dict:
         return asdict(self)

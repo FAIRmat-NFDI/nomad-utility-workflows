@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Any, Literal, Optional, TypedDict, Union
+from typing import Any, Literal, TypedDict
 
 import networkx as nx
 import yaml
@@ -62,8 +62,8 @@ default_path_info = {
 
 
 class NomadSection(BaseModel):
-    name: Optional[str] = Field(None, description='Name of the section')
-    type: Optional[SectionType] = Field(None, description='Type of the section')
+    name: str | None = Field(None, description='Name of the section')
+    type: SectionType | None = Field(None, description='Type of the section')
     path_info: dict[str, Any] = Field(
         default=default_path_info.copy(), description='Archive path'
     )
@@ -79,16 +79,15 @@ class NomadSection(BaseModel):
         if self.path_info.get('upload_id') is None:
             self.path_info['upload_id'] = self.path_to_archive_root()
 
-    def entry_to_upload_id(self) -> Optional[str]:
+    def entry_to_upload_id(self) -> str | None:
         response = post_nomad_request(
-            json_dict={"query": {"metadata": "upload_id"}},
+            json_dict={'query': {'metadata': 'upload_id'}},
             with_authentication=True,
         )
         try:
             return response['metadata']['upload_id']
         except KeyError:
             return None
-
 
     @property
     def archive_path(self) -> str:
@@ -183,7 +182,7 @@ class NomadTask(BaseModel):
     m_def: str
     inputs: list[NomadSection] = Field(default_factory=list)
     outputs: list[NomadSection] = Field(default_factory=list)
-    task_section: Optional[NomadSection] = None
+    task_section: NomadSection | None = None
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -202,8 +201,11 @@ class NomadTask(BaseModel):
             return TASK_M_DEF
 
     @property
-    def task(self) -> Optional[str]:
-        if self.task_section.type == 'workflow' and self.task_section.path_to_archive_root:
+    def task(self) -> str | None:
+        if (
+            self.task_section.type == 'workflow'
+            and self.task_section.path_to_archive_root
+        ):
             return self.task_section.path_to_archive_root + '#/workflow2'
         elif self.task_section.type == 'task' and self.task_section.full_path:
             return self.task_section.full_path
@@ -299,7 +301,7 @@ class NomadWorkflow(BaseModel):
         self.fill_workflow_graph()
 
     def register_section(
-        self, node_key: Union[int, str, tuple], node_attrs: dict[str, Any]
+        self, node_key: int | str | tuple, node_attrs: dict[str, Any]
     ) -> None:
         section = NomadSection(**node_attrs)
         self.task_elements[node_key] = section

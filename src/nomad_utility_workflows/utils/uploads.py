@@ -1,6 +1,6 @@
 import datetime as dt
 import logging
-from typing import Any, Optional, TypedDict
+from typing import Any, TypedDict
 
 from cachetools.func import ttl_cache
 from marshmallow import EXCLUDE, Schema, pre_load
@@ -72,19 +72,19 @@ class NomadUpload:
     embargo_length: float
     license: str
     entries: int
-    n_entries: Optional[int] = None
-    upload_files_server_path: Optional[str] = None
-    publish_time: Optional[dt.datetime] = None
-    references: Optional[list[str]] = None
-    datasets: Optional[list[str]] = None
-    external_db: Optional[str] = None
-    upload_name: Optional[str] = None
-    comment: Optional[str] = None
-    url: Optional[str] = None
-    complete_time: Optional[dt.datetime] = None
+    n_entries: int | None = None
+    upload_files_server_path: str | None = None
+    publish_time: dt.datetime | None = None
+    references: list[str] | None = None
+    datasets: list[str] | None = None
+    external_db: str | None = None
+    upload_name: str | None = None
+    comment: str | None = None
+    url: str | None = None
+    complete_time: dt.datetime | None = None
 
     @property
-    def base_url(self) -> Optional[str]:
+    def base_url(self) -> str | None:
         url = get_nomad_url(self.url)
         return get_nomad_base_url(url)
 

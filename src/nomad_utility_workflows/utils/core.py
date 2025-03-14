@@ -103,7 +103,7 @@ def get_nomad_request(
     with_authentication = request_options.get('with_authentication')
 
     url_base = get_nomad_url(url)
-    url = url_base + f"{'/' if section[0] != '/' else ''}{section}"
+    url = url_base + f'{"/" if section[0] != "/" else ""}{section}'
     logger.info('Sending get request @ %s', url)
     if headers is None:
         headers = {}
@@ -212,7 +212,7 @@ def post_nomad_request(
     if json_dict is None:
         json_dict = {}
     url = get_nomad_url(url)
-    url += f"{'/' if section[0] != '/' else ''}{section}"
+    url += f'{"/" if section[0] != "/" else ""}{section}'
     logger.info('Sending post request @ %s', url)
     response = requests.post(
         url, headers=headers, json=json_dict, data=data, timeout=timeout_in_sec
@@ -252,7 +252,7 @@ def delete_nomad_request(
             'Accept': 'application/json',
         }
     url = get_nomad_url(url)
-    url += f"{'/' if section[0] != '/' else ''}{section}"
+    url += f'{"/" if section[0] != "/" else ""}{section}'
     logger.info('Sending delete request @ %s', url)
     response = requests.delete(url, headers=headers, timeout=timeout_in_sec)
     if not response.status_code == STATUS_CODE:
