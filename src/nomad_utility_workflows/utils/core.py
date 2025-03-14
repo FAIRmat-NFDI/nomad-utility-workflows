@@ -8,8 +8,8 @@ from decouple import config as environ
 
 logger = logging.getLogger(__name__)
 
-NOMAD_USERNAME = environ('NOMAD_USERNAME')
-NOMAD_PASSWORD = environ('NOMAD_PASSWORD')
+NOMAD_USERNAME = environ('NOMAD_USERNAME')  # this breaks when `.env` is not present
+NOMAD_PASSWORD = environ('NOMAD_PASSWORD')  # this breaks when `.env` is not present
 NOMAD_PROD_URL = 'https://nomad-lab.eu/prod/v1/api/v1'
 NOMAD_STAGING_URL = 'https://nomad-lab.eu/prod/v1/staging/api/v1'
 NOMAD_TEST_URL = 'https://nomad-lab.eu/prod/v1/test/api/v1'

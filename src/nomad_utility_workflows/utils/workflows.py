@@ -6,6 +6,8 @@ import yaml
 from nomad.utils import get_logger
 from pydantic import BaseModel, Field
 
+from nomad_utility_workflows.utils.core import post_nomad_request
+
 logger = get_logger(__name__)
 TASK_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
 WORKFLOW_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
@@ -74,6 +76,19 @@ class NomadSection(BaseModel):
     def __init__(self, **data):
         super().__init__(**data)
         self.path_info = {**default_path_info, **self.path_info}
+        if self.path_info.get('upload_id') is None:
+            self.path_info['upload_id'] = self.path_to_archive_root()
+
+    def entry_to_upload_id(self) -> Optional[str]:
+        response = post_nomad_request(
+            json_dict={"query": {"metadata": "upload_id"}},
+            with_authentication=True,
+        )
+        try:
+            return response['metadata']['upload_id']
+        except KeyError:
+            return None
+
 
     @property
     def archive_path(self) -> str:
@@ -146,7 +161,8 @@ class NomadSection(BaseModel):
         if entry_id := self.path_info.get('entry_id'):
             if upload_id := self.path_info.get('upload_id'):
                 return f'/uploads/{upload_id}/archive/{entry_id}'
-            return f'/entries/{entry_id}/archive'
+            # temporarily deactivate this option, until NOMAD can resolve it
+            # return f'/entries/{entry_id}/archive'
         return '../upload'
 
     @property

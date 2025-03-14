@@ -2,14 +2,14 @@ import nomad_utility_workflows.utils.workflows as nuw
 
 
 def test_main_path():
+    upload_id = '<fill_in>'
+    entry_id = '<fill_in>'
     ns = nuw.NomadSection(
         path_info={
             'mainfile_path': 'vibrational_analysis.archive.yaml',
-            'entry_id': 'Qq0VGiABIgx9HQtpYL4RLdONuUp1',
+            'upload_id': upload_id,
+            'entry_id': entry_id,
             'archive_path': 'data'
         },        
     )
-    assert ns.full_path == '/entries/Qq0VGiABIgx9HQtpYL4RLdONuUp1/archive#/data'
-
-    ns.path_info['upload_id'] = 'J3lTsIQBRxuGBJQFd6uaKA'
-    assert ns.full_path == '/uploads/J3lTsIQBRxuGBJQFd6uaKA/archive/Qq0VGiABIgx9HQtpYL4RLdONuUp1#/data'
+    assert ns.full_path == f'/uploads/{upload_id}/archive/{entry_id}#/data'
