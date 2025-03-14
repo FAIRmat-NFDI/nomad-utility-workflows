@@ -17,7 +17,7 @@ name = "nomad-utility-workflows"
 description = "A module with utilities for interacting with NOMAD via, e.g., a workflow manager."
 dynamic = ["version"]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
     { name = "Joseph F. Rudzinski", email = "joseph.rudzinski@physik.hu-berlin.de" },
 ]
@@ -26,7 +26,7 @@ maintainers = [
 ]
 license = { file = "LICENSE" }
 dependencies = [
-    "nomad-lab>=1.3.6.dev1",
+    "nomad-lab>=1.3.14",
     "python-magic-bin; sys_platform == 'win32'",
     "nomad-schema-plugin-simulation-workflow>=1.0.6",
     "networkx",
@@ -44,7 +44,8 @@ dependencies = [
     "insane>=1.2.0",
     "anyio>=3.0.0,<4.0",
     "gravis>=0.1.0",
-    "pydantic==1.10.18"
+    "pydantic>=2.0.0",
+    "pytest"
 ]
 
 [project.urls]
