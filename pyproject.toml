@@ -7,6 +7,7 @@ classifiers = [
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -16,7 +17,7 @@ name = "nomad-utility-workflows"
 description = "A module with utilities for interacting with NOMAD via, e.g., a workflow manager."
 dynamic = ["version"]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 authors = [
     { name = "Joseph F. Rudzinski", email = "joseph.rudzinski@physik.hu-berlin.de" },
 ]
