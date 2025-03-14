@@ -109,7 +109,7 @@ class NomadSection(BaseModel):
     def _get_supersection_path_with_index(self) -> str:
         archive_path = self.path_info['supersection_path']
         if self.path_info.get('supersection_index') is not None:
-            archive_path += f"/{self.path_info.get('supersection_index')}"
+            archive_path += f'/{self.path_info.get("supersection_index")}'
         return archive_path
 
     def _get_section_type_path(self) -> str:
@@ -121,16 +121,16 @@ class NomadSection(BaseModel):
         elif self.path_info.get('section_type') in ['results']:
             archive_path = 'workflow2'
         else:
-            archive_path += f"/{self.path_info.get('section_type')}"
+            archive_path += f'/{self.path_info.get("section_type")}'
             if self.path_info.get('section_index') is not None:
-                archive_path += f"/{self.path_info.get('section_index')}"
+                archive_path += f'/{self.path_info.get("section_index")}'
         return archive_path
 
     def _get_section_path(self, archive_path: str) -> str:
         if self.path_info.get('section_type') is not None:
-            archive_path += f"/{self.path_info['section_type']}"
+            archive_path += f'/{self.path_info["section_type"]}'
             if self.path_info.get('section_index') is not None:
-                archive_path += f"/{self.path_info['section_index']}"
+                archive_path += f'/{self.path_info["section_index"]}'
         else:
             # TODO: this may be is a false warning if the subsection_path is given
             logger.warning(
@@ -142,29 +142,19 @@ class NomadSection(BaseModel):
         return archive_path
 
     @property
-    def upload_prefix(self) -> str:
-        if not self.path_info['mainfile_path']:
-            logger.warning(
-                f'No mainfile path provided for {self.type}-{self.name}. '
-                'Section reference will be missing.'
-            )
-            return ''
-
-        if self.path_info.get('entry_id'):
-            upload_prefix = f"/entries/{self.path_info.get('entry_id')}"
-        elif self.path_info.get('upload_id'):
-            upload_prefix = f"/uploads/{self.path_info.get('upload_id')}"
-        else:
-            upload_prefix = f"../upload{''}"
-
-        return f"{upload_prefix}/archive/mainfile/{self.path_info['mainfile_path']}"
+    def path_to_archive_root(self) -> str:
+        if entry_id := self.path_info.get('entry_id'):
+            if upload_id := self.path_info.get('upload_id'):
+                return f'/uploads/{upload_id}/archive/{entry_id}'
+            return f'/entries/{entry_id}/archive'
+        return '../upload'
 
     @property
     def full_path(self) -> str:
-        if not self.upload_prefix or not self.archive_path:
+        if not self.path_to_archive_root or not self.archive_path:
             return ''
 
-        return f"{self.upload_prefix}#/{self.archive_path}{''}"
+        return f'{self.path_to_archive_root}#/{self.archive_path}{""}'
 
     def to_dict(self) -> dict:
         return OrderedDict(
@@ -197,8 +187,8 @@ class NomadTask(BaseModel):
 
     @property
     def task(self) -> Optional[str]:
-        if self.task_section.type == 'workflow' and self.task_section.upload_prefix:
-            return self.task_section.upload_prefix + '#/workflow2'
+        if self.task_section.type == 'workflow' and self.task_section.path_to_archive_root:
+            return self.task_section.path_to_archive_root + '#/workflow2'
         elif self.task_section.type == 'task' and self.task_section.full_path:
             return self.task_section.full_path
         else:
@@ -434,8 +424,7 @@ class NomadWorkflow(BaseModel):
                 inouts.append(
                     {
                         'name': (
-                            f'{inout_type[:-1]} {default_section} '
-                            f'from {partner_name}'
+                            f'{inout_type[:-1]} {default_section} from {partner_name}'
                         ),
                         'path_info': path_info,
                         'is_default': True,
@@ -456,8 +445,7 @@ class NomadWorkflow(BaseModel):
                 inouts.append(
                     {
                         'name': (
-                            f'{inout_type[:-1]} {default_section} '
-                            f'from {partner_name}'
+                            f'{inout_type[:-1]} {default_section} from {partner_name}'
                         ),
                         'path_info': {
                             'section_type': default_section,
@@ -782,7 +770,7 @@ def _add_edges(workflow_graph, node_key, node_attrs):
     def set_mainfile_path(workflow_graph, edge, node_attrs) -> None:
         parent_mainfile_path = (
             workflow_graph.nodes[edge].get('path_info', '').get('mainfile_path', None)
-        )
+        )  # ND: this is not secure, will fail if 'path_info' is not present
         if not node_attrs.get('path_info'):
             node_attrs['path_info'] = {'mainfile_path': parent_mainfile_path}
         else:
