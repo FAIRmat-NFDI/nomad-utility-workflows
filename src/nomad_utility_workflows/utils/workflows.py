@@ -77,7 +77,7 @@ class NomadSection(BaseModel):
         super().__init__(**data)
         self.path_info = {**default_path_info, **self.path_info}
         if self.path_info.get('upload_id') is None:
-            self.path_info['upload_id'] = self.path_to_archive_root()
+            self.path_info['upload_id'] = self.path_to_archive_root
 
     def entry_to_upload_id(self) -> str | None:
         response = post_nomad_request(
