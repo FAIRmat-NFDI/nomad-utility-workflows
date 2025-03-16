@@ -179,7 +179,6 @@ class NomadSection(BaseModel):
 
 class NomadTask(BaseModel):
     name: str
-    m_def: str
     inputs: list[NomadSection] = Field(default_factory=list)
     outputs: list[NomadSection] = Field(default_factory=list)
     task_section: NomadSection | None = None
@@ -193,8 +192,7 @@ class NomadTask(BaseModel):
             if output_.name is None:
                 output_.name = f'output_{o}'
 
-    @property
-    def m_def(self) -> str:
+    def get_m_def(self) -> str:
         if self.task_section.type == 'workflow':
             return WORKFLOW_M_DEF
         elif self.task_section.type == 'task':
@@ -214,8 +212,8 @@ class NomadTask(BaseModel):
 
     def to_dict(self) -> dict:
         output_dict = OrderedDict()
-        if self.m_def:
-            output_dict['m_def'] = self.m_def
+        if m_def := self.get_m_def():
+            output_dict['m_def'] = m_def
         output_dict['name'] = self.name
         if self.task:
             output_dict['task'] = self.task
