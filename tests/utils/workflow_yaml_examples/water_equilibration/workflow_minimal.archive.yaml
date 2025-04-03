@@ -3,6 +3,8 @@
   'inputs':
   - 'name': 'input system'
     'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/0'
+  - 'name': 'input system from Geometry Optimization'
+    'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/-1'
   'outputs':
   - 'name': 'output system'
     'section': '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/run/0/system/-1'
@@ -12,7 +14,9 @@
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'Geometry Optimization'
     'task': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/workflow2'
-    'inputs': []
+    'inputs':
+    - 'name': 'input system from Geometry Optimization'
+      'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/-1'
     'outputs':
     - 'name': 'output system from Geometry Optimization'
       'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/-1'

@@ -4,7 +4,7 @@ from typing import Any, Literal, Optional, TypedDict, Union
 import networkx as nx
 import yaml
 from nomad.utils import get_logger
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 logger = get_logger(__name__)
 TASK_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
@@ -174,7 +174,6 @@ class NomadSection(BaseModel):
 
 class NomadTask(BaseModel):
     name: str
-    m_def: str
     inputs: list[NomadSection] = Field(default_factory=list)
     outputs: list[NomadSection] = Field(default_factory=list)
     task_section: Optional[NomadSection] = None
@@ -188,6 +187,7 @@ class NomadTask(BaseModel):
             if output_.name is None:
                 output_.name = f'output_{o}'
 
+    @computed_field
     @property
     def m_def(self) -> str:
         if self.task_section.type == 'workflow':
@@ -195,6 +195,7 @@ class NomadTask(BaseModel):
         elif self.task_section.type == 'task':
             return TASK_M_DEF
 
+    @computed_field
     @property
     def task(self) -> Optional[str]:
         if self.task_section.type == 'workflow' and self.task_section.upload_prefix:

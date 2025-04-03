@@ -22,7 +22,7 @@ and insert your username and password.
 
 ## Development
 
-If you want to develop this module locally, clone the project and in the plugin folder, create a virtual environment (you can use Python 3.9, 3.10, or 3.11):
+If you want to develop this module locally, clone the project and in the plugin folder, create a virtual environment (you can use Python 3.10, or 3.11):
 ```sh
 git clone https://github.com/FAIRmat-NFDI/nomad-utility-workflows.git
 cd nomad-utility-workflows
@@ -42,16 +42,12 @@ pip install uv
 
 Install the `nomad-lab` package:
 ```sh
-uv pip install '.[dev]' --index-url https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple
+uv pip install '.[dev]'
 ```
-
-**Note!**
-Until we have an official pypi NOMAD release with the plugins functionality make
-sure to include NOMAD's internal package registry (via `--index-url` in the above command).
 
 The plugin is still under development. If you would like to contribute, install the package in editable mode (with the added `-e` flag):
 ```sh
-uv pip install -e '.[dev]' --index-url https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple
+uv pip install -e '.[dev]'
 ```
 
 ### Run the tests
