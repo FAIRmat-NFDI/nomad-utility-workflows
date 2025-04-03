@@ -4,8 +4,7 @@ from typing import Any, Literal, Optional, TypedDict, Union
 import networkx as nx
 import yaml
 from nomad.utils import get_logger
-from pydantic import BaseModel, Field, PrivateAttr, computed_field
-from threading import Lock
+from pydantic import BaseModel, Field, computed_field
 
 logger = get_logger(__name__)
 TASK_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
