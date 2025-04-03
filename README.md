@@ -28,7 +28,7 @@ and insert your username and password.
 
 ## Development
 
-If you want to develop locally this plugin, clone the project and in the plugin folder, create a virtual environment (you can use Python 3.9, 3.10, or 3.11):
+If you want to develop locally this plugin, clone the project and in the plugin folder, create a virtual environment (you can use Python 3.10, or 3.11):
 ```sh
 git clone https://github.com/FAIRmat-NFDI/nomad-utility-workflows.git
 cd nomad-utility-workflows
