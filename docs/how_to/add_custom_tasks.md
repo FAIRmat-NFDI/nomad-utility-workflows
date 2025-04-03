@@ -31,7 +31,7 @@ This utilizes the `ELNBaseSection` class to create the following overview page u
 
 ## Link the ELN entries to your workflow
 
-Now that we have a mainfile for each task, we can specify the graph strucuture and node attributes as described in the [Create Custom Workflows > Create an input graph with nodes_to_graph()](./create_custom_workflows.md#create-an-input-graph-with-nodes_to_graph):
+Now that we have a mainfile for each task, we can specify the graph strucuture and node attributes as described in the [Create Custom Workflows > Complete Workflow Creation Example](./create_custom_workflows.md#complete-workflow-creation-example):
 
 ```python
 path_to_job = ''
@@ -191,7 +191,7 @@ node_attributes = {
 
 ## Generate the input workflow graph and workflow yaml
 
-Identically to `Create Custom Workflows >` [Create an input graph with nodes_to_graph()](./create_custom_workflows.md#create-an-input-graph-with-nodes_to_graph) and [Generate the workflow yaml](./create_custom_workflows.md#generate-the-workflow-yaml), we simply apply the `node_to_graph()` and `build_nomad_workflow()` functions:
+Identically to `Create Custom Workflows >` [Complete Workflow Creation Example](./create_custom_workflows.md#complete-workflow-creation-example) and [Generate the workflow yaml](./create_custom_workflows.md#step-3-generate-the-workflow-yaml), we simply apply the `node_to_graph()` and `build_nomad_workflow()` functions:
 
 ```python
 workflow_graph_input = nodes_to_graph(node_attributes)

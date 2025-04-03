@@ -2,12 +2,16 @@
 
 This how-to will walk you through how to use `nomad-utility-workflows` to generate the yaml file required to define a [custom workflow](https://nomad-lab.eu/prod/v1/docs/howto/customization/workflows.html){:target="_blank"}.
 
+## Prerequisites
+
+* A very basic understanding of NOMAD terminology: [entry](https://nomad-lab.eu/prod/v1/docs/reference/glossary.html#entry){:target="_blank"}, [mainfile](https://nomad-lab.eu/prod/v1/docs/reference/glossary.html#mainfile){:target="_blank"}
+* [Python environment with this utility module](./install_this_plugin.md)
+* Example simulation data files (provided below)
+
+
 ## Example Overview
 
 To demonstrate, we will use the following 3 step molecular dynamics equilibration workflow:
-
-
-
 
 1. Geometry optimization (energy minimization)
 2. Equilibration MD simulation in NPT ensemble
@@ -20,14 +24,9 @@ The final result will be a workflow graph visualization in NOMAD that looks like
 
 <!--- TODO: have a link to a comparable self-contained nomad upload. -->
 
-## Prerequisites
 
-* Basic understanding of NOMAD's data model
-* Python environment with `nomad-utility-workflows` installed
-* Python package `gravis` for visualization
-* Simulation data files (provided below)
 
-## Example Data Structure
+### Example Data Structure
 
 Each task in this workflow represents a supported entry in NOMAD. All three simulations will be uploaded together with the `workflow.archive.yaml` file, within the following structure:
 
@@ -45,21 +44,25 @@ upload.zip
     └── ...other raw simulation files
 ```
 
-You can download the simulation data from the GitHub repository under [tests/utils/workflow_yaml_examples/water_equilibration/](https://github.com/FAIRmat-NFDI/nomad-utility-workflows/tree/develop/tests/utils/workflow_yaml_examples/water_equilibration){:target="_blank"} in the file `simulation_data.zip`.
+<center>
+[Download Example Data](../assets/simulation_data.zip){:target="_blank" .md-button }
+</center>
 
 ## Complete Workflow Creation Example
 
 Let's create the workflow from start to finish. First, import the necessary packages:
 
 ```python
-import gravis as gv 
+import gravis as gv
 import networkx as nx
 from nomad_utility_workflows.utils.workflows import build_nomad_workflow, nodes_to_graph
 ```
 
 ### Step 1: Define the workflow structure
 
-We'll define our workflow structure using a dictionary of node attributes:
+<!-- TODO I think simplify this example to the bare minimum and then add some further smaller extension examples at the end -->
+
+We'll define our workflow structure using a dictionary of [NodeAttributes](../reference/workflows.md#nodeattributes):
 
 ```python
 node_attributes = {
@@ -121,11 +124,12 @@ node_attributes = {
 ```
 
 !!! Note "IMPORTANT"
-To ensure that all functionalities work correctly, the node keys **must** be unique integers that index the nodes. For example, `node_keys = [0, 1, 2, 3, 4, 5]` for a graph with 6 nodes.
+
+    To ensure that all functionalities work correctly, the node keys **must** be unique integers that index the nodes. For example, `node_keys = [0, 1, 2, 3, 4, 5]` for a graph with 6 nodes.
 
 ### Step 2: Create the workflow graph
 
-Now, convert the node attributes dictionary to a graph:
+Now, convert the node attributes dictionary to a graph using [`nodes_to_graph()`](../reference/workflows.md#nodes_to_graph) and display the resulting workflow graph with gravis (gv):
 
 ```python
 workflow_graph_input = nodes_to_graph(node_attributes)
@@ -146,7 +150,7 @@ The visualization of the input graph should look like this:
 
 ### Step 3: Generate the workflow YAML
 
-Finally, generate the workflow YAML file:
+Finally, define `workflow_metadata` (i.e., the filename of the output yaml and the name of the workflow) and generate the workflow YAML file with [`build_nomad_workflow()`](../reference/workflows.md#build_nomad_workflow):
 
 ```python
 workflow_metadata = {
@@ -216,6 +220,18 @@ The resulting `workflow.archive.yaml` file will look like this:
       'section': '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/run/0/calculation/-1'
 ```
 
+## Uploading and Viewing Your Workflow
+
+After generating the `workflow.archive.yaml` file:
+
+
+1. Place it in the root directory of your example data, matching the [Example Data Structure](#example-data-structure) above
+2. Upload to NOMAD via the [API](./use_api_functions.md) or [Drag-and-Drop](https://nomad-lab.eu/prod/v1/docs/howto/manage/upload.html)
+3. Navigate to the entry overview page associated with the `workflow.archive.yaml` file.
+
+<!-- TODO Maybe update this with links to the tutorials when they are added -->
+
+## Understanding the Workflow Graph
 
 The visualization of the output graph should look like this:
 
@@ -231,14 +247,9 @@ gv.d3(
 
  ![workflow output graph](images/water_equilibration_workflow_graph_output.png){.screenshot}
 
-## Understanding the Workflow Graph
+
 
 The workflow graph has two representations:
-
-
-
-
-
 
 1. **Input graph**: The simplified graph you define with your node attributes
 2. **Output graph**: The expanded graph generated by `build_nomad_workflow()` that includes additional nodes and connections
@@ -246,11 +257,6 @@ The workflow graph has two representations:
 ### What happens during graph transformation?
 
 When you run `build_nomad_workflow()`, the function:
-
-
-
-
-
 
 1. Adds default input/output nodes for each workflow node
 2. Connects these nodes appropriately
@@ -261,6 +267,9 @@ For nodes with `entry_type = 'simulation'`, the automatically generated outputs 
 * The [System](https://nomad-lab.eu/prod/v1/gui/analyze/metainfo/runschema/section_definitions@runschema.system.System){:target="_blank"} section
 * The [Calculation](https://nomad-lab.eu/prod/v1/gui/analyze/metainfo/runschema/section_definitions@runschema.calculation.Calculation){:target="_blank"} section
 
+
+
+
 ## Alternative Approach: Creating a Graph Manually
 
 If you prefer to create the graph structure directly with NetworkX instead of using `nodes_to_graph()`, you can do so:
@@ -270,7 +279,7 @@ If you prefer to create the graph structure directly with NetworkX instead of us
 workflow_graph_input = nx.DiGraph()
 
 # Add nodes with attributes
-workflow_graph_input.add_node(0, 
+workflow_graph_input.add_node(0,
     name='input system',
     type='input',
     path_info={
@@ -298,26 +307,273 @@ workflow_graph_input.add_edge(1, 2)
 # Add more edges...
 ```
 
-## Uploading and Viewing Your Workflow
+## Adding additional inputs/outputs
 
-After generating the `workflow.archive.yaml` file:
+You can add inputs/outputs beyond the defaults set by the utility by simply adding them to the node attributes dictionary:
+
+```python
+node_attributes = {
+0: {'name': 'input system',
+    'type': 'input',
+    'path_info': {
+        'mainfile_path': 'Emin/mdrun_Emin.log',
+        'supersection_index': 0,
+        'section_index': 0,
+        'section_type': 'system'
+    },
+    'out_edge_nodes': [1],
+},
+
+1: {'name': 'Geometry Optimization',
+    'type': 'workflow',
+    'entry_type': 'simulation',
+    'path_info': {
+        'mainfile_path': 'Emin/mdrun_Emin.log'
+    },
+    'outputs': [
+        {
+            'name': 'energies of the relaxed system',
+            'path_info': {
+                'section_type': 'energy',
+                'supersection_path': 'run/0/calculation', # this can be done, but at this point it's safer / easier to just use archive_path
+                'supersection_index': -1,
+            },
+        }
+    ],
+},
+
+2: {'name': 'Equilibration NPT Molecular Dynamics',
+    'type': 'workflow',
+    'entry_type': 'simulation',
+    'path_info': {
+        'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'
+    },
+    'in_edge_nodes': [1],
+    'outputs': [
+        {
+            'name': 'MD workflow properties (structural and dynamical)',
+            'path_info': {
+                'section_type': 'results',
+            },
+        }
+    ],
+},
+
+3: {'name': 'Production NVT Molecular Dynamics',
+    'type': 'workflow',
+    'entry_type': 'simulation',
+    'path_info': {
+        'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'
+    },
+    'in_edge_nodes': [2],
+    'outputs': [
+        {
+            'name': 'MD workflow properties (structural and dynamical)',
+            'path_info': {
+                'section_type': 'results',
+            },
+        }
+    ],
+},
+
+4: {'name': 'output system',
+    'type': 'output',
+    'path_info': {
+        'section_type': 'system',
+        'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'
+    },
+    'in_edge_nodes': [3],
+},
+
+5: {'name': 'output properties',
+    'type': 'output',
+    'path_info': {
+        'section_type': 'calculation',
+        'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'
+    },
+    'in_edge_nodes': [3],
+}
+}
+```
+
+```python
+workflow_graph_input = nodes_to_graph(node_attributes)
+
+gv.d3(
+    workflow_graph_input,
+    node_label_data_source='name',
+    edge_label_data_source='name',
+    zoom_factor=1.5,
+    node_hover_tooltip=True,
+)
+```
+
+![workflow output graph](images/water_equilibration_workflow_graph_input.png){.screenshot}
 
 
+```python
+for node_key, node_attributes in workflow_graph_input.nodes(data=True):
+    print(node_key, node_attributes)
+```
+
+```
+0 {'name': 'input system', 'type': 'input', 'path_info': {'mainfile_path': 'Emin/mdrun_Emin.log', 'supersection_index': 0, 'section_index': 0, 'section_type': 'system'}, 'out_edge_nodes': [1]}
+1 {'name': 'Geometry Optimization', 'type': 'workflow', 'entry_type': 'simulation', 'path_info': {'mainfile_path': 'Emin/mdrun_Emin.log'}}
+2 {'name': 'Equilibration NPT Molecular Dynamics', 'type': 'workflow', 'entry_type': 'simulation', 'path_info': {'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'}, 'in_edge_nodes': [1]}
+3 {'name': 'Production NVT Molecular Dynamics', 'type': 'workflow', 'entry_type': 'simulation', 'path_info': {'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'}, 'in_edge_nodes': [2]}
+4 {'name': 'output system', 'type': 'output', 'path_info': {'section_type': 'system', 'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'}, 'in_edge_nodes': [3]}
+5 {'name': 'output properties', 'type': 'output', 'path_info': {'section_type': 'calculation', 'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'}, 'in_edge_nodes': [3]}
+6 {'type': 'output', 'name': 'energies of the relaxed system', 'path_info': {'section_type': 'energy', 'supersection_path': 'run/0/calculation', 'supersection_index': -1}}
+7 {'type': 'output', 'name': 'MD workflow properties (structural and dynamical)', 'path_info': {'section_type': 'results'}}
+8 {'type': 'output', 'name': 'MD workflow properties (structural and dynamical)', 'path_info': {'section_type': 'results'}}
+```
+
+```python
+for edge_1, edge_2, edge_attributes in workflow_graph_input.edges(data=True):
+    print(edge_1, edge_2, edge_attributes)
+```
+
+```
+0 1 {}
+1 6 {'inputs': [{'name': 'energies of the relaxed system', 'path_info': {'section_type': 'energy', 'supersection_path': 'run/0/calculation', 'supersection_index': -1}}]}
+1 2 {}
+2 7 {'inputs': [{'name': 'MD workflow properties (structural and dynamical)', 'path_info': {'section_type': 'results'}}]}
+2 3 {}
+3 8 {'inputs': [{'name': 'MD workflow properties (structural and dynamical)', 'path_info': {'section_type': 'results'}}]}
+3 4 {}
+3 5 {}
+```
+
+And again we generate the final workflow graph and yaml:
+
+```python
+workflow_graph_output = build_nomad_workflow(
+    destination_filename='./workflow.archive.yaml',
+    workflow_name='Equilibration Procedure',
+    workflow_graph=nx.DiGraph(workflow_graph_input),
+    write_to_yaml=True,
+)
+
+gv.d3(
+    workflow_graph_output,
+    node_label_data_source='name',
+    edge_label_data_source='name',
+    zoom_factor=1.5,
+    node_hover_tooltip=True,
+)
+```
+
+![workflow output graph](images/water_equilibration_workflow_graph_output.png){.screenshot}
+
+```python
+for node_key, node_attributes in workflow_graph_output.nodes(data=True):
+    print(node_key, node_attributes)
+```
+
+```
+0 {'name': 'input system', 'type': 'input', 'path_info': {'mainfile_path': 'Emin/mdrun_Emin.log', 'supersection_index': 0, 'section_index': 0, 'section_type': 'system'}, 'out_edge_nodes': [1]}
+1 {'name': 'Geometry Optimization', 'type': 'workflow', 'entry_type': 'simulation', 'path_info': {'mainfile_path': 'Emin/mdrun_Emin.log'}}
+2 {'name': 'Equilibration NPT Molecular Dynamics', 'type': 'workflow', 'entry_type': 'simulation', 'path_info': {'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'}, 'in_edge_nodes': [1]}
+3 {'name': 'Production NVT Molecular Dynamics', 'type': 'workflow', 'entry_type': 'simulation', 'path_info': {'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'}, 'in_edge_nodes': [2]}
+4 {'name': 'output system', 'type': 'output', 'path_info': {'section_type': 'system', 'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'}, 'in_edge_nodes': [3]}
+5 {'name': 'output properties', 'type': 'output', 'path_info': {'section_type': 'calculation', 'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'}, 'in_edge_nodes': [3]}
+6 {'type': 'output', 'name': 'energies of the relaxed system', 'path_info': {'section_type': 'energy', 'supersection_path': 'run/0/calculation', 'supersection_index': -1, 'mainfile_path': 'Emin/mdrun_Emin.log'}}
+7 {'type': 'output', 'name': 'MD workflow properties (structural and dynamical)', 'path_info': {'section_type': 'results', 'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'}}
+8 {'type': 'output', 'name': 'MD workflow properties (structural and dynamical)', 'path_info': {'section_type': 'results', 'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'}}
+9 {'type': 'output', 'name': 'output system from Geometry Optimization', 'path_info': {'section_type': 'system', 'mainfile_path': 'Emin/mdrun_Emin.log'}}
+10 {'type': 'output', 'name': 'output calculation from Geometry Optimization', 'path_info': {'section_type': 'calculation', 'mainfile_path': 'Emin/mdrun_Emin.log'}}
+11 {'type': 'input', 'name': 'input system from Geometry Optimization', 'path_info': {'section_type': 'system', 'mainfile_path': 'Emin/mdrun_Emin.log'}}
+12 {'type': 'output', 'name': 'output system from Equilibration NPT Molecular Dynamics', 'path_info': {'section_type': 'system', 'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'}}
+13 {'type': 'output', 'name': 'output calculation from Equilibration NPT Molecular Dynamics', 'path_info': {'section_type': 'calculation', 'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'}}
+14 {'type': 'input', 'name': 'input system from Equilibration NPT Molecular Dynamics', 'path_info': {'section_type': 'system', 'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'}}
+15 {'type': 'output', 'name': 'output system from Production NVT Molecular Dynamics', 'path_info': {'section_type': 'system', 'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'}}
+16 {'type': 'output', 'name': 'output calculation from Production NVT Molecular Dynamics', 'path_info': {'section_type': 'calculation', 'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'}}
+```
+
+```python
+for edge_1, edge_2, edge_attributes in workflow_graph_output.edges(data=True):
+    print(edge_1, edge_2, edge_attributes)
+```
+
+```
+0 1 {'inputs': [], 'outputs': []}
+1 6 {'inputs': [{'name': 'energies of the relaxed system', 'path_info': {'section_type': 'energy', 'supersection_path': 'run/0/calculation', 'supersection_index': -1, 'mainfile_path': 'Emin/mdrun_Emin.log'}}, {'name': 'output system from Geometry Optimization', 'path_info': {'section_type': 'system', 'mainfile_path': 'Emin/mdrun_Emin.log'}}, {'name': 'output calculation from Geometry Optimization', 'path_info': {'section_type': 'calculation', 'mainfile_path': 'Emin/mdrun_Emin.log'}}], 'outputs': []}
+1 2 {'inputs': [], 'outputs': [{'name': 'input system from Geometry Optimization', 'path_info': {'section_type': 'system', 'mainfile_path': 'Emin/mdrun_Emin.log'}}]}
+1 9 {}
+1 10 {}
+2 7 {'inputs': [{'name': 'MD workflow properties (structural and dynamical)', 'path_info': {'section_type': 'results', 'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'}}, {'name': 'output system from Equilibration NPT Molecular Dynamics', 'path_info': {'section_type': 'system', 'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'}}, {'name': 'output calculation from Equilibration NPT Molecular Dynamics', 'path_info': {'section_type': 'calculation', 'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'}}], 'outputs': []}
+2 3 {'inputs': [], 'outputs': [{'name': 'input system from Equilibration NPT Molecular Dynamics', 'path_info': {'section_type': 'system', 'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log'}}]}
+2 12 {}
+2 13 {}
+3 8 {'inputs': [{'name': 'MD workflow properties (structural and dynamical)', 'path_info': {'section_type': 'results', 'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'}}, {'name': 'output system from Production NVT Molecular Dynamics', 'path_info': {'section_type': 'system', 'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'}}, {'name': 'output calculation from Production NVT Molecular Dynamics', 'path_info': {'section_type': 'calculation', 'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log'}}], 'outputs': []}
+3 4 {'inputs': [], 'outputs': []}
+3 5 {'inputs': [], 'outputs': []}
+3 15 {}
+3 16 {}
+11 2 {}
+14 3 {}
+```
+
+`workflow_archive.yaml`:
+```yaml
+'workflow2':
+  'name': 'Equilibration Procedure'
+  'inputs':
+  - 'name': 'input system'
+    'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/0'
+  'outputs':
+  - 'name': 'MD workflow properties (structural and dynamical)'
+    'section': '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/workflow2/results/-1'
+  - 'name': 'output system'
+    'section': '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/run/0/system/-1'
+  - 'name': 'output properties'
+    'section': '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/run/0/calculation/-1'
+  'tasks':
+  - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
+    'name': 'Geometry Optimization'
+    'task': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/workflow2'
+    'inputs': []
+    'outputs':
+    - 'name': 'energies of the relaxed system'
+      'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/calculation/-1/energy/-1'
+    - 'name': 'output system from Geometry Optimization'
+      'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/-1'
+    - 'name': 'output calculation from Geometry Optimization'
+      'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/calculation/-1'
+  - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
+    'name': 'Equilibration NPT Molecular Dynamics'
+    'task': '../upload/archive/mainfile/Equil_NPT/mdrun_Equil-NPT.log#/workflow2'
+    'inputs':
+    - 'name': 'input system from Geometry Optimization'
+      'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/-1'
+    'outputs':
+    - 'name': 'MD workflow properties (structural and dynamical)'
+      'section': '../upload/archive/mainfile/Equil_NPT/mdrun_Equil-NPT.log#/workflow2/results/-1'
+    - 'name': 'output system from Equilibration NPT Molecular Dynamics'
+      'section': '../upload/archive/mainfile/Equil_NPT/mdrun_Equil-NPT.log#/run/0/system/-1'
+    - 'name': 'output calculation from Equilibration NPT Molecular Dynamics'
+      'section': '../upload/archive/mainfile/Equil_NPT/mdrun_Equil-NPT.log#/run/0/calculation/-1'
+  - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
+    'name': 'Production NVT Molecular Dynamics'
+    'task': '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/workflow2'
+    'inputs':
+    - 'name': 'input system from Equilibration NPT Molecular Dynamics'
+      'section': '../upload/archive/mainfile/Equil_NPT/mdrun_Equil-NPT.log#/run/0/system/-1'
+    'outputs':
+    - 'name': 'MD workflow properties (structural and dynamical)'
+      'section': '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/workflow2/results/-1'
+    - 'name': 'output system from Production NVT Molecular Dynamics'
+      'section': '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/run/0/system/-1'
+    - 'name': 'output calculation from Production NVT Molecular Dynamics'
+      'section': '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/run/0/calculation/-1'
+```
 
 
-
-
-1. Place it in the root directory of your upload package
-2. Ensure all referenced files are in the correct locations
-3. Upload the package to NOMAD
-4. View the workflow visualization in the workflow entry
-
-
-## Reference
+## References
 
 For more details on node attributes and other options, see:
 
 * [Explanation > Workflow > Node Attributes](../explanation/workflows.md#node-attributes)
-* [Reference > Workflows](../reference/workflows.html)
+* [Reference > Workflows](../reference/workflows.md)
 
 
