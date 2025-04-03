@@ -36,6 +36,9 @@ from nomad_utility_workflows.utils.users import (
     search_users_by_name,
     who_am_i,
 )
+
+from dotenv import load_dotenv
+load_dotenv()
 ```
 
 ## NOMAD URLs
@@ -120,6 +123,12 @@ token
     <A very long series of numbers and letters>
     ```
 
+??? tip "Tip - If your `.env` file is not found"
+
+    If the authentication credentials from your `.env` file is not picked, add this directory to your `PYTHONPATH`:
+    ```bash
+    export PYTHONPATH=$PYTHONPATH:<path-to-tutorial-root-working-directory>
+    ```
 
 In practice, you do not need to obtain a token yourself when using `nomad-utility-workflows`. A token will automatically be obtained for API calls that require authentication. However, you may want to do the token generation yourself for custom API calls (see [Writing your own wrappers](#writing-your-own-wrappers) below.)
 
