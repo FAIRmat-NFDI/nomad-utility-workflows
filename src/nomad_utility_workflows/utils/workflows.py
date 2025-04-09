@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from typing import Any, Literal, Optional, TypedDict, Union, Dict
+from typing import Any, Literal, Optional, Union, Dict
+from typing_extensions import TypedDict
 
 import networkx as nx
 import yaml
@@ -751,7 +752,7 @@ class NomadWorkflow(BaseModel):
     #     return archive
 
 
-def nodes_to_graph(node_attributes_universe: "NodeAttributesUniverse") -> nx.DiGraph:
+def nodes_to_graph(node_attributes_universe: 'NodeAttributesUniverse') -> nx.DiGraph:
     """Builds a workflow graph (nx.DiGraph) from a NodeAttributesUniverse of node attributes
     as specified below.
 
@@ -921,20 +922,29 @@ class NodeAttributes(BaseModel):
         out_edge_nodes (list[int]): A list of integers specifying the node keys which
             contain out-edges to this node.
     """
+
     name: str = Field(None, description='A free-form string describing this node.')
     type: SectionType = Field(None, description='The type of node.')
-    entry_type: EntryType = Field(None, description='The type of node recognized by NOMAD.')
-    path_info: PathInfo = Field(None, description='Information for generating the NOMAD archive section paths.')
+    entry_type: EntryType = Field(
+        None, description='The type of node recognized by NOMAD.'
+    )
+    path_info: PathInfo = Field(
+        None, description='Information for generating the NOMAD archive section paths.'
+    )
     inputs: list[dict[str, Any]] = Field(
         default_factory=list,
-        description='A list of input nodes to be added to the graph.'
+        description='A list of input nodes to be added to the graph.',
     )
     outputs: list[dict[str, Any]] = Field(
         default_factory=list,
-        description='A list of output nodes to be added to the graph.'
+        description='A list of output nodes to be added to the graph.',
     )
-    in_edge_nodes: list[int] = Field(default_factory=list, description='Nodes with in-edges to this node.')
-    out_edge_nodes: list[int] = Field(default_factory=list, description='Nodes with out-edges to this node.')
+    in_edge_nodes: list[int] = Field(
+        default_factory=list, description='Nodes with in-edges to this node.'
+    )
+    out_edge_nodes: list[int] = Field(
+        default_factory=list, description='Nodes with out-edges to this node.'
+    )
 
 
 class NodeAttributesUniverse(BaseModel):
