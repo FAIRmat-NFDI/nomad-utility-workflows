@@ -1,7 +1,13 @@
 {
   "upload_ids": {
-    "md-workflow": "<your md workflow upload id from Part 1>"
-     },
+    "setup-workflow": "2g1kxNndRfCvMsHMrUvU2w",
+    "md-workflow": "4Fvz-xp8Rq-fB5t3_WxDhg",
+    "DFT": [
+      "Xee25obDQdmu8tGQhAEHpw",
+      "1bU_8R0NSdee85ZGZhkSRA",
+      "P-1j-DRcSsKINFe2_8LI0w"
+    ],
+    "analysis": "B-boIB-fQeacDHZklS4ZsA"},
   "entry_ids": {
     "md-workflow": "ERvFmh9BlclnU-Ai3ohQP-6vZJjf",
     "DFT": ["iJi7Q-C97J2BEupZVEgGq-TEZf5N", "7B0NdXAK7wqjHNX2yPR3ghdwdjG2", "15UO3IElPxAFZG3xl0tmmyhyLoHa"],

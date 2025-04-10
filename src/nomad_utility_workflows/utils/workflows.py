@@ -151,14 +151,24 @@ class NomadSection(BaseModel):
             )
             return ''
 
-        if self.path_info.get('entry_id'):
-            upload_prefix = f"/entries/{self.path_info.get('entry_id')}"
+        if self.path_info.get('entry_id') and self.path_info.get('upload_id'):
+            upload_prefix = (
+                f"/uploads/{self.path_info.get('upload_id')}/archive/"
+                f"{self.path_info.get('entry_id')}"
+            )
+        elif self.path_info.get('entry_id'):
+            upload_prefix = f"/entries/{self.path_info.get('entry_id')}/archive"
         elif self.path_info.get('upload_id'):
-            upload_prefix = f"/uploads/{self.path_info.get('upload_id')}"
+            upload_prefix = (
+                f"/uploads/{self.path_info.get('upload_id')}/archive/mainfile/"
+                f"{self.path_info['mainfile_path']}"
+            )
         else:
-            upload_prefix = f"../upload{''}"
+            upload_prefix = (
+                f"../upload/archive/mainfile/{self.path_info['mainfile_path']}"
+            )
 
-        return f"{upload_prefix}/archive/mainfile/{self.path_info['mainfile_path']}"
+        return upload_prefix
 
     @property
     def full_path(self) -> str:
