@@ -946,6 +946,19 @@ class NodeAttributes(BaseModel):
         default_factory=list, description='Nodes with out-edges to this node.'
     )
 
+    def get(self, key: str, default: Any = None) -> Any:
+        """
+        Allows dictionary-like access to the attributes of the NodeAttributes class.
+
+        Args:
+            key (str): The attribute name to retrieve.
+            default (Any): The default value to return if the attribute is not found.
+
+        Returns:
+            Any: The value of the attribute if it exists, otherwise the default value.
+        """
+        return getattr(self, key, default)
+
 
 class NodeAttributesUniverse(BaseModel):
     nodes: Dict[int, NodeAttributes]

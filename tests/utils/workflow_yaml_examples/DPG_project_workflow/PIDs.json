@@ -1,0 +1,13 @@
+{
+  "upload_ids": {
+    "md-workflow": "<your md workflow upload id from Part 1>"
+     },
+  "entry_ids": {
+    "md-workflow": "ERvFmh9BlclnU-Ai3ohQP-6vZJjf",
+    "DFT": ["iJi7Q-C97J2BEupZVEgGq-TEZf5N", "7B0NdXAK7wqjHNX2yPR3ghdwdjG2", "15UO3IElPxAFZG3xl0tmmyhyLoHa"],
+    "setup-workflow": "Gqm3Tek---QCH2z0FwTqkEhtvV1s",
+    "parameters": "Lyku0eClZtAGwwY9o7vWeKL-7YWK",
+    "analysis": "G74EVJ4bCbjLlFKs-Oytxqzv7E0H"
+  },
+  "dataset_id": "<your dataset id>"
+}
