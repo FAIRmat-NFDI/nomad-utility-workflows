@@ -1,11 +1,11 @@
 from collections import OrderedDict
-from typing import Any, Literal, Optional, Union, Dict
-from typing_extensions import TypedDict
+from typing import Any, Literal, Optional, Union
 
 import networkx as nx
 import yaml
 from nomad.utils import get_logger
 from pydantic import BaseModel, Field, computed_field
+from typing_extensions import TypedDict
 
 logger = get_logger(__name__)
 TASK_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
@@ -753,8 +753,8 @@ class NomadWorkflow(BaseModel):
 
 
 def nodes_to_graph(node_attributes_universe: 'NodeAttributesUniverse') -> nx.DiGraph:
-    """Builds a workflow graph (nx.DiGraph) from a NodeAttributesUniverse of node attributes
-    as specified below.
+    """Builds a workflow graph (nx.DiGraph) from a NodeAttributesUniverse of node
+    attributes as specified below.
 
     Args:
         node_attributes_universe: A NodeAttributesUniverse object containing the node
@@ -961,7 +961,7 @@ class NodeAttributes(BaseModel):
 
 
 class NodeAttributesUniverse(BaseModel):
-    nodes: Dict[int, NodeAttributes]
+    nodes: dict[int, NodeAttributes]
 
 
 def build_nomad_workflow(
