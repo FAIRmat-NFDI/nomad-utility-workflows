@@ -1,0 +1,15 @@
+tolerance 2.0
+
+filetype pdb
+
+output solute_in_bilayer_generate.pdb
+
+structure bilayer_production.pdb
+  number 1
+  fixed 0. 0. 0. 0. 0. 0.
+end structure
+
+structure solute_in_bilayer_solute_translated.pdb
+  number 1
+  inside box 0.0 0.0 70.78244367724605 60.638999938964844 60.63899230957031 72.78244367724605
+end structure

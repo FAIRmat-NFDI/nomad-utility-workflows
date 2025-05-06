@@ -153,14 +153,24 @@ class NomadSection(BaseModel):
 
         if self.path_info.get('entry_id') and self.path_info.get('upload_id'):
             upload_prefix = (
-                f"/uploads/{self.path_info.get('upload_id')}/archive/"
+                f"../uploads/{self.path_info.get('upload_id')}/archive/"
                 f"{self.path_info.get('entry_id')}"
             )
         elif self.path_info.get('entry_id'):
-            upload_prefix = f"/entries/{self.path_info.get('entry_id')}/archive"
+            # TODO - remove when entry_id only references supported
+            logger.warning(
+                'upload_id missing. entry_id only references not yet supported.'
+                'reference will be missing.'
+            )
+            upload_prefix = f"../entries/{self.path_info.get('entry_id')}/archive"
         elif self.path_info.get('upload_id'):
+            # TODO - remove when upload_id only references supported
+            logger.warning(
+                'entry_id missing. upload_id only references not yet supported.'
+                'reference will be missing.'
+            )
             upload_prefix = (
-                f"/uploads/{self.path_info.get('upload_id')}/archive/mainfile/"
+                f"../uploads/{self.path_info.get('upload_id')}/archive/mainfile/"
                 f"{self.path_info['mainfile_path']}"
             )
         else:
@@ -313,6 +323,7 @@ class NomadWorkflow(BaseModel):
     def fill_workflow_graph(self) -> None:
         """_summary_"""
         for node_source, node_dest, edge in list(self.workflow_graph.edges(data=True)):
+            print(node_source, node_dest, edge)
             self._resolve_edge_inputs(node_source, node_dest, edge)
             self._resolve_edge_outputs(node_source, node_dest, edge)
             self._add_defaults(node_source, node_dest, edge)
@@ -398,34 +409,108 @@ class NomadWorkflow(BaseModel):
     def _get_defaults(
         self, inout_type: Literal['inputs', 'outputs'], node_source, node_dest
     ) -> list:
-        entry_type, partner_node = self._determine_entry_type_and_partner_node(
-            node_source, node_dest
-        )
-
-        if entry_type == 'simulation':
-            return self._get_simulation_defaults(
-                inout_type, partner_node, node_source, node_dest
-            )
-        else:
-            return self._get_general_defaults(
-                inout_type, partner_node, node_source, node_dest
-            )
-
-    def _determine_entry_type_and_partner_node(self, node_source, node_dest):
+        # entry_type, partner_node = self._determine_entry_type_and_partner_node(
+        #     node_source, node_dest
+        # )
         entry_type_source = self.workflow_graph.nodes[node_source].get('entry_type', '')
         node_source_type = self.workflow_graph.nodes[node_source].get('type', '')
         entry_type_dest = self.workflow_graph.nodes[node_dest].get('entry_type', '')
         node_dest_type = self.workflow_graph.nodes[node_dest].get('type', '')
-        entry_type = ''
-        partner_node = node_source
+
+        # TODO - If source is sim, then input sys from source instead of dest
+        # TODO - if source is not simulation, add gen source section as input to dest
+        inouts = []
         if entry_type_source == 'simulation':
-            entry_type = 'simulation'
-        elif entry_type_dest == 'simulation' and node_source_type == 'input':
-            entry_type = 'simulation'
+            partner_node = node_source
+            # adds output sys + calc
+            inouts += self._get_simulation_defaults(
+                inout_type, partner_node, node_source, node_dest
+            )
+            if node_dest_type == 'output':
+                partner_node = node_dest
+                # adds the global output
+                inouts += self._get_general_defaults(
+                    inout_type, partner_node, node_source, node_dest
+                )
+        elif entry_type_dest == 'simulation':
             partner_node = node_dest
+            # adds the input sys
+            # print(inout_type)
+            # print(
+            #     self._get_simulation_defaults(
+            #         inout_type, partner_node, node_source, node_dest
+            #     )
+            # )
+            inouts += self._get_simulation_defaults(
+                inout_type, partner_node, node_source, node_dest
+            )
+            if node_source_type == 'input':
+                partner_node = node_source
+                # adds the global input
+                inouts += self._get_general_defaults(
+                    inout_type, partner_node, node_source, node_dest
+                )
         elif node_dest_type == 'output':
             partner_node = node_dest
-        return entry_type, partner_node
+            # adds the global output
+            inouts += self._get_general_defaults(
+                inout_type, partner_node, node_source, node_dest
+            )
+        elif node_source_type == 'input':
+            partner_node = node_source
+            # adds the global input
+            inouts += self._get_general_defaults(
+                inout_type, partner_node, node_source, node_dest
+            )
+        else:
+            partner_node = node_source
+            # adds the edge link?
+            inouts += self._get_general_defaults(
+                inout_type, partner_node, node_source, node_dest
+            )
+
+        return inouts
+
+        # if entry_type == 'simulation':
+        #     return self._get_simulation_defaults(
+        #         inout_type, partner_node, node_source, node_dest
+        #     )
+        # else:
+        #     return self._get_general_defaults(
+        #         inout_type, partner_node, node_source, node_dest
+        #     )
+
+    # def _get_defaults(
+    #     self, inout_type: Literal['inputs', 'outputs'], node_source, node_dest
+    # ) -> list:
+    #     entry_type, partner_node = self._determine_entry_type_and_partner_node(
+    #         node_source, node_dest
+    #     )
+
+    #     if entry_type == 'simulation':
+    #         return self._get_simulation_defaults(
+    #             inout_type, partner_node, node_source, node_dest
+    #         )
+    #     else:
+    #         return self._get_general_defaults(
+    #             inout_type, partner_node, node_source, node_dest
+    #         )
+
+    # def _determine_entry_type_and_partner_node(self, node_source, node_dest):
+    #     entry_type_source = self.workflow_graph.nodes[node_source].get('entry_type', '')
+    #     node_source_type = self.workflow_graph.nodes[node_source].get('type', '')
+    #     entry_type_dest = self.workflow_graph.nodes[node_dest].get('entry_type', '')
+    #     node_dest_type = self.workflow_graph.nodes[node_dest].get('type', '')
+    #     entry_type = ''
+    #     partner_node = node_source
+    #     if entry_type_source == 'simulation':
+    #         entry_type = 'simulation'
+    #     elif entry_type_dest == 'simulation' and node_source_type == 'input':
+    #         entry_type = 'simulation'
+    #         partner_node = node_dest
+    #     elif node_dest_type == 'output':
+    #         partner_node = node_dest
+    #     return entry_type, partner_node
 
     def _get_general_defaults(self, inout_type, partner_node, node_source, node_dest):
         section = NomadSection(**self.workflow_graph.nodes[partner_node])
@@ -768,6 +853,14 @@ class NodeAttributes(BaseModel):
     out_edge_nodes: list[int] = Field(
         default_factory=list, description='Nodes with out-edges to this node.'
     )
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if self.type == 'workflow':
+            if not self.path_info:
+                return
+            if not self.path_info.get('archive_path'):
+                self.path_info['archive_path'] = 'workflow2'
 
     def get(self, key: str, default: Any = None) -> Any:
         """

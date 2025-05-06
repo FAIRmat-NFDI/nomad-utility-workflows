@@ -1,0 +1,58 @@
+integrator               = md
+dt                       = 0.01
+nsteps                   = 5000
+; Output
+nstxout                  = 0
+nstvout                  = 0
+nstfout                  = 0
+nstlog                   = 3000
+nstenergy                = 3000
+nstxout-compressed       = 3000
+; Non-bonded interactions
+verlet-buffer-tolerance  = -1
+rlist                    = 1.4
+nstlist                  = 50
+coulombtype              = Cut-off
+coulomb-modifier         = Potential-shift
+rcoulomb                 = 1.2
+epsilon-r                = 15
+vdwtype                  = Shift
+rvdw                     = 1.2
+rvdw-switch              = 0.9
+periodic-molecules       = no
+; Temperature coupling
+tcoupl                   = v-rescale
+tau_t                    = 1.0
+ref_t                    = 298
+tc-grps                  = system
+; Pressure coupling
+pcoupl                   = c-rescale
+pcoupltype               = semiisotropic
+tau-p                    = 12.0
+ref-p                    = 1.0 1.0 
+compressibility          = 3e-4 3e-4
+; Boundary conditions
+pbc                      = xyz
+; Initial velocities
+gen-vel                  = yes
+gen-temp                 = 298
+
+; Group restraints
+pull                     = yes
+pull-nstxout             = 0
+pull-nstfout             = 0
+pull-constr-tol          = 1e-06
+pull-cylinder-r          = 1.5
+pull-ngroups             = 2
+pull-group1-name         = POPC
+pull-group2-name         = C1C1
+pull-ncoords             = 1
+pull-coord1-groups       = 1 2
+pull-coord1-type         = umbrella
+pull-coord1-geometry     = cylinder
+pull-coord1-vec          = 0 0 1
+pull-coord1-dim          = N N Y
+pull-coord1-start        = no
+pull-coord1-init         = 2.0
+pull-coord1-rate         = 0
+pull-coord1-k            = 1000

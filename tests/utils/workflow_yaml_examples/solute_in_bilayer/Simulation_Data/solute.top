@@ -1,0 +1,8 @@
+#include "martini_v2.2.itp"
+#include "solute.itp"
+
+[ system ]
+C1C1 system
+
+[ molecules ]
+C1C1                1

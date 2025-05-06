@@ -3,13 +3,6 @@
   'inputs':
   - 'name': 'Solute in bilayer workflow parameters'
     'section': '../upload/archive/mainfile/workflow_parameters.archive.yaml#/data'
-  'outputs':
-  - 'name': 'WHAM Analysis'
-    'section': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
-  - 'name': 'output system from production'
-    'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1'
-  - 'name': 'output calculation from production'
-    'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/calculation/-1'
   'tasks':
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'insert_solute_in_box'
@@ -71,3 +64,10 @@
       'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1'
     - 'name': 'output calculation from production'
       'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/calculation/-1'
+  - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
+    'name': 'compute_wham'
+    'task': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
+    'inputs':
+    - 'name': 'input system from production'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1'
+    'outputs': []

@@ -1,4 +1,5 @@
 # How to add custom tasks to workflows using NOMAD's ELN Functionalities
+<!-- Implemented in nomad-utility-workflows/tests/utils/workflow_yaml_examples/solute_in_bilayer/ -->
 
 This how-to covers how to add a custom NOMAD entry in the case that some tasks or input/output of your workflow, will not automatically parsed and stored within a NOMAD archive, i.e., there it cannot be referenced within your workflow.
 
@@ -7,7 +8,12 @@ This how-to covers how to add a custom NOMAD entry in the case that some tasks o
 
 Consider the following setup, simulation, and analysis protocol:
 
-![NOMAD workflow graph](images/solute_in_bilayer_workflow_graph_NOMAD.png){.screenshot}
+<div class="click-zoom">
+    <label>
+        <input type="checkbox">
+        <img src="images/solute_in_bilayer_workflow_graph_NOMAD.png" alt="" width="100%" title="Click to zoom in">
+    </label>
+</div>
 
 The minimize, equilibrate, and production (workflow) tasks are analogous to that described in [How to > Create Custom Workflows](./create_custom_workflows.md). The remaining tasks (green boxes) correspond to steps in the simulation protocol that are not supported by the NOMAD simulation parsers, e.g., creation of the initial configuration or model parameter files, or post-simulation analysis.
 
@@ -34,10 +40,13 @@ This utilizes the `ELNBaseSection` class to create the following overview page u
 Now that we have a mainfile for each task, we can specify the graph strucuture and node attributes as described in the [Create Custom Workflows > Complete Workflow Creation Example](./create_custom_workflows.md#complete-workflow-creation-example):
 
 ```python
+import gravis as gv
+import networkx as nx
+
 from nomad_utility_workflows.utils.workflows import (
-    NodeAttributesUniverse, 
-    NodeAttributes, 
-    nodes_to_graph, 
+    NodeAttributesUniverse,
+    NodeAttributes,
+    nodes_to_graph,
     build_nomad_workflow,
 )
 
@@ -54,7 +63,7 @@ node_attributes_universe = NodeAttributesUniverse(
             },
             out_edge_nodes=[1, 3],
         ),
-        
+
         1: NodeAttributes(
             name="insert_solute_in_box",
             type="task",
@@ -82,7 +91,7 @@ node_attributes_universe = NodeAttributesUniverse(
                 }
             ],
         ),
-        
+
         2: NodeAttributes(
             name="convert_box_to_gro",
             type="task",
@@ -110,7 +119,7 @@ node_attributes_universe = NodeAttributesUniverse(
                 }
             ],
         ),
-        
+
         3: NodeAttributes(
             name="update_topology_file",
             type="task",
@@ -137,7 +146,7 @@ node_attributes_universe = NodeAttributesUniverse(
                 }
             ],
         ),
-        
+
         4: NodeAttributes(
             name="minimize",
             type="workflow",
@@ -163,8 +172,8 @@ node_attributes_universe = NodeAttributesUniverse(
                 }
             ],
         ),
-        
-        
+
+
         5: NodeAttributes(
             name="equilibrate",
             type="workflow",
@@ -174,7 +183,7 @@ node_attributes_universe = NodeAttributesUniverse(
             },
             in_edge_nodes= [4],
         ),
-        
+
         6: NodeAttributes(
             name="production",
             type="workflow",
@@ -184,7 +193,7 @@ node_attributes_universe = NodeAttributesUniverse(
             },
             in_edge_nodes= [5],
         ),
-        
+
         7: NodeAttributes(
             name="compute_wham",
             type="task",
@@ -205,7 +214,6 @@ node_attributes_universe = NodeAttributesUniverse(
         ),
         }
 )
-
 ```
 
 ## Generate the input workflow graph and workflow yaml
@@ -229,7 +237,6 @@ workflow_graph_output_minimal = build_nomad_workflow(
 
 which produces the following workflow yaml:
 
-
 ```yaml
 'workflow2':
   'name': 'Solute in bilayer workflow'
@@ -244,26 +251,38 @@ which produces the following workflow yaml:
     'name': 'insert_solute_in_box'
     'task': '../upload/archive/mainfile/insert_solute_in_box.archive.yaml#/data'
     'inputs':
+    - 'name': 'input data from Solute in bilayer workflow parameters'
+      'section': '../upload/archive/mainfile/workflow_parameters.archive.yaml#/data'
     - 'name': 'data from workflow parameters'
       'section': '../upload/archive/mainfile/workflow_parameters.archive.yaml#/data'
     'outputs':
     - 'name': 'data from insert_solute_in_box'
       'section': '../upload/archive/mainfile/insert_solute_in_box.archive.yaml#/data'
+    - 'name': 'output data from data from insert_solute_in_box'
+      'section': '../upload/archive/mainfile/insert_solute_in_box.archive.yaml#/data'
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'convert_box_to_gro'
     'inputs':
+    - 'name': 'input data from insert_solute_in_box'
+      'section': '../upload/archive/mainfile/insert_solute_in_box.archive.yaml#/data'
     - 'name': 'data from insert_solute_in_box'
       'section': '../upload/archive/mainfile/insert_solute_in_box.archive.yaml#/data'
     'outputs':
     - 'name': 'data from convert_box_to_gro'
       'section': '../upload/archive/mainfile/convert_box_to_gro.archive.yaml#/data'
+    - 'name': 'output data from data from convert_box_to_gro'
+      'section': '../upload/archive/mainfile/convert_box_to_gro.archive.yaml#/data'
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'update_topology_file'
     'inputs':
+    - 'name': 'input data from Solute in bilayer workflow parameters'
+      'section': '../upload/archive/mainfile/workflow_parameters.archive.yaml#/data'
     - 'name': 'data from workflow parameters'
       'section': '../upload/archive/mainfile/workflow_parameters.archive.yaml#/data'
     'outputs':
     - 'name': 'data from update_topology_file'
+      'section': '../upload/archive/mainfile/update_topology_file.archive.yaml#/data'
+    - 'name': 'output data from data from update_topology_file'
       'section': '../upload/archive/mainfile/update_topology_file.archive.yaml#/data'
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'minimize'
@@ -309,6 +328,8 @@ which produces the following workflow yaml:
       'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1'
     'outputs':
     - 'name': 'data from compute_wham'
+      'section': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
+    - 'name': 'output data from data from compute_wham'
       'section': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
 ```
 

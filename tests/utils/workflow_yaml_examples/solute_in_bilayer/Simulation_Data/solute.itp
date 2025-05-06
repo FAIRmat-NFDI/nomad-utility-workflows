@@ -1,0 +1,15 @@
+
+;;;;;; C1C1 molecule
+
+[moleculetype]
+; molname       nrexcl
+ C1C1	3
+
+[atoms]
+; id    type    resnr   residu  atom    cgnr    charge
+ 1	C1	1	C1C1	C1	1	0
+ 2	C1	1	C1C1	C1	2	0
+
+[bonds]
+; i     j       funct   length  force_constant
+ 1	2	1	0.37	5000

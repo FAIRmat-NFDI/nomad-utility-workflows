@@ -11,7 +11,7 @@ This `nomad` plugin was generated with `Cookiecutter` along with `@nomad`'s [`co
 For direct usage and integrating the utility module into other plugins or codes, `nomad-utility-workflows` is available as a PyPI package:
 
 ```bash
-pip install nomad-utility-workflows>=0.0.8
+pip install nomad-utility-workflows>=0.1.0
 ```
 
 ### Linking to your NOMAD account
