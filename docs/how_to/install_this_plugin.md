@@ -5,8 +5,11 @@
 For direct usage and integrating the utility module into other plugins or codes, `nomad-utility-workflows` is available as a PyPI package:
 
 ```bash
-pip install nomad-utility-workflows>=0.0.9
+pip install nomad-utility-workflows>=0.1.0
 ```
+
+!!! Warning "Warning"
+    There were breaking changes made in the transition to `nomad-utility-workflows` version 0.1.0. This is particularly relevant for the structure of inputs of the workflow graph generation functions. To use older versions, you should reference the corresponding docs pages by checking out an older branch and serving the mkdocs page locally (See README.md).
 
 ### Linking to your NOMAD account
 Create an account on https://nomad-lab.eu/.
