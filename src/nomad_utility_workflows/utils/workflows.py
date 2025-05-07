@@ -323,7 +323,6 @@ class NomadWorkflow(BaseModel):
     def fill_workflow_graph(self) -> None:
         """_summary_"""
         for node_source, node_dest, edge in list(self.workflow_graph.edges(data=True)):
-            print(node_source, node_dest, edge)
             self._resolve_edge_inputs(node_source, node_dest, edge)
             self._resolve_edge_outputs(node_source, node_dest, edge)
             self._add_defaults(node_source, node_dest, edge)
@@ -419,9 +418,6 @@ class NomadWorkflow(BaseModel):
     def _get_defaults(
         self, inout_type: Literal['inputs', 'outputs'], node_source, node_dest
     ) -> list:
-        # entry_type, partner_node = self._determine_entry_type_and_partner_node(
-        #     node_source, node_dest
-        # )
         entry_type_source = self.workflow_graph.nodes[node_source].get('entry_type', '')
         node_source_type = self.workflow_graph.nodes[node_source].get('type', '')
         entry_type_dest = self.workflow_graph.nodes[node_dest].get('entry_type', '')
@@ -475,110 +471,6 @@ class NomadWorkflow(BaseModel):
 
         return inouts
 
-        # if entry_type_source == 'simulation' and entry_type_dest == 'simulation':
-        #     if inout_type == 'inputs':
-        #         partner_node = node_source
-        #         # adds source sys as input to dest
-        #         inouts += self._get_simulation_defaults(
-        #             inout_type, partner_node, node_source, node_dest
-        #         )
-        #     elif inout_type == 'outputs':
-        #         partner_node = node_source
-        #         # adds source sys and calc as output of source
-        #         inouts += self._get_simulation_defaults(
-        #             inout_type, partner_node, node_source, node_dest
-        #         )
-        #         partner_node = node_dest
-        #         # adds dest sys and calc as output of source
-        #         inouts += self._get_simulation_defaults(
-        #             inout_type, partner_node, node_source, node_dest
-        #         )
-        # if entry_type_source == 'simulation':
-        #     partner_node = node_source
-        #     # adds output sys + calc
-        #     inouts += self._get_simulation_defaults(
-        #         inout_type, partner_node, node_source, node_dest
-        #     )
-        #     if node_dest_type == 'output':
-        #         partner_node = node_dest
-        #         # adds the global output
-        #         inouts += self._get_general_defaults(
-        #             inout_type, partner_node, node_source, node_dest
-        #         )
-        # elif entry_type_dest == 'simulation':
-        #     partner_node = node_dest
-        #     # adds the input sys
-        #     inouts += self._get_simulation_defaults(
-        #         inout_type, partner_node, node_source, node_dest
-        #     )
-        #     if node_source_type == 'input':
-        #         partner_node = node_source
-        #         # adds the global input
-        #         inouts += self._get_general_defaults(
-        #             inout_type, partner_node, node_source, node_dest
-        #         )
-        # elif node_dest_type == 'output':
-        #     partner_node = node_dest
-        #     # adds the global output
-        #     inouts += self._get_general_defaults(
-        #         inout_type, partner_node, node_source, node_dest
-        #     )
-        # elif node_source_type == 'input':
-        #     partner_node = node_source
-        #     # adds the global input
-        #     inouts += self._get_general_defaults(
-        #         inout_type, partner_node, node_source, node_dest
-        #     )
-        # else:
-        #     partner_node = node_source
-        #     # adds the edge link?
-        #     inouts += self._get_general_defaults(
-        #         inout_type, partner_node, node_source, node_dest
-        #     )
-
-        # return inouts
-
-        # if entry_type == 'simulation':
-        #     return self._get_simulation_defaults(
-        #         inout_type, partner_node, node_source, node_dest
-        #     )
-        # else:
-        #     return self._get_general_defaults(
-        #         inout_type, partner_node, node_source, node_dest
-        #     )
-
-    # def _get_defaults(
-    #     self, inout_type: Literal['inputs', 'outputs'], node_source, node_dest
-    # ) -> list:
-    #     entry_type, partner_node = self._determine_entry_type_and_partner_node(
-    #         node_source, node_dest
-    #     )
-
-    #     if entry_type == 'simulation':
-    #         return self._get_simulation_defaults(
-    #             inout_type, partner_node, node_source, node_dest
-    #         )
-    #     else:
-    #         return self._get_general_defaults(
-    #             inout_type, partner_node, node_source, node_dest
-    #         )
-
-    # def _determine_entry_type_and_partner_node(self, node_source, node_dest):
-    #     entry_type_source = self.workflow_graph.nodes[node_source].get('entry_type', '')
-    #     node_source_type = self.workflow_graph.nodes[node_source].get('type', '')
-    #     entry_type_dest = self.workflow_graph.nodes[node_dest].get('entry_type', '')
-    #     node_dest_type = self.workflow_graph.nodes[node_dest].get('type', '')
-    #     entry_type = ''
-    #     partner_node = node_source
-    #     if entry_type_source == 'simulation':
-    #         entry_type = 'simulation'
-    #     elif entry_type_dest == 'simulation' and node_source_type == 'input':
-    #         entry_type = 'simulation'
-    #         partner_node = node_dest
-    #     elif node_dest_type == 'output':
-    #         partner_node = node_dest
-    #     return entry_type, partner_node
-
     def _get_general_defaults(self, inout_type, partner_node, node_source, node_dest):
         section = NomadSection(**self.workflow_graph.nodes[partner_node])
         archive_path = section.archive_path
@@ -620,9 +512,7 @@ class NomadWorkflow(BaseModel):
                 'path_info', {}
             )
             proposed_path_info['section_type'] = default_section
-            # proposed_path_info = {
-            #     'mainfile_path': self._get_mainfile_path(partner_node),
-            # }
+
             if not self._flag_defaults(
                 inout_type,
                 node_source,
