@@ -394,16 +394,26 @@ class NomadWorkflow(BaseModel):
             .get('mainfile_path', '')
         )
 
-    def _check_for_defaults(self, inout_type, default_section, edge) -> bool:
+    def _check_for_defaults(self, inout_type, edge, proposed_path_info) -> bool:
+        # ! The current method would prevent multiple inputs from the same section
+        # TODO - look into removing duplicates after the registration of the section
         inout_type = 'inputs' if inout_type == 'outputs' else 'outputs'
         for input_ in edge.get(inout_type, []):
-            if input_.get('path_info', {}).get('section_type', '') == default_section:
-                return True
-            if (
-                input_.get('path_info', {}).get('supersection_path', '')
-                == default_section
-            ):
-                return True
+            if input_.get('path_info', {}).get(
+                'section_type', ''
+            ) == proposed_path_info.get('section_type', ''):
+                if input_.get('path_info', {}).get(
+                    'mainfile_path', ''
+                ) == proposed_path_info.get('mainfile_path', ''):
+                    return True
+            # ? Not sure if this second case is needed
+            if input_.get('path_info', {}).get(
+                'supersection_path', ''
+            ) == proposed_path_info.get('section_type', ''):
+                if input_.get('path_info', {}).get(
+                    'mainfile_path', ''
+                ) == proposed_path_info.get('mainfile_path', ''):
+                    return True
         return False
 
     def _get_defaults(
@@ -417,59 +427,116 @@ class NomadWorkflow(BaseModel):
         entry_type_dest = self.workflow_graph.nodes[node_dest].get('entry_type', '')
         node_dest_type = self.workflow_graph.nodes[node_dest].get('type', '')
 
-        # TODO - If source is sim, then input sys from source instead of dest
-        # TODO - if source is not simulation, add gen source section as input to dest
         inouts = []
-        if entry_type_source == 'simulation':
-            partner_node = node_source
-            # adds output sys + calc
-            inouts += self._get_simulation_defaults(
-                inout_type, partner_node, node_source, node_dest
-            )
+        if inout_type == 'outputs':  # Gets outputs for the source node
             if node_dest_type == 'output':
                 partner_node = node_dest
                 # adds the global output
                 inouts += self._get_general_defaults(
                     inout_type, partner_node, node_source, node_dest
                 )
-        elif entry_type_dest == 'simulation':
-            partner_node = node_dest
-            # adds the input sys
-            # print(inout_type)
-            # print(
-            #     self._get_simulation_defaults(
-            #         inout_type, partner_node, node_source, node_dest
-            #     )
-            # )
-            inouts += self._get_simulation_defaults(
-                inout_type, partner_node, node_source, node_dest
-            )
+            if entry_type_source == 'simulation':
+                partner_node = node_source
+                # adds output sys + calc
+                inouts += self._get_simulation_defaults(
+                    inout_type, partner_node, node_source, node_dest
+                )
+            if not inouts:
+                partner_node = node_source
+                # adds the general archive path of source to its output
+                inouts += self._get_general_defaults(
+                    inout_type, partner_node, node_source, node_dest
+                )
+        elif inout_type == 'inputs':  # Gets inputs for the dest node
             if node_source_type == 'input':
                 partner_node = node_source
                 # adds the global input
                 inouts += self._get_general_defaults(
                     inout_type, partner_node, node_source, node_dest
                 )
-        elif node_dest_type == 'output':
-            partner_node = node_dest
-            # adds the global output
-            inouts += self._get_general_defaults(
-                inout_type, partner_node, node_source, node_dest
-            )
-        elif node_source_type == 'input':
-            partner_node = node_source
-            # adds the global input
-            inouts += self._get_general_defaults(
-                inout_type, partner_node, node_source, node_dest
-            )
-        else:
-            partner_node = node_source
-            # adds the edge link?
-            inouts += self._get_general_defaults(
-                inout_type, partner_node, node_source, node_dest
-            )
+            elif entry_type_source == 'simulation':
+                partner_node = node_source
+                # adds the output sys + calc? from source to dest input
+                inouts += self._get_simulation_defaults(
+                    inout_type, partner_node, node_source, node_dest
+                )
+            else:
+                partner_node = node_source
+                # adds the general archive path of source to its input
+                inouts += self._get_general_defaults(
+                    inout_type, partner_node, node_source, node_dest
+                )
+                if entry_type_dest == 'simulation':
+                    partner_node = node_dest
+                    # adds the input sys from dest to its own input
+                    inouts += self._get_simulation_defaults(
+                        inout_type, partner_node, node_source, node_dest
+                    )
 
         return inouts
+
+        # if entry_type_source == 'simulation' and entry_type_dest == 'simulation':
+        #     if inout_type == 'inputs':
+        #         partner_node = node_source
+        #         # adds source sys as input to dest
+        #         inouts += self._get_simulation_defaults(
+        #             inout_type, partner_node, node_source, node_dest
+        #         )
+        #     elif inout_type == 'outputs':
+        #         partner_node = node_source
+        #         # adds source sys and calc as output of source
+        #         inouts += self._get_simulation_defaults(
+        #             inout_type, partner_node, node_source, node_dest
+        #         )
+        #         partner_node = node_dest
+        #         # adds dest sys and calc as output of source
+        #         inouts += self._get_simulation_defaults(
+        #             inout_type, partner_node, node_source, node_dest
+        #         )
+        # if entry_type_source == 'simulation':
+        #     partner_node = node_source
+        #     # adds output sys + calc
+        #     inouts += self._get_simulation_defaults(
+        #         inout_type, partner_node, node_source, node_dest
+        #     )
+        #     if node_dest_type == 'output':
+        #         partner_node = node_dest
+        #         # adds the global output
+        #         inouts += self._get_general_defaults(
+        #             inout_type, partner_node, node_source, node_dest
+        #         )
+        # elif entry_type_dest == 'simulation':
+        #     partner_node = node_dest
+        #     # adds the input sys
+        #     inouts += self._get_simulation_defaults(
+        #         inout_type, partner_node, node_source, node_dest
+        #     )
+        #     if node_source_type == 'input':
+        #         partner_node = node_source
+        #         # adds the global input
+        #         inouts += self._get_general_defaults(
+        #             inout_type, partner_node, node_source, node_dest
+        #         )
+        # elif node_dest_type == 'output':
+        #     partner_node = node_dest
+        #     # adds the global output
+        #     inouts += self._get_general_defaults(
+        #         inout_type, partner_node, node_source, node_dest
+        #     )
+        # elif node_source_type == 'input':
+        #     partner_node = node_source
+        #     # adds the global input
+        #     inouts += self._get_general_defaults(
+        #         inout_type, partner_node, node_source, node_dest
+        #     )
+        # else:
+        #     partner_node = node_source
+        #     # adds the edge link?
+        #     inouts += self._get_general_defaults(
+        #         inout_type, partner_node, node_source, node_dest
+        #     )
+
+        # return inouts
 
         # if entry_type == 'simulation':
         #     return self._get_simulation_defaults(
@@ -522,19 +589,21 @@ class NomadWorkflow(BaseModel):
 
         inouts = []
         for default_section in default_sections[inout_type]:
+            partner_name = self.workflow_graph.nodes[partner_node].get('name', '')
+            proposed_path_info = self.workflow_graph.nodes[partner_node].get(
+                'path_info', {}
+            )
+            proposed_path_info['supersection_path'] = default_section
             if not self._flag_defaults(
-                inout_type, default_section, node_source, node_dest
+                inout_type, node_source, node_dest, proposed_path_info
             ):
-                partner_name = self.workflow_graph.nodes[partner_node].get('name', '')
-                path_info = self.workflow_graph.nodes[partner_node].get('path_info', {})
-                path_info['supersection_path'] = default_section
                 inouts.append(
                     {
                         'name': (
                             f'{inout_type[:-1]} {default_section} '
                             f'from {partner_name}'
                         ),
-                        'path_info': path_info,
+                        'path_info': proposed_path_info,
                         'is_default': True,
                     },
                 )
@@ -546,34 +615,47 @@ class NomadWorkflow(BaseModel):
         default_sections = self.simulation_default_sections
         inouts = []
         for default_section in default_sections[inout_type]:
+            partner_name = self.workflow_graph.nodes[partner_node].get('name', '')
+            proposed_path_info = self.workflow_graph.nodes[partner_node].get(
+                'path_info', {}
+            )
+            proposed_path_info['section_type'] = default_section
+            # proposed_path_info = {
+            #     'mainfile_path': self._get_mainfile_path(partner_node),
+            # }
             if not self._flag_defaults(
-                inout_type, default_section, node_source, node_dest
+                inout_type,
+                node_source,
+                node_dest,
+                proposed_path_info,
             ):
-                partner_name = self.workflow_graph.nodes[partner_node].get('name', '')
                 inouts.append(
                     {
                         'name': (
                             f'{inout_type[:-1]} {default_section} '
                             f'from {partner_name}'
                         ),
-                        'path_info': {
-                            'section_type': default_section,
-                            'mainfile_path': self._get_mainfile_path(partner_node),
-                        },
+                        'path_info': proposed_path_info,
                     },
                 )
         return inouts
 
-    def _flag_defaults(self, inout_type, default_section, node_source, node_dest):
+    def _flag_defaults(
+        self,
+        inout_type,
+        node_source,
+        node_dest,
+        proposed_path_info,
+    ):
         flag_defaults = False
         if inout_type == 'outputs':
             for _, _, edge2 in self.workflow_graph.out_edges(node_source, data=True):
-                if self._check_for_defaults(inout_type, default_section, edge2):
+                if self._check_for_defaults(inout_type, edge2, proposed_path_info):
                     flag_defaults = True
                     break
         elif inout_type == 'inputs':
             for _, _, edge2 in self.workflow_graph.in_edges(node_dest, data=True):
-                if self._check_for_defaults(inout_type, default_section, edge2):
+                if self._check_for_defaults(inout_type, edge2, proposed_path_info):
                     flag_defaults = True
                     break
         return flag_defaults
@@ -930,3 +1012,5 @@ def build_nomad_workflow(
 # TODO add some text to the test notebooks
 # TODO change the rest of the functions to pydantic -- not sure if I really want to
 # tackle this now
+# TODO advanced defaults for simulation --
+# -- look into a subworkflow for the output system from the final task

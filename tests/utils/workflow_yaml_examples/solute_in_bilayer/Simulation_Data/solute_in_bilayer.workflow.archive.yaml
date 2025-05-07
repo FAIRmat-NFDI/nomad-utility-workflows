@@ -3,6 +3,13 @@
   'inputs':
   - 'name': 'Solute in bilayer workflow parameters'
     'section': '../upload/archive/mainfile/workflow_parameters.archive.yaml#/data'
+  'outputs':
+  - 'name': 'WHAM Analysis'
+    'section': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
+  - 'name': 'output system from production'
+    'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1'
+  - 'name': 'output calculation from production'
+    'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/calculation/-1'
   'tasks':
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'insert_solute_in_box'
@@ -37,6 +44,10 @@
     'inputs':
     - 'name': 'input data from convert_box_to_gro'
       'section': '../upload/archive/mainfile/convert_box_to_gro.archive.yaml#/data'
+    - 'name': 'input system from minimize'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/system/-1'
+    - 'name': 'input data from update_topology_file'
+      'section': '../upload/archive/mainfile/update_topology_file.archive.yaml#/data'
     'outputs':
     - 'name': 'output system from minimize'
       'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/system/-1'
@@ -60,14 +71,9 @@
     - 'name': 'input system from equilibrate'
       'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/run/0/system/-1'
     'outputs':
+    - 'name': 'output data from WHAM Analysis'
+      'section': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
     - 'name': 'output system from production'
       'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1'
     - 'name': 'output calculation from production'
       'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/calculation/-1'
-  - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
-    'name': 'compute_wham'
-    'task': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
-    'inputs':
-    - 'name': 'input system from production'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1'
-    'outputs': []
