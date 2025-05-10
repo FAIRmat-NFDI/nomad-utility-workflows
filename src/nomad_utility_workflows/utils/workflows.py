@@ -16,7 +16,8 @@ WORKFLOW_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
 
 SectionType = Literal['task', 'workflow', 'input', 'output', 'other']
 EntryType = Literal['simulation', 'other']
-# TODO check/implement functionality of "other" type
+# ! other has no functionality for type or entry_type
+# TODO remove other as an option, update notebooks, docs, and descriptions
 
 
 # Define a custom representer for OrderedDict
