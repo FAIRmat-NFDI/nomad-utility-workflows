@@ -1,0 +1,4 @@
+data:
+  m_def: nomad.datamodel.metainfo.eln.ElnBaseSection
+  name: 'convert_box_to_gro'
+  description: 'This is a description of the method performed to create the initial gro file...'

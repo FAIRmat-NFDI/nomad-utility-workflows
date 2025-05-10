@@ -1,0 +1,4 @@
+data:
+  m_def: nomad.datamodel.metainfo.eln.ElnBaseSection
+  name: 'insert_solute_in_box'
+  description: 'This is a description of the method performed to insert the solute into the simulation box...'

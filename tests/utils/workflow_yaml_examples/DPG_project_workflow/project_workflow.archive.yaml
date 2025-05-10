@@ -1,0 +1,54 @@
+'workflow2':
+  'name': 'DPG Tutorial 2025 Project Workflow'
+  'inputs':
+  - 'name': 'Workflow Parameters'
+    'section': '/uploads/2g1kxNndRfCvMsHMrUvU2w/archive/mainfile/workflow_parameters.archive.yaml#/data'
+  'outputs':
+  - 'name': 'Vibrational Analysis'
+    'section': '/uploads/B-boIB-fQeacDHZklS4ZsA/archive/mainfile/vibrational_analysis.archive.yaml#/data'
+  'tasks':
+  - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
+    'name': 'MD Setup'
+    'task': '/uploads/2g1kxNndRfCvMsHMrUvU2w/archive/mainfile/setup_workflow.archive.yaml#/workflow2'
+    'inputs':
+    - 'name': 'input data from Workflow Parameters'
+      'section': '/uploads/2g1kxNndRfCvMsHMrUvU2w/archive/mainfile/workflow_parameters.archive.yaml#/data'
+    'outputs':
+    - 'name': 'output workflow2 from MD Setup'
+      'section': '/uploads/2g1kxNndRfCvMsHMrUvU2w/archive/mainfile/setup_workflow.archive.yaml#/workflow2'
+  - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
+    'name': 'MD Equilibration'
+    'task': '/uploads/4Fvz-xp8Rq-fB5t3_WxDhg/archive/mainfile/workflow.archive.yaml#/workflow2'
+    'inputs':
+    - 'name': 'input workflow2 from MD Setup'
+      'section': '/uploads/2g1kxNndRfCvMsHMrUvU2w/archive/mainfile/setup_workflow.archive.yaml#/workflow2'
+    'outputs':
+    - 'name': 'output workflow2 from MD Equilibration'
+      'section': '/uploads/4Fvz-xp8Rq-fB5t3_WxDhg/archive/mainfile/workflow.archive.yaml#/workflow2'
+  - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
+    'name': 'DFT-1'
+    'task': '/uploads/Xee25obDQdmu8tGQhAEHpw/archive/mainfile/aims.out#/workflow2'
+    'inputs':
+    - 'name': 'input workflow2 from MD Equilibration'
+      'section': '/uploads/4Fvz-xp8Rq-fB5t3_WxDhg/archive/mainfile/workflow.archive.yaml#/workflow2'
+    'outputs':
+    - 'name': 'output data from Vibrational Analysis'
+      'section': '/uploads/B-boIB-fQeacDHZklS4ZsA/archive/mainfile/vibrational_analysis.archive.yaml#/data'
+  - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
+    'name': 'DFT-2'
+    'task': '/uploads/1bU_8R0NSdee85ZGZhkSRA/archive/mainfile/aims.out#/workflow2'
+    'inputs':
+    - 'name': 'input workflow2 from MD Equilibration'
+      'section': '/uploads/4Fvz-xp8Rq-fB5t3_WxDhg/archive/mainfile/workflow.archive.yaml#/workflow2'
+    'outputs':
+    - 'name': 'output data from Vibrational Analysis'
+      'section': '/uploads/B-boIB-fQeacDHZklS4ZsA/archive/mainfile/vibrational_analysis.archive.yaml#/data'
+  - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
+    'name': 'DFT-3'
+    'task': '/uploads/P-1j-DRcSsKINFe2_8LI0w/archive/mainfile/aims.out#/workflow2'
+    'inputs':
+    - 'name': 'input workflow2 from MD Equilibration'
+      'section': '/uploads/4Fvz-xp8Rq-fB5t3_WxDhg/archive/mainfile/workflow.archive.yaml#/workflow2'
+    'outputs':
+    - 'name': 'output data from Vibrational Analysis'
+      'section': '/uploads/B-boIB-fQeacDHZklS4ZsA/archive/mainfile/vibrational_analysis.archive.yaml#/data'

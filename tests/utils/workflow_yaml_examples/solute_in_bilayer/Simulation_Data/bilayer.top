@@ -1,0 +1,12 @@
+#include "martini_v2.2.itp"
+#include "martini_v2.0_solvents.itp"
+#include "martini_v2.0_lipids.itp"
+
+[ system ]
+INSANE! Membrane UpperLeaflet>M2.POPC=10.0 LowerLeaflet>M2.POPC=10.0
+
+[ molecules ]
+POPC                56
+POPC                56
+W                   1332
+WF                  148

@@ -11,7 +11,7 @@ This `nomad` plugin was generated with `Cookiecutter` along with `@nomad`'s [`co
 For direct usage and integrating the utility module into other plugins or codes, `nomad-utility-workflows` is available as a PyPI package:
 
 ```bash
-pip install nomad-utility-workflows>=0.0.8
+pip install nomad-utility-workflows>=0.1.0
 ```
 
 ### Linking to your NOMAD account
@@ -130,9 +130,16 @@ python -m ipykernel install --user --name=nomad_utility_workflows
 ```
 
 ## How to cite this work
-Rudzinski, J.F., NOMAD Utility Workflows (all versions) [Computer software]. https://zenodo.org/doi/10.5281/zenodo.14895189
+Rudzinski, J.F., Albino, A., Bereau, T., Daelman, N., Ladines, A.N., Mohr, B., Pedersen, J., Walter, L.J., NOMAD Utility Workflows (all versions) [Computer software]. https://zenodo.org/doi/10.5281/zenodo.14895189
 
 ## Main contributors
 | Name | E-mail     |
 |------|------------|
 | Joseph F. Rudzinski | [joseph.rudzinski@physik.hu-berlin.de](mailto:joseph.rudzinski@physik.hu-berlin.de)
+| Andrea Albino |
+| Tristan Bereau |
+| Nathan Daelman |
+| Alvin N. Ladines |
+| Bernadette Mohr |
+| Jesper Pedersen |
+| Luis J. Walter |

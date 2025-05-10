@@ -1,0 +1,5 @@
+TITLE     MDANALYSIS FRAME 0: Created by PDBWriter
+CRYST1  100.000  100.000  100.000  90.00  90.00  90.00 P 1           1
+ATOM      1  C1  C1C1X   1       0.490   1.430   0.980  1.00  0.00      SYST    
+ATOM      2  C1  C1C1X   1      -0.490  -1.430  -0.980  1.00  0.00      SYST    
+END

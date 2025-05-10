@@ -67,3 +67,24 @@
     margin-top: 0;
     font-weight: 700;
 }
+
+.click-zoom {
+    text-align: center;
+}
+
+.click-zoom input[type=checkbox] {
+    z-index: 0;
+    display: none
+}
+
+.click-zoom img {
+    transition: transform 0.25s ease;
+    z-index: 0;
+    cursor: zoom-in
+}
+
+.click-zoom input[type=checkbox]:checked~img {
+    transform: scale(2);
+    z-index: 0;
+    cursor: zoom-out
+}

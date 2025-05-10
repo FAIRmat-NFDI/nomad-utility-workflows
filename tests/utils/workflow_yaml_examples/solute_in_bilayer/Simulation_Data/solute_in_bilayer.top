@@ -1,0 +1,13 @@
+#include "martini_v2.2.itp"
+#include "martini_v2.0_solvents.itp"
+#include "martini_v2.0_lipids.itp"
+#include "solute.itp"
+
+[ system ]
+solute in bilayer
+
+[ molecules ]
+POPC                112
+W                   1332
+WF                  148
+C1C1                1

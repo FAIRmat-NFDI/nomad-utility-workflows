@@ -8,6 +8,27 @@ authors:
   - given-names: Joseph F.
     family-names: Rudzinski
     orcid: 'https://orcid.org/0000-0003-3403-640X'
+  - given-names: Andrea
+    family-names: Albino
+    orcid: 'https://orcid.org/0000-0001-9280-7431'
+  - given-names: Tristan
+    family-names: Bereau
+    orcid: 'https://orcid.org/0000-0001-9945-1271'
+  - given-names: Nathan
+    family-names: Daelman
+    orcid: 'https://orcid.org/0000-0002-7647-1816'
+  - given-names: Alvin N.
+    family-names: Ladines
+    orcid: 'https://orcid.org/0000-0003-0077-2097'
+  - given-names: Bernadette
+    family-names: Mohr
+    orcid: 'https://orcid.org/0000-0003-0903-0073'
+  - given-names: Jesper
+    family-names: Pedersen
+    orcid: ''
+  - given-names: Luis J.
+    family-names: Walter
+    orcid: 'https://orcid.org/0009-0000-0113-6215'
 doi: 10.5281/zenodo.14895189
 
 repository-code: 'https://github.com/FAIRmat-NFDI/nomad-utility-workflows'

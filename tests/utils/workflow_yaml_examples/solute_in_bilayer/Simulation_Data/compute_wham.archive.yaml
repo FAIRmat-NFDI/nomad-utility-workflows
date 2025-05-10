@@ -1,0 +1,4 @@
+data:
+  m_def: nomad.datamodel.metainfo.eln.ElnBaseSection
+  name: 'compute_wham'
+  description: 'This is a description of the application of the wham method...'
