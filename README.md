@@ -130,8 +130,7 @@ python -m ipykernel install --user --name=nomad_utility_workflows
 ```
 
 ## How to cite this work
-Rudzinski, J.F., Albino, A., Bereau, T., Daelman, N., Ladines, A.N., Mohr, B.,
-Pedersen, J., Walter, L.J., NOMAD Utility Workflows (all versions) [Computer software].
+Rudzinski, J.F., Albino, A., Bereau, T., Daelman, N., Ladines, A.N., Mohr, B., Pedersen, J., Walter, L.J., NOMAD Utility Workflows (all versions) [Computer software].
 https://zenodo.org/doi/10.5281/zenodo.14895189
 
 ## Main contributors
