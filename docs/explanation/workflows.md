@@ -25,7 +25,6 @@ see [NetworkX Docs > DiGraph](https://networkx.org/documentation/stable/referenc
 The following attributes can be added to each node in the graph:
 
 ```python
-{
 'name': str
     """
     a free-form string which describing this node,
@@ -145,7 +144,6 @@ a list of output nodes to be added to the graph with out_edges from the parent n
             """
     }
 ],
-}
 ```
 
 This can be achieved in practice with:
@@ -197,3 +195,20 @@ Alternatively, `nomad-utility-workflows` provides a functionality to automatical
     """
 }
 ```
+
+and then the node attributes are defined:
+
+```python
+from nomad_utility_workflows.utils.workflows import (
+    NodeAttributesUniverse,
+    NodeAttributes,
+)
+
+node_attributes_universe = NodeAttributesUniverse(
+    nodes={
+    0: NodeAttribute(<key>=<value>) # with pairs as defined above>,
+    1: NodeAttribute(<key>=<value>) # with pairs as defined above>
+    })
+```
+
+and used as input for the function `build_nomad_workflow()` as described in [How to Create Custom Workflows](../how_to/create_custom_workflows.md).

@@ -33,7 +33,12 @@ data:
 
 This utilizes the `ELNBaseSection` class to create the following overview page upon upload:
 
-![NOMAD workflow graph](images/ELN_overview_page.png){.screenshot}
+<div class="click-zoom">
+    <label>
+        <input type="checkbox">
+        <img src="images/ELN_overview_page.png" alt="" width="90%" title="Click to zoom in">
+    </label>
+</div>
 
 ## Link the ELN entries to your workflow
 
@@ -244,8 +249,10 @@ which produces the following workflow yaml:
   - 'name': 'Solute in bilayer workflow parameters'
     'section': '../upload/archive/mainfile/workflow_parameters.archive.yaml#/data'
   'outputs':
-  - 'name': 'data from compute_wham'
+  - 'name': 'WHAM Analysis'
     'section': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
+  - 'name': 'output system from production'
+    'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/workflow2'
   'tasks':
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'insert_solute_in_box'
@@ -253,84 +260,66 @@ which produces the following workflow yaml:
     'inputs':
     - 'name': 'input data from Solute in bilayer workflow parameters'
       'section': '../upload/archive/mainfile/workflow_parameters.archive.yaml#/data'
-    - 'name': 'data from workflow parameters'
-      'section': '../upload/archive/mainfile/workflow_parameters.archive.yaml#/data'
     'outputs':
-    - 'name': 'data from insert_solute_in_box'
-      'section': '../upload/archive/mainfile/insert_solute_in_box.archive.yaml#/data'
-    - 'name': 'output data from data from insert_solute_in_box'
+    - 'name': 'output data from insert_solute_in_box'
       'section': '../upload/archive/mainfile/insert_solute_in_box.archive.yaml#/data'
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'convert_box_to_gro'
+    'task': '../upload/archive/mainfile/convert_box_to_gro.archive.yaml#/data'
     'inputs':
     - 'name': 'input data from insert_solute_in_box'
       'section': '../upload/archive/mainfile/insert_solute_in_box.archive.yaml#/data'
-    - 'name': 'data from insert_solute_in_box'
-      'section': '../upload/archive/mainfile/insert_solute_in_box.archive.yaml#/data'
     'outputs':
-    - 'name': 'data from convert_box_to_gro'
-      'section': '../upload/archive/mainfile/convert_box_to_gro.archive.yaml#/data'
-    - 'name': 'output data from data from convert_box_to_gro'
+    - 'name': 'output data from convert_box_to_gro'
       'section': '../upload/archive/mainfile/convert_box_to_gro.archive.yaml#/data'
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'update_topology_file'
+    'task': '../upload/archive/mainfile/update_topology_file.archive.yaml#/data'
     'inputs':
     - 'name': 'input data from Solute in bilayer workflow parameters'
       'section': '../upload/archive/mainfile/workflow_parameters.archive.yaml#/data'
-    - 'name': 'data from workflow parameters'
-      'section': '../upload/archive/mainfile/workflow_parameters.archive.yaml#/data'
     'outputs':
-    - 'name': 'data from update_topology_file'
-      'section': '../upload/archive/mainfile/update_topology_file.archive.yaml#/data'
-    - 'name': 'output data from data from update_topology_file'
+    - 'name': 'output data from update_topology_file'
       'section': '../upload/archive/mainfile/update_topology_file.archive.yaml#/data'
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'minimize'
     'task': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/workflow2'
     'inputs':
-    - 'name': 'data from convert_box_to_gro'
+    - 'name': 'input data from convert_box_to_gro'
       'section': '../upload/archive/mainfile/convert_box_to_gro.archive.yaml#/data'
     - 'name': 'input system from minimize'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/system/-1'
-    - 'name': 'data from update_topology_file'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/workflow2'
+    - 'name': 'input data from update_topology_file'
       'section': '../upload/archive/mainfile/update_topology_file.archive.yaml#/data'
     'outputs':
     - 'name': 'output system from minimize'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/system/-1'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/workflow2'
     - 'name': 'output calculation from minimize'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/calculation/-1'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/workflow2'
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'equilibrate'
     'task': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/workflow2'
     'inputs':
     - 'name': 'input system from minimize'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/system/-1'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/workflow2'
     'outputs':
     - 'name': 'output system from equilibrate'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/run/0/system/-1'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/workflow2'
     - 'name': 'output calculation from equilibrate'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/run/0/calculation/-1'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/workflow2'
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'production'
     'task': '../upload/archive/mainfile/solute_in_bilayer_production.log#/workflow2'
     'inputs':
     - 'name': 'input system from equilibrate'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/run/0/system/-1'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/workflow2'
     'outputs':
+    - 'name': 'output data from WHAM Analysis'
+      'section': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
     - 'name': 'output system from production'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/workflow2'
     - 'name': 'output calculation from production'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/calculation/-1'
-  - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
-    'name': 'compute_wham'
-    'inputs':
-    - 'name': 'input system from production'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1'
-    'outputs':
-    - 'name': 'data from compute_wham'
-      'section': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
-    - 'name': 'output data from data from compute_wham'
-      'section': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/workflow2'
 ```
 
 and when uploaded with the corresponding simulation files and ELN `archive.yaml`'s will produce the workflow visualization at the top of this page.

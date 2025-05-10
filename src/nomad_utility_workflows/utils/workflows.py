@@ -3,6 +3,8 @@ from typing import Any, Literal, Optional, Union
 
 import networkx as nx
 import yaml
+
+# TODO - get get_logger from logging and remove nomad dependency
 from nomad.utils import get_logger
 from pydantic import BaseModel, Field, computed_field
 from typing_extensions import TypedDict
