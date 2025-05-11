@@ -3,21 +3,18 @@ from typing import Any, Literal, Optional, Union
 
 import networkx as nx
 import yaml
+import logging
 
-# TODO - get get_logger from logging and remove nomad dependency
-from nomad.utils import get_logger
 from pydantic import BaseModel, Field, computed_field
 from typing_extensions import TypedDict
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 TASK_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
 WORKFLOW_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
 # TODO not yet sure about the specification of actual tasks, need to test
 
-SectionType = Literal['task', 'workflow', 'input', 'output', 'other']
-EntryType = Literal['simulation', 'other']
-# ! other has no functionality for type or entry_type
-# TODO remove other as an option, update notebooks, docs, and descriptions
+SectionType = Literal['task', 'workflow', 'input', 'output']
+EntryType = Literal['simulation']
 
 
 # Define a custom representer for OrderedDict
@@ -731,7 +728,7 @@ class NodeAttributes(BaseModel):
         name (str): A free-form string describing this node, which will be used as a
                     label in the NOMAD workflow graph visualizer.
 
-        type (Literal['input', 'output', 'workflow', 'task', 'other']):
+        type (Literal['input', 'output', 'workflow', 'task']):
             Specifies the type of node. Must be one of the specified options.
 
             - input: (meta)data taken as input for the entire workflow or a specific
@@ -749,9 +746,6 @@ class NodeAttributes(BaseModel):
 
             - task: A node in the workflow which represents an individual task
                     (i.e., no underlying workflow), that is recognized by NOMAD.
-
-            - other: A node in the workflow which represents either a (sub)workflow
-                    or individual task that is not supported by NOMAD.
 
         entry_type (Literal['simulation']): Specifies the type of node in terms of
             tasks or workflows recognized by NOMAD. Functionally, this attribute is
@@ -890,6 +884,7 @@ def build_nomad_workflow(
     return workflow.workflow_graph
 
 
+# TODO prevent duplicates to global outputs
 # TODO the input from in edge task nodes are automatically added to the global inputs...
 # TODO but not vice versa, the reverse should be done...
 # TODO also prevent that the same ios are added 2x

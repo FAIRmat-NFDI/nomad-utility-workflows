@@ -8,6 +8,12 @@ For direct usage and integrating the utility module into other plugins or codes,
 pip install nomad-utility-workflows>=0.1.0
 ```
 
+If you are following the How-to guides in the docs, use the "vis" optional dependencies tag (includes dependencies for, e.g., Jupyter notebook and graph visualization):
+
+```bash
+pip install nomad-utility-workflows[vis]>=0.1.0
+```
+
 !!! Warning "Warning"
     There were breaking changes made in the transition to `nomad-utility-workflows` version 0.1.0. This is particularly relevant for the structure of inputs of the workflow graph generation functions. To use older versions, you should reference the corresponding docs pages by checking out an older branch and serving the mkdocs page locally (See README.md).
 
@@ -25,7 +31,7 @@ and insert your username and password.
 
 ## Development
 
-If you want to develop this module locally, clone the project and in the plugin folder, create a virtual environment (you can use Python 3.10, or 3.11):
+If you want to develop locally this plugin, clone the project and in the plugin folder, create a virtual environment (you can use Python 3.10, or 3.11):
 ```sh
 git clone https://github.com/FAIRmat-NFDI/nomad-utility-workflows.git
 cd nomad-utility-workflows
@@ -45,12 +51,12 @@ pip install uv
 
 Install the `nomad-lab` package:
 ```sh
-uv pip install '.[dev]'
+uv pip install '.[vis,dev]'
 ```
 
 The plugin is still under development. If you would like to contribute, install the package in editable mode (with the added `-e` flag):
 ```sh
-uv pip install -e '.[dev]'
+uv pip install -e '.[vis,dev]'
 ```
 
 ### Run the tests
