@@ -509,10 +509,10 @@ class NomadWorkflow(BaseModel):
         for default_section in default_sections[inout_type]:
             partner_name = self.workflow_graph.nodes[partner_node].get('name', '')
             # TODO - check this when reassessing the method for simulation defaults
-            # proposed_path_info = self.workflow_graph.nodes[partner_node].get(
-            #     'path_info', {}
-            # )
+            path_info = self.workflow_graph.nodes[partner_node].get('path_info', {})
             proposed_path_info = {}
+            proposed_path_info['entry_id'] = path_info.get('entry_id', None)
+            proposed_path_info['upload_id'] = path_info.get('upload_id', None)
             proposed_path_info['section_type'] = default_section
             proposed_path_info['mainfile_path'] = self._get_mainfile_path(partner_node)
 
