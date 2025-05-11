@@ -114,6 +114,7 @@ class NomadSection(BaseModel):
 
     def _get_section_type_path(self) -> str:
         archive_path = ''
+        # TODO - these default path_info options should be moved to get_defaults
         if self.path_info.get('section_type') in ['system', 'calculation', 'method']:
             run_index = self.path_info.get('supersection_index', 0)
             run_index = run_index if run_index is not None else 0
@@ -507,10 +508,13 @@ class NomadWorkflow(BaseModel):
         inouts = []
         for default_section in default_sections[inout_type]:
             partner_name = self.workflow_graph.nodes[partner_node].get('name', '')
-            proposed_path_info = self.workflow_graph.nodes[partner_node].get(
-                'path_info', {}
-            )
+            # TODO - check this when reassessing the method for simulation defaults
+            # proposed_path_info = self.workflow_graph.nodes[partner_node].get(
+            #     'path_info', {}
+            # )
+            proposed_path_info = {}
             proposed_path_info['section_type'] = default_section
+            proposed_path_info['mainfile_path'] = self._get_mainfile_path(partner_node)
 
             if not self._flag_defaults(
                 inout_type,
