@@ -61,7 +61,6 @@ node_attributes_universe = NodeAttributesUniverse(
         0: NodeAttributes(
             name="Solute in bilayer workflow parameters",
             type="input",
-            entry_type="other",
             path_info={
                 'archive_path': 'data',
                 'mainfile_path': f'{path_to_job}workflow_parameters.archive.yaml',
@@ -72,7 +71,6 @@ node_attributes_universe = NodeAttributesUniverse(
         1: NodeAttributes(
             name="insert_solute_in_box",
             type="task",
-            entry_type="other",
             path_info={
                 'mainfile_path': f'{path_to_job}insert_solute_in_box.archive.yaml',
                 'archive_path': 'data',
@@ -100,7 +98,6 @@ node_attributes_universe = NodeAttributesUniverse(
         2: NodeAttributes(
             name="convert_box_to_gro",
             type="task",
-            entry_type="other",
             path_info={
                 'mainfile_path': f'{path_to_job}convert_box_to_gro.archive.yaml'
             },
@@ -128,7 +125,6 @@ node_attributes_universe = NodeAttributesUniverse(
         3: NodeAttributes(
             name="update_topology_file",
             type="task",
-            entry_type="other",
             path_info={
                 'mainfile_path': f'{path_to_job}update_topology_file.archive.yaml'
             },
@@ -202,7 +198,6 @@ node_attributes_universe = NodeAttributesUniverse(
         7: NodeAttributes(
             name="compute_wham",
             type="task",
-            entry_type="other",
             path_info={
                 'mainfile_path': f'{path_to_job}compute_wham.archive.yaml'
             },
