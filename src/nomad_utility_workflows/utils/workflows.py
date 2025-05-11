@@ -1,10 +1,9 @@
+import logging
 from collections import OrderedDict
 from typing import Any, Literal, Optional, Union
 
 import networkx as nx
 import yaml
-import logging
-
 from pydantic import BaseModel, Field, computed_field
 from typing_extensions import TypedDict
 
