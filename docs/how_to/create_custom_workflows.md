@@ -49,9 +49,9 @@ upload.zip
     └── ...other raw simulation files
 ```
 
-<center>
-[Download Example Data](../assets/simulation_data.zip){:target="_blank" .md-button }
-</center>
+<!--- <center> -->
+[Download Example Data](../assets/simulation_data.zip){:target="_blank" .md-button}
+<!--- </center> -->
 
 ## Complete Workflow Creation Example
 

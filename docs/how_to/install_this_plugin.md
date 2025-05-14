@@ -127,7 +127,7 @@ mkdocs serve
 ```
 
 ### Test Notebooks
-To run the test notebooks, create a jupyter kernel using your venv:
+To run the test notebooks, create a jupyter kernel using your venv (make sure the venv is activated!):
 ```sh
 python -m ipykernel install --user --name=nomad_utility_workflows
 ```

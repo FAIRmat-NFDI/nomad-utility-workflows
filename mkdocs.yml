@@ -11,10 +11,14 @@ nav:
       - Install: how_to/install_this_plugin.md
       - Perform API Calls: how_to/use_api_functions.md
       - Create Custom Workflows: how_to/create_custom_workflows.md
-      - Add Custom Taks: how_to/add_custom_tasks.md
-  # - Examples:
-  #     - Workflows - Proof of Concept: examples/workflow_proof_of_concept.md
-  #     - Workflows - Adding Custom Tasks: examples/workflow_custom_tasks.md
+      - Add Custom Tasks: how_to/add_custom_tasks.md
+      - Use this Plugin: how_to/use_this_plugin.md
+  - Examples:
+      - "Workflows - Proof of Concept": examples/workflow_proof_of_concept.md
+      - "Workflows - Adding Custom Tasks": examples/workflow_custom_tasks.md
+      - "Workflows - Simulation Protocol": examples/workflow_simulation_protocol.md
+  - Tutorial:
+    - Tutorial: tutorial/tutorial.md
   - Explanation:
     - Workflows: explanation/workflows.md
   - Reference:
@@ -40,6 +44,7 @@ theme:
   favicon: assets/favicon.png
   features:
     - navigation.instant
+    - content.buttons
   custom_dir: docs/theme
   icon:
     repo: fontawesome/brands/github

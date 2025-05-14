@@ -49,16 +49,17 @@ By default, nomad-utility-workflows uses the Test deployment of NOMAD to make AP
 
 All API functions allow the user to specify the URL with the optional keyword argument `url`. If you want to use the central NOMAD URLs, you can simply set `url` equal to "prod", "staging", or "test", which correspond to the following deployments (see full URLs below):
 
-- prod: the official NOMAD deployment.
+- **prod**: the official NOMAD deployment.
     - Updated most infrequently (as advertised in [#software-updates](https://discordapp.com/channels/1201445470485106719/1275764272122826752) on the NOMAD Discord Server&mdash;If you are not yet a member of the NOMAD server use [Invitation to Discord](https://discord.gg/Gyzx3ukUw8))
-- staging: the beta version of NOMAD.
+- **staging**: the beta version of NOMAD.
     - Updated more frequently than prod in order to integrate and test new features.
-- test: a test NOMAD deployment.
+- **test**: a test NOMAD deployment.
     - The data is occassionally wiped, such that test publishing can be made.
 
-Note that the prod and staging deployments share a common database, and that publishing on either will result in publically available data.
+!!! warning
+    Note that the **prod** and **staging** deployments share a common database, and that *publishing on either will result in publically available data*.
 
-Alternatively to these short names, the user can use the `url` input to specify the full API address to some alternative NOMAD deployment, e.g., an Oasis.
+Alternatively to these short names, the user can use the `url` input to specify the full API address to some alternative NOMAD deployment, e.g., an **Oasis**.
 
 For reference, the full addresses of the above-mentioned central NOMAD deployments (including api suffix) are:
 
