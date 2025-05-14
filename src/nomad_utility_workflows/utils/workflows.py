@@ -121,7 +121,8 @@ class NomadSection(BaseModel):
             archive_path = f'run/{run_index}'
         elif self.path_info.get('section_type') in ['results']:
             archive_path = 'workflow2'
-        # ? Is this required in some case? It appears to be a duplicate of get_section_path
+        # ? Is this required in some case?
+        # ! It appears to be a duplicate of get_section_path
         # else:
         #     archive_path += f"/{self.path_info.get('section_type')}"
         #     if self.path_info.get('section_index') is not None:
