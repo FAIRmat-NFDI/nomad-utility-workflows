@@ -121,10 +121,12 @@ class NomadSection(BaseModel):
             archive_path = f'run/{run_index}'
         elif self.path_info.get('section_type') in ['results']:
             archive_path = 'workflow2'
-        else:
-            archive_path += f"/{self.path_info.get('section_type')}"
-            if self.path_info.get('section_index') is not None:
-                archive_path += f"/{self.path_info.get('section_index')}"
+        # ? Is this required in some case?
+        # ! It appears to be a duplicate of get_section_path
+        # else:
+        #     archive_path += f"/{self.path_info.get('section_type')}"
+        #     if self.path_info.get('section_index') is not None:
+        #         archive_path += f"/{self.path_info.get('section_index')}"
         return archive_path
 
     def _get_section_path(self, archive_path: str) -> str:
@@ -485,7 +487,7 @@ class NomadWorkflow(BaseModel):
             proposed_path_info = self.workflow_graph.nodes[partner_node].get(
                 'path_info', {}
             )
-            proposed_path_info['supersection_path'] = default_section
+            proposed_path_info['archive_path'] = default_section
             if not self._flag_defaults(
                 inout_type, node_source, node_dest, proposed_path_info
             ):
