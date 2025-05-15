@@ -15,6 +15,8 @@ Consider the following setup, simulation, and analysis protocol:
     </label>
 </div>
 
+[Download Example Data](../assets/solute_in_bilayer.zip){:target="_blank" .md-button}
+
 The minimize, equilibrate, and production (workflow) tasks are analogous to that described in [How to > Create Custom Workflows](./create_custom_workflows.md). The remaining tasks (green boxes) correspond to steps in the simulation protocol that are not supported by the NOMAD simulation parsers, e.g., creation of the initial configuration or model parameter files, or post-simulation analysis.
 
 ## Create an ELN entry with ElnBaseSection
