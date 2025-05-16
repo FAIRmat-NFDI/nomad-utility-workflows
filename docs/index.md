@@ -10,6 +10,16 @@ NOMAD's API and workflow functionalities provide users with a route to FAIR data
 
 <div markdown="block">
 
+### Tutorial
+
+Prototypical usage of the tool within a broader project and workflow management context:
+
+- [NOMAD Tutorial Workflow](https://fairmat-nfdi.github.io/nomad-tutorial-workflows/latest){:target="\_blank"}
+
+</div>
+
+<div markdown="block">
+
 ### How-to guides
 
 How-to guides provide step-by-step instructions for a wide range of tasks, with the overarching topics:
@@ -21,7 +31,6 @@ How-to guides provide step-by-step instructions for a wide range of tasks, with 
 
 
 </div>
-
 <div markdown="block">
 
 ### Explanation
@@ -31,6 +40,7 @@ The explanation provides background knowledge on functionalities of this plugin:
 - [Workflows](explanation/workflows.md)
 
 </div>
+
 <div markdown="block">
 
 ### Reference

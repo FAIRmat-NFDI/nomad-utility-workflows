@@ -15,6 +15,8 @@ Consider the following setup, simulation, and analysis protocol:
     </label>
 </div>
 
+[Download Example Data](../assets/solute_in_bilayer.zip){:target="_blank" .md-button}
+
 The minimize, equilibrate, and production (workflow) tasks are analogous to that described in [How to > Create Custom Workflows](./create_custom_workflows.md). The remaining tasks (green boxes) correspond to steps in the simulation protocol that are not supported by the NOMAD simulation parsers, e.g., creation of the initial configuration or model parameter files, or post-simulation analysis.
 
 ## Create an ELN entry with ElnBaseSection
@@ -39,6 +41,39 @@ This utilizes the `ELNBaseSection` class to create the following overview page u
         <img src="images/ELN_overview_page.png" alt="" width="90%" title="Click to zoom in">
     </label>
 </div>
+
+Similarly, the remaining (non-simulation) custom workflow steps (i.e., tasks) can be included in a similar manner:
+
+??? abstract "workflow_parameters.archive.yaml"
+    ```yaml
+    data:
+        m_def: nomad.datamodel.metainfo.eln.ElnBaseSection
+        name: 'workflow_parameters'
+        description: 'This is a description of the overall workflow parameters, or alternatively standard workflow specification...'
+    ```
+??? abstract "convert_box_to_gro.archive.yaml"
+    ```yaml
+    data:
+        m_def: nomad.datamodel.metainfo.eln.ElnBaseSection
+        name: 'convert_box_to_gro'
+        description: 'This is a description of the method performed to create the initial gro file...'
+    ```
+??? abstract "update_topology_file.archive.yaml"
+    ```yaml
+    data:
+        m_def: nomad.datamodel.metainfo.eln.ElnBaseSection
+        name: 'update_topology_file'
+        description: 'This is a description of the method performed to update the topology file...'
+    ```
+??? abstract "compute_wham.archive.yaml"
+    ```yaml
+    data:
+         m_def: nomad.datamodel.metainfo.eln.ElnBaseSection
+        name: 'compute_wham'
+        description: 'This is a description of the application of the wham method...'
+    ```
+
+All custom yaml entry files are already included in the example data provided above.
 
 ## Link the ELN entries to your workflow
 
@@ -75,77 +110,25 @@ node_attributes_universe = NodeAttributesUniverse(
                 'mainfile_path': f'{path_to_job}insert_solute_in_box.archive.yaml',
                 'archive_path': 'data',
             },
-            inputs=[
-                {
-                    'name': 'data from workflow parameters',
-                    'path_info': {
-                        'archive_path': 'data',
-                        'mainfile_path': f'{path_to_job}workflow_parameters.archive.yaml',
-                    },
-                }
-            ],
-            outputs=[
-                {
-                    'name': 'data from insert_solute_in_box',
-                    'path_info': {
-                        'archive_path': 'data',
-                        'mainfile_path': f'{path_to_job}insert_solute_in_box.archive.yaml',
-                    },
-                }
-            ],
         ),
 
         2: NodeAttributes(
             name="convert_box_to_gro",
             type="task",
             path_info={
-                'mainfile_path': f'{path_to_job}convert_box_to_gro.archive.yaml'
+                'mainfile_path': f'{path_to_job}convert_box_to_gro.archive.yaml',
+                'archive_path': 'data',
             },
             in_edge_nodes=[1],
-            inputs=[
-                {
-                    'name': 'data from insert_solute_in_box',
-                    'path_info': {
-                        'archive_path': 'data',
-                        'mainfile_path': f'{path_to_job}insert_solute_in_box.archive.yaml',
-                    },
-                }
-            ],
-            outputs=[
-                {
-                    'name': 'data from convert_box_to_gro',
-                    'path_info': {
-                        'archive_path': 'data',
-                        'mainfile_path': f'{path_to_job}convert_box_to_gro.archive.yaml'
-                    },
-                }
-            ],
         ),
 
         3: NodeAttributes(
             name="update_topology_file",
             type="task",
             path_info={
-                'mainfile_path': f'{path_to_job}update_topology_file.archive.yaml'
+                'mainfile_path': f'{path_to_job}update_topology_file.archive.yaml',
+                'archive_path': 'data',
             },
-            inputs=[
-                {
-                    'name': 'data from workflow parameters',
-                    'path_info': {
-                        'archive_path': 'data',
-                        'mainfile_path': f'{path_to_job}workflow_parameters.archive.yaml',
-                    },
-                }
-            ],
-            outputs=[
-                {
-                    'name': 'data from update_topology_file',
-                    'path_info': {
-                        'archive_path': 'data',
-                        'mainfile_path': f'{path_to_job}update_topology_file.archive.yaml'
-                    },
-                }
-            ],
         ),
 
         4: NodeAttributes(
@@ -156,22 +139,6 @@ node_attributes_universe = NodeAttributesUniverse(
             path_info={
                 'mainfile_path': f'{path_to_job}solute_in_bilayer_minimize.log'
             },
-            inputs=[
-                {
-                    'name': 'data from convert_box_to_gro',
-                    'path_info': {
-                        'archive_path': 'data',
-                        'mainfile_path': f'{path_to_job}convert_box_to_gro.archive.yaml',
-                    },
-                },
-                {
-                    'name': 'data from update_topology_file',
-                    'path_info': {
-                        'archive_path': 'data',
-                        'mainfile_path': f'{path_to_job}update_topology_file.archive.yaml',
-                    },
-                }
-            ],
         ),
 
 
@@ -182,7 +149,7 @@ node_attributes_universe = NodeAttributesUniverse(
             path_info={
                 'mainfile_path': f'{path_to_job}solute_in_bilayer_equilibrate.log'
             },
-            in_edge_nodes= [4],
+            in_edge_nodes=[4],
         ),
 
         6: NodeAttributes(
@@ -192,27 +159,19 @@ node_attributes_universe = NodeAttributesUniverse(
             path_info={
                 'mainfile_path': f'{path_to_job}solute_in_bilayer_production.log'
             },
-            in_edge_nodes= [5],
+            in_edge_nodes=[5],
+            out_edge_nodes=[7],
         ),
 
         7: NodeAttributes(
-            name="compute_wham",
-            type="task",
+            name='WHAM Analysis',
+            type='output',
             path_info={
+                'archive_path': 'data',
                 'mainfile_path': f'{path_to_job}compute_wham.archive.yaml'
             },
-            in_edge_nodes= [6],
-            outputs=[
-                {
-                    'name': 'data from compute_wham',
-                    'path_info': {
-                        'archive_path': 'data',
-                        'mainfile_path': f'{path_to_job}compute_wham.archive.yaml'
-                    },
-                }
-            ],
         ),
-        }
+    }
 )
 ```
 
@@ -228,7 +187,7 @@ workflow_metadata = {
     'workflow_name': 'Solute in bilayer workflow',
 }
 
-workflow_graph_output_minimal = build_nomad_workflow(
+workflow_graph_output = build_nomad_workflow(
     workflow_metadata=workflow_metadata,
     workflow_graph=nx.DiGraph(workflow_graph_input),
     write_to_yaml=True,
@@ -247,7 +206,9 @@ which produces the following workflow yaml:
   - 'name': 'WHAM Analysis'
     'section': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
   - 'name': 'output system from production'
-    'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/workflow2'
+    'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1'
+  - 'name': 'output calculation from production'
+    'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/calculation/-1'
   'tasks':
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'insert_solute_in_box'
@@ -283,38 +244,38 @@ which produces the following workflow yaml:
     - 'name': 'input data from convert_box_to_gro'
       'section': '../upload/archive/mainfile/convert_box_to_gro.archive.yaml#/data'
     - 'name': 'input system from minimize'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/workflow2'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/system/-1'
     - 'name': 'input data from update_topology_file'
       'section': '../upload/archive/mainfile/update_topology_file.archive.yaml#/data'
     'outputs':
     - 'name': 'output system from minimize'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/workflow2'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/system/-1'
     - 'name': 'output calculation from minimize'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/workflow2'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/calculation/-1'
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'equilibrate'
     'task': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/workflow2'
     'inputs':
     - 'name': 'input system from minimize'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/workflow2'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/system/-1'
     'outputs':
     - 'name': 'output system from equilibrate'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/workflow2'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/run/0/system/-1'
     - 'name': 'output calculation from equilibrate'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/workflow2'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/run/0/calculation/-1'
   - 'm_def': 'nomad.datamodel.metainfo.workflow.TaskReference'
     'name': 'production'
     'task': '../upload/archive/mainfile/solute_in_bilayer_production.log#/workflow2'
     'inputs':
     - 'name': 'input system from equilibrate'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/workflow2'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/run/0/system/-1'
     'outputs':
     - 'name': 'output data from WHAM Analysis'
       'section': '../upload/archive/mainfile/compute_wham.archive.yaml#/data'
     - 'name': 'output system from production'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/workflow2'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1'
     - 'name': 'output calculation from production'
-      'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/workflow2'
+      'section': '../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/calculation/-1'
 ```
 
-and when uploaded with the corresponding simulation files and ELN `archive.yaml`'s will produce the workflow visualization at the top of this page.
+When uploaded to NOMAD with the corresponding simulation files and ELN `archive.yaml`'s, you should obtain a workflow entry with the visualization show the top of this page.
