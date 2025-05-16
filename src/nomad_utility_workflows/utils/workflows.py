@@ -62,6 +62,7 @@ default_path_info = {
 class NomadSection(BaseModel):
     name: Optional[str] = Field(None, description='Name of the section')
     type: Optional[SectionType] = Field(None, description='Type of the section')
+    entry_type: Optional[EntryType] = Field(None, description='Type of the entry')
     path_info: dict[str, Any] = Field(
         default=default_path_info.copy(), description='Archive path'
     )
@@ -86,8 +87,10 @@ class NomadSection(BaseModel):
 
         if self.path_info.get('archive_path'):
             return self.path_info['archive_path']
-        elif self.type == 'workflow':
+        elif self.type == 'workflow' or self.entry_type == 'simulation':
             return 'workflow2'
+        elif self.type == 'task':
+            return 'data'
         else:
             return self._get_supersection_path()
 
@@ -96,7 +99,7 @@ class NomadSection(BaseModel):
         if self.path_info.get('supersection_path'):
             archive_path = self._get_supersection_path_with_index()
         elif self.path_info.get('section_type'):
-            archive_path = self._get_section_type_path()
+            archive_path = self._get_supersection_path_from_section_type()
         else:
             logger.warning(
                 (
@@ -112,10 +115,10 @@ class NomadSection(BaseModel):
             archive_path += f"/{self.path_info.get('supersection_index')}"
         return archive_path
 
-    def _get_section_type_path(self) -> str:
+    def _get_supersection_path_from_section_type(self) -> str:
         archive_path = ''
-        # TODO - these default path_info options should be moved to get_defaults
         if self.path_info.get('section_type') in ['system', 'calculation', 'method']:
+            # get default run supersection for simulation sections
             run_index = self.path_info.get('supersection_index', 0)
             run_index = run_index if run_index is not None else 0
             archive_path = f'run/{run_index}'

@@ -1,19 +1,20 @@
 {
   "upload_ids": {
-    "setup-workflow": "2g1kxNndRfCvMsHMrUvU2w",
-    "md-workflow": "4Fvz-xp8Rq-fB5t3_WxDhg",
+    "md-workflow": "7Ncu4YyXTTyTSfg0qpiziQ",
     "DFT": [
-      "Xee25obDQdmu8tGQhAEHpw",
-      "1bU_8R0NSdee85ZGZhkSRA",
-      "P-1j-DRcSsKINFe2_8LI0w"
+      "JHsC4UFnRtCB9dQYR1BO6A",
+      "exkqL5J8Q62ldMHbuE5tcQ",
+      "0wUg7_GuSLiG3U1LcNlr2A"
     ],
-    "analysis": "B-boIB-fQeacDHZklS4ZsA"},
+    "setup-workflow": "ME2oYBdiQUW4CGcG0YsGuw",
+    "analysis": "yyqHpBFOSxqhrNALIJswSw"
+     },
   "entry_ids": {
-    "md-workflow": "ERvFmh9BlclnU-Ai3ohQP-6vZJjf",
-    "DFT": ["iJi7Q-C97J2BEupZVEgGq-TEZf5N", "7B0NdXAK7wqjHNX2yPR3ghdwdjG2", "15UO3IElPxAFZG3xl0tmmyhyLoHa"],
-    "setup-workflow": "Gqm3Tek---QCH2z0FwTqkEhtvV1s",
-    "parameters": "Lyku0eClZtAGwwY9o7vWeKL-7YWK",
-    "analysis": "G74EVJ4bCbjLlFKs-Oytxqzv7E0H"
+    "md-workflow": "J3Vkhz2NAtSw4-KTnbHqUyPhhY3g",
+    "DFT": ["d2ZJkTjL4LoxdFAVS8YT_jlZdzhm", "zeiiGOoZL0dikRgYSvzuZZ3xPv9m", "8x9j0tEtx6LeGVEv7ByWD3k5VK1F"],
+    "setup-workflow": "8EcTSRbvb8PiYaG_TwqAgOYiE8J7",
+    "parameters": "ujuIHCdj7StVCxbvYP7NjMvG4v22",
+    "analysis": "zv4Q_jnvhsGry4oEyj5AC2qD103H"
   },
   "dataset_id": "<your dataset id>"
 }
