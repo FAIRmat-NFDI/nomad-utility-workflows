@@ -42,6 +42,37 @@ This utilizes the `ELNBaseSection` class to create the following overview page u
     </label>
 </div>
 
+Custom workflow steps can be included in a similar manner, each containing the relevant metadata for reproducibility (files used here are included with the example data):
+
+??? abstract "workflow_parameters.archive.yaml"
+    ```yaml
+    data:
+        m_def: nomad.datamodel.metainfo.eln.ElnBaseSection
+        name: 'workflow_parameters'
+        description: 'This is a description of the overall workflow parameters, or alternatively standard workflow specification...'
+    ```
+??? abstract "convert_box_to_gro.archive.yaml"
+    ```yaml
+    data:
+        m_def: nomad.datamodel.metainfo.eln.ElnBaseSection
+        name: 'convert_box_to_gro'
+        description: 'This is a description of the method performed to create the initial gro file...'
+    ```
+??? abstract "update_topology_file.archive.yaml"
+    ```yaml
+    data:
+        m_def: nomad.datamodel.metainfo.eln.ElnBaseSection
+        name: 'update_topology_file'
+        description: 'This is a description of the method performed to update the topology file...'
+    ```
+??? abstract "compute_wham.archive.yaml"
+    ```yaml
+    data:
+         m_def: nomad.datamodel.metainfo.eln.ElnBaseSection
+        name: 'compute_wham'
+        description: 'This is a description of the application of the wham method...'
+    ```
+
 ## Link the ELN entries to your workflow
 
 Now that we have a mainfile for each task, we can specify the graph strucuture and node attributes as described in the [Create Custom Workflows > Complete Workflow Creation Example](./create_custom_workflows.md#complete-workflow-creation-example):

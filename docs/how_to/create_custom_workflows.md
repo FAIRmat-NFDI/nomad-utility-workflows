@@ -252,11 +252,11 @@ You should see a workflow visualization identical to the one in [Example Overvie
 
 ## Understanding the Workflow Graph
 
-The visualization of the output graph should look like this:
+The visualization of the output graph should look like this (notice the changes):
 
 ```javascript
 gv.d3(
-    workflow_graph_output,
+    workflow_graph_output_minimal,
     node_label_data_source='name',
     edge_label_data_source='name',
     zoom_factor=1.5,
