@@ -1,10 +1,17 @@
 # Workflow References
 
-### `build_nomad_workflow()`
-::: nomad_utility_workflows.utils.workflows.build_nomad_workflow
+## Stand-alone utilities
 
 ### `nodes_to_graph()`
 ::: nomad_utility_workflows.utils.workflows.nodes_to_graph
 
-### NodeAttributes
+## User-relevant classes
+
+### `NodeAttributes`
 ::: nomad_utility_workflows.utils.workflows.NodeAttributes
+
+### `NodeAttributesUniverse`
+::: nomad_utility_workflows.utils.workflows.NodeAttributesUniverse
+
+### `NomadWorkflow`
+::: nomad_utility_workflows.utils.workflows.NomadWorkflow

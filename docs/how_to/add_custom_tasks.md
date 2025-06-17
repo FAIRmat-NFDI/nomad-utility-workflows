@@ -177,21 +177,15 @@ node_attributes_universe = NodeAttributesUniverse(
 
 ## Generate the input workflow graph and workflow yaml
 
-Identically to `Create Custom Workflows >` [Complete Workflow Creation Example](./create_custom_workflows.md#complete-workflow-creation-example) and [Generate the workflow yaml](./create_custom_workflows.md#step-3-generate-the-workflow-yaml), we simply apply the `node_to_graph()` and `build_nomad_workflow()` functions:
+Identically to `Create Custom Workflows >` [Complete Workflow Creation Example](./create_custom_workflows.md#complete-workflow-creation-example) and [Generate the workflow yaml](./create_custom_workflows.md#step-4-generate-the-workflow-yaml), we create a `NomadWorkflow` object with the appropriate quantities:
 
 ```python
-workflow_graph_input = nodes_to_graph(node_attributes_universe)
-
-workflow_metadata = {
-    'destination_filename': 'solute_in_bilayer.workflow.archive.yaml',
-    'workflow_name': 'Solute in bilayer workflow',
-}
-
-workflow_graph_output = build_nomad_workflow(
-    workflow_metadata=workflow_metadata,
-    workflow_graph=nx.DiGraph(workflow_graph_input),
-    write_to_yaml=True,
+nomad_workflow = NomadWorkflow(
+    node_attributes_universe=node_attributes_universe,
+    destination_filename='solute_in_bilayer.workflow.archive.yaml',
+    name='Solute in bilayer workflow',
 )
+nomad_workflow.build_workflow_yaml()
 ```
 
 which produces the following workflow yaml:

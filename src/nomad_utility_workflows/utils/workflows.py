@@ -426,10 +426,50 @@ class NodeAttributes(BaseModel):
 
 
 class NodeAttributesUniverse(BaseModel):
+    """
+    Container for all node attributes in a NOMAD workflow graph.
+
+    This class holds a mapping from node keys (integers) to their corresponding
+    `NodeAttributes` objects, representing the full set of nodes in a workflow.
+    It is used as the input for building the workflow graph and for serializing
+    or deserializing workflow definitions.
+
+    Attributes:
+        nodes (dict[int, NodeAttributes]):
+            Dictionary mapping node keys to their attributes.
+    """
+
     nodes: dict[int, NodeAttributes]
 
 
 class NomadWorkflow(BaseModel):
+    """
+    Represents a NOMAD workflow and provides methods to build and serialize it.
+
+    This class manages the workflow graph, node attributes, and the logic for
+    constructing a NOMAD-compatible workflow archive. It supports registering
+    nodes, resolving edges, adding default sections, and exporting the workflow
+    to a YAML file for use with NOMAD systems.
+
+    Attributes:
+        destination_filename (str):
+            Path to the output YAML file for the workflow archive.
+        m_def (str):
+            NOMAD m_def path for the workflow type.
+        name (str):
+            User-defined name for the workflow.
+        archive_section (str):
+            Root section of the archive to store the workflow.
+        node_attributes_universe (NodeAttributesUniverse):
+            Universe of node attributes for the workflow graph.
+        workflow_graph (nx.DiGraph):
+            Directed graph representing the workflow structure.
+        task_elements (dict[str, NomadSection]):
+            Registered sections for each node in the workflow.
+        simulation_default_sections (dict[str, list[str]]):
+            Default input and output sections for simulation tasks.
+    """
+
     destination_filename: str = Field(
         './nomad_custom_workflow_archive.yaml',
         description='The full path and filename to write the output yaml file.',
@@ -463,7 +503,7 @@ class NomadWorkflow(BaseModel):
         # ! add more defaults here
         if self.workflow_graph is None:
             self.workflow_graph = nodes_to_graph(self.node_attributes_universe)
-        self.fill_workflow_graph()
+        self._fill_workflow_graph()
 
     def register_section(
         self, node_key: Union[int, str, tuple], node_attrs: dict[str, Any]
@@ -471,7 +511,7 @@ class NomadWorkflow(BaseModel):
         section = NomadSection(**node_attrs)
         self.task_elements[node_key] = section
 
-    def fill_workflow_graph(self) -> None:
+    def _fill_workflow_graph(self) -> None:
         """_summary_"""
         for node_source, node_dest, edge in list(self.workflow_graph.edges(data=True)):
             self._resolve_edge_inputs(node_source, node_dest, edge)
@@ -705,6 +745,18 @@ class NomadWorkflow(BaseModel):
         return flag_defaults
 
     def build_workflow_yaml(self) -> None:
+        """
+        Construct and serialize the workflow archive to a YAML file.
+
+        This method registers all nodes in the workflow graph as sections, builds the
+        internal task elements, generates the workflow archive, removes duplicate
+        inputs/outputs, and writes the resulting archive to the YAML file specified by
+        `self.destination_filename`. The resulting YAML file is compatible with the
+        NOMAD workflow schema and can be used for further processing or import into
+        NOMAD systems.
+
+        After writing the file, a summary message is logged with the output filename.
+        """
         # register the sections and build task_elements
         # register the nodes as sections for the archive construction
         for (
