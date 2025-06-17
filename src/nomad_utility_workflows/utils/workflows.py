@@ -1,4 +1,9 @@
 import logging
+
+logging.basicConfig(
+    level=logging.INFO,  # or DEBUG
+    format='%(levelname)s: %(message)s',
+)
 from collections import OrderedDict
 from typing import Any, Literal, Optional, Union
 
@@ -246,7 +251,8 @@ class NomadTask(BaseModel):
 
 class NomadWorkflowArchive(BaseModel):
     archive_section: str = None
-    name: str = None
+    m_def: Optional[str] = None
+    name: Optional[str] = None
     inputs: list[NomadSection] = Field(default_factory=list)
     outputs: list[NomadSection] = Field(default_factory=list)
     tasks: list[NomadTask] = Field(default_factory=list)
@@ -266,6 +272,8 @@ class NomadWorkflowArchive(BaseModel):
 
     def to_dict(self) -> dict:
         yaml_dict = {self.archive_section: OrderedDict({})}
+        if self.m_def:
+            yaml_dict[self.archive_section]['m_def'] = self.m_def
         if self.name:
             yaml_dict[self.archive_section]['name'] = self.name
         if self.inputs:
@@ -292,11 +300,149 @@ class NomadWorkflowArchive(BaseModel):
             )
 
 
+class NodeAttributes(BaseModel):
+    """
+    NodeAttributes represents the attributes of a node in the NOMAD workflow graph.
+
+    Attributes:
+        name (str): A free-form string describing this node, which will be used as a
+                    label in the NOMAD workflow graph visualizer.
+
+        type (Literal['input', 'output', 'workflow', 'task']):
+            Specifies the type of node. Must be one of the specified options.
+
+            - input: (meta)data taken as input for the entire workflow or a specific
+                    task. For simulations, often corresponds to a section within the
+                    archive (e.g., system, method).
+
+            - output: (meta)data produced as output for the entire workflow or a
+                    specific task. For simulations, often corresponds to a section
+                    within the archive (e.g., calculation).
+
+            - workflow: A node in the workflow which itself contains an internal
+                    (sub)workflow, that is recognized by NOMAD. Such nodes can be
+                    linked to existing workflows within NOMAD, providing
+                    functionalities within NOMAD's interactive workflow graphs.
+
+            - task: A node in the workflow which represents an individual task
+                    (i.e., no underlying workflow), that is recognized by NOMAD.
+
+        entry_type (Literal['simulation']): Specifies the type of node in terms of
+            tasks or workflows recognized by NOMAD. Functionally, this attribute is
+            used to create default inputs and outputs that are required for properly
+            creating the edge visualizations in the NOMAD GUI.
+
+        path_info (dict): Information for generating the NOMAD archive section paths
+            (i.e., connections between nodes in terms of the NOMAD MetaInfo sections).
+
+            - upload_id (str): NOMAD PID for the upload, if exists.
+
+            - entry_id (str): NOMAD PID for the entry, if exists.
+
+            - mainfile_path (str): Local (relative to the native upload) path to the
+                mainfile, including the mainfile name with extension.
+
+            - supersection_path (str): Archive path to the supersection, e.g.,
+                "run" or "workflow2/method".
+
+            - supersection_index (int): The relevant index for the supersection, if it
+                is a repeating subsection.
+
+            - section_type (str): The name of the section for an input or output node,
+                e.g., "system", "method", or "calculation".
+
+            - section_index (int): The relevant index for the section, if it is a
+                repeating subsection.
+
+            - archive_path (str): Specifies the entire archive path to the section,
+                e.g., "run/0/system/2".
+
+        inputs (list[dict]): A list of input nodes to be added to the graph with
+            in_edges to the parent node.
+
+            - name (str): Will be set as the name for the input node created.
+
+            - path_info (dict): Path information for the input node created, as
+                specified for the node attributes above.
+
+        outputs (list[dict]): A list of output nodes to be added to the graph with
+            out_edges from the parent node.
+
+            - name (str): Will be set as the name for the output node created.
+
+            - path_info (dict): Path information for the output node created, as
+                specified for the node attributes above.
+
+        in_edge_nodes (list[int]): A list of integers specifying the node keys which
+            contain in-edges to this node.
+
+        out_edge_nodes (list[int]): A list of integers specifying the node keys which
+            contain out-edges to this node.
+    """
+
+    name: str = Field(None, description='A free-form string describing this node.')
+    type: SectionType = Field(None, description='The type of node.')
+    entry_type: EntryType = Field(
+        None, description='The type of node recognized by NOMAD.'
+    )
+    path_info: PathInfo = Field(
+        None, description='Information for generating the NOMAD archive section paths.'
+    )
+    inputs: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description='A list of input nodes to be added to the graph.',
+    )
+    outputs: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description='A list of output nodes to be added to the graph.',
+    )
+    in_edge_nodes: list[int] = Field(
+        default_factory=list, description='Nodes with in-edges to this node.'
+    )
+    out_edge_nodes: list[int] = Field(
+        default_factory=list, description='Nodes with out-edges to this node.'
+    )
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if self.type == 'workflow':
+            if not self.path_info:
+                return
+            if not self.path_info.get('archive_path'):
+                self.path_info['archive_path'] = 'workflow2'
+
+    def get(self, key: str, default: Any = None) -> Any:
+        """
+        Allows dictionary-like access to the attributes of the NodeAttributes class.
+
+        Args:
+            key (str): The attribute name to retrieve.
+            default (Any): The default value to return if the attribute is not found.
+
+        Returns:
+            Any: The value of the attribute if it exists, otherwise the default value.
+        """
+        return getattr(self, key, default)
+
+
+class NodeAttributesUniverse(BaseModel):
+    nodes: dict[int, NodeAttributes]
+
+
 class NomadWorkflow(BaseModel):
-    destination_filename: str
-    archive_section: str
-    name: str
-    node_attributes: dict[int, Any] = Field(default_factory=dict)
+    destination_filename: str = Field(
+        './nomad_custom_workflow_archive.yaml',
+        description='The full path and filename to write the output yaml file.',
+    )
+    m_def: str = Field(
+        None, description='The NOMAD m_def path for a specific workflow type.'
+    )
+    name: str = Field(None, description='User-defined name for the workflow.')
+    archive_section: str = Field(
+        'workflow2',
+        description='The root section of the archive to store the workflow.',
+    )
+    node_attributes_universe: NodeAttributesUniverse = Field(default_factory=dict)
     workflow_graph: nx.DiGraph = None
     task_elements: dict[str, NomadSection] = Field(default_factory=dict)
     simulation_default_sections: dict[str, list[str]] = Field(
@@ -316,7 +462,7 @@ class NomadWorkflow(BaseModel):
         }
         # ! add more defaults here
         if self.workflow_graph is None:
-            self.workflow_graph = nodes_to_graph(self.node_attributes)
+            self.workflow_graph = nodes_to_graph(self.node_attributes_universe)
         self.fill_workflow_graph()
 
     def register_section(
@@ -570,10 +716,11 @@ class NomadWorkflow(BaseModel):
         archive = self.generate_archive()
         archive.remove_duplicate_ios()
         archive.to_yaml(self.destination_filename)
+        logger.info(f'NOMAD workflow written to {self.destination_filename}')
 
     def generate_archive(self) -> NomadWorkflowArchive:
         archive = NomadWorkflowArchive(
-            archive_section=self.archive_section, name=self.name
+            archive_section=self.archive_section, m_def=self.m_def, name=self.name
         )
         archive.inputs = []
         archive.outputs = []
@@ -728,168 +875,71 @@ def _add_task_inouts(workflow_graph, node_key, node_attrs):
             workflow_graph.edges[node_key, edge_node]['inputs'].append(output_)
 
 
-class NodeAttributes(BaseModel):
-    """
-    NodeAttributes represents the attributes of a node in the NOMAD workflow graph.
-
-    Attributes:
-        name (str): A free-form string describing this node, which will be used as a
-                    label in the NOMAD workflow graph visualizer.
-
-        type (Literal['input', 'output', 'workflow', 'task']):
-            Specifies the type of node. Must be one of the specified options.
-
-            - input: (meta)data taken as input for the entire workflow or a specific
-                    task. For simulations, often corresponds to a section within the
-                    archive (e.g., system, method).
-
-            - output: (meta)data produced as output for the entire workflow or a
-                    specific task. For simulations, often corresponds to a section
-                    within the archive (e.g., calculation).
-
-            - workflow: A node in the workflow which itself contains an internal
-                    (sub)workflow, that is recognized by NOMAD. Such nodes can be
-                    linked to existing workflows within NOMAD, providing
-                    functionalities within NOMAD's interactive workflow graphs.
-
-            - task: A node in the workflow which represents an individual task
-                    (i.e., no underlying workflow), that is recognized by NOMAD.
-
-        entry_type (Literal['simulation']): Specifies the type of node in terms of
-            tasks or workflows recognized by NOMAD. Functionally, this attribute is
-            used to create default inputs and outputs that are required for properly
-            creating the edge visualizations in the NOMAD GUI.
-
-        path_info (dict): Information for generating the NOMAD archive section paths
-            (i.e., connections between nodes in terms of the NOMAD MetaInfo sections).
-
-            - upload_id (str): NOMAD PID for the upload, if exists.
-
-            - entry_id (str): NOMAD PID for the entry, if exists.
-
-            - mainfile_path (str): Local (relative to the native upload) path to the
-                mainfile, including the mainfile name with extension.
-
-            - supersection_path (str): Archive path to the supersection, e.g.,
-                "run" or "workflow2/method".
-
-            - supersection_index (int): The relevant index for the supersection, if it
-                is a repeating subsection.
-
-            - section_type (str): The name of the section for an input or output node,
-                e.g., "system", "method", or "calculation".
-
-            - section_index (int): The relevant index for the section, if it is a
-                repeating subsection.
-
-            - archive_path (str): Specifies the entire archive path to the section,
-                e.g., "run/0/system/2".
-
-        inputs (list[dict]): A list of input nodes to be added to the graph with
-            in_edges to the parent node.
-
-            - name (str): Will be set as the name for the input node created.
-
-            - path_info (dict): Path information for the input node created, as
-                specified for the node attributes above.
-
-        outputs (list[dict]): A list of output nodes to be added to the graph with
-            out_edges from the parent node.
-
-            - name (str): Will be set as the name for the output node created.
-
-            - path_info (dict): Path information for the output node created, as
-                specified for the node attributes above.
-
-        in_edge_nodes (list[int]): A list of integers specifying the node keys which
-            contain in-edges to this node.
-
-        out_edge_nodes (list[int]): A list of integers specifying the node keys which
-            contain out-edges to this node.
-    """
-
-    name: str = Field(None, description='A free-form string describing this node.')
-    type: SectionType = Field(None, description='The type of node.')
-    entry_type: EntryType = Field(
-        None, description='The type of node recognized by NOMAD.'
-    )
-    path_info: PathInfo = Field(
-        None, description='Information for generating the NOMAD archive section paths.'
-    )
-    inputs: list[dict[str, Any]] = Field(
-        default_factory=list,
-        description='A list of input nodes to be added to the graph.',
-    )
-    outputs: list[dict[str, Any]] = Field(
-        default_factory=list,
-        description='A list of output nodes to be added to the graph.',
-    )
-    in_edge_nodes: list[int] = Field(
-        default_factory=list, description='Nodes with in-edges to this node.'
-    )
-    out_edge_nodes: list[int] = Field(
-        default_factory=list, description='Nodes with out-edges to this node.'
-    )
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        if self.type == 'workflow':
-            if not self.path_info:
-                return
-            if not self.path_info.get('archive_path'):
-                self.path_info['archive_path'] = 'workflow2'
-
-    def get(self, key: str, default: Any = None) -> Any:
-        """
-        Allows dictionary-like access to the attributes of the NodeAttributes class.
-
-        Args:
-            key (str): The attribute name to retrieve.
-            default (Any): The default value to return if the attribute is not found.
-
-        Returns:
-            Any: The value of the attribute if it exists, otherwise the default value.
-        """
-        return getattr(self, key, default)
-
-
-class NodeAttributesUniverse(BaseModel):
-    nodes: dict[int, NodeAttributes]
-
-
 def build_nomad_workflow(
-    workflow_metadata: dict[str, str] = {},
-    node_attributes: NodeAttributes = {},
-    workflow_graph: nx.DiGraph = None,
+    workflow: NomadWorkflow = {},
     write_to_yaml: bool = False,
 ) -> nx.DiGraph:
     """_summary_
 
     Args:
-        workflow_metadata (dict[str, str], optional): _description_. Defaults to {}.
-        node_attributes (NodeAttributes, optional): _description_. Defaults to {}.
-        workflow_graph (nx.DiGraph, optional): _description_. Defaults to None.
-        write_to_yaml (bool, optional): _description_. Defaults to False.
+        workflow (NomadWorkflow, optional): _description_. Defaults to {}.
+        write_to_yaml (bool, optional): If True, writes the workflow to a YAML file.
+            Defaults to False.
 
     Returns:
         nx.DiGraph: _description_
     """
-    destination_filename = workflow_metadata.get(
-        'destination_filename', './nomad_workflow.archive.yaml'
-    )
-    archive_section = workflow_metadata.get('archive_section', 'workflow2')
-    workflow_name = workflow_metadata.get('workflow_name', '')
-    workflow = NomadWorkflow(
-        destination_filename=destination_filename,
-        archive_section=archive_section,
-        name=workflow_name,
-        node_attributes=node_attributes,
-        workflow_graph=workflow_graph,
-    )
+    # destination_filename = workflow_metadata.get(
+    #     'destination_filename', './nomad_workflow.archive.yaml'
+    # )
+    # archive_section = workflow_metadata.get('archive_section', 'workflow2')
+    # workflow_name = workflow_metadata.get('workflow_name', '')
+    # workflow = NomadWorkflow(
+    #     destination_filename=destination_filename,
+    #     archive_section=archive_section,
+    #     name=workflow_name,
+    #     node_attributes=node_attributes,
+    #     workflow_graph=workflow_graph,
+    # )
     if write_to_yaml:
         workflow.build_workflow_yaml()
 
     return workflow.workflow_graph
+
+
+# def build_nomad_workflow(
+#     workflow_metadata: dict[str, str] = {},
+#     node_attributes: NodeAttributes = {},
+#     workflow_graph: nx.DiGraph = None,
+#     write_to_yaml: bool = False,
+# ) -> nx.DiGraph:
+#     """_summary_
+
+#     Args:
+#         workflow_metadata (dict[str, str], optional): _description_. Defaults to {}.
+#         node_attributes (NodeAttributes, optional): _description_. Defaults to {}.
+#         workflow_graph (nx.DiGraph, optional): _description_. Defaults to None.
+#         write_to_yaml (bool, optional): _description_. Defaults to False.
+
+#     Returns:
+#         nx.DiGraph: _description_
+#     """
+#     destination_filename = workflow_metadata.get(
+#         'destination_filename', './nomad_workflow.archive.yaml'
+#     )
+#     archive_section = workflow_metadata.get('archive_section', 'workflow2')
+#     workflow_name = workflow_metadata.get('workflow_name', '')
+#     workflow = NomadWorkflow(
+#         destination_filename=destination_filename,
+#         archive_section=archive_section,
+#         name=workflow_name,
+#         node_attributes=node_attributes,
+#         workflow_graph=workflow_graph,
+#     )
+#     if write_to_yaml:
+#         workflow.build_workflow_yaml()
+
+#     return workflow.workflow_graph
 
 
 # TODO prevent duplicates to global outputs
