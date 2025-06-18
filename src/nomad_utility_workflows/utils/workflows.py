@@ -1,9 +1,4 @@
 import logging
-
-logging.basicConfig(
-    level=logging.INFO,  # or DEBUG
-    format='%(levelname)s: %(message)s',
-)
 from collections import OrderedDict
 from typing import Any, Literal, Optional, Union
 
@@ -11,6 +6,11 @@ import networkx as nx
 import yaml
 from pydantic import BaseModel, Field, computed_field
 from typing_extensions import TypedDict
+
+logging.basicConfig(
+    level=logging.INFO,  # or DEBUG
+    format='%(levelname)s: %(message)s',
+)
 
 logger = logging.getLogger(__name__)
 TASK_M_DEF = 'nomad.datamodel.metainfo.workflow.TaskReference'
