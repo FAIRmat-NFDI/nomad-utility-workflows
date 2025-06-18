@@ -80,8 +80,6 @@ node_attributes = {
         type='input',
         path_info={
             'mainfile_path': 'Emin/mdrun_Emin.log',
-            'supersection_index': 0,
-            'section_index': 0,
             'section_type': 'system',
         },
         out_edge_nodes=[1],
@@ -161,7 +159,7 @@ The visualization of the input graph should look like this:
 
 ### Step 3: Fill the workflow graph with default connections
 
-Before creating the workflow YAML, the utility module will fill the workflow graph generated in the previous step with certain "default" connections (i.e., inputs and outputs) based on the types of nodes in the workflow. This happens automatically upon instantiation of the `NomadWorkflow` class:
+Before creating the workflow YAML, the utility module will fill the workflow graph generated in the previous step with certain "default" connections (i.e., inputs and outputs) based on the types of nodes in the workflow. This happens automatically upon instantiation of the [`NomadWorkflow`](../reference/workflows.md#nomadworkflow) class:
 
 ```python
 nomad_workflow = NomadWorkflow(
@@ -196,7 +194,7 @@ In this case, because the nodes have `entry_type = 'simulation'`, the automatica
 
 ### Step 4: Generate the workflow YAML
 
-Finally, we can some workflow metadata to the `NomadWorkflow` (i.e., the filename of the output yaml and the name of the workflow) and generate the workflow YAML file with the class method `build_workflow_yaml`[`build_workflow_yaml()`](../reference/workflows.md#build_workflow_yaml):
+Finally, we can add some workflow metadata to the [`NomadWorkflow`](../reference/workflows.md#nomadworkflow) (i.e., the filename of the output yaml and the name of the workflow) and generate the workflow YAML file with the class method [`build_workflow_yaml()`](../reference/workflows.md#build_workflow_yaml):
 
 ```python
 nomad_workflow.destination_filename = './workflow_minimal.archive.yaml'
@@ -317,8 +315,6 @@ node_attributes = {
         type='input',
         path_info={
             'mainfile_path': 'Emin/mdrun_Emin.log',
-            'supersection_index': 0,
-            'section_index': 0,
             'section_type': 'system',
         },
         out_edge_nodes=[1],
@@ -334,7 +330,7 @@ node_attributes = {
                 'path_info': {
                     'section_type': 'energy',
                     'supersection_path': 'run/0/calculation',  # this can be done,
-                    # but at this point it's safer / easier to just use archive_path
+                    # or use archive_path='/run/0/calculation/-1/energy',
                     'supersection_index': -1,
                 },
             }
@@ -432,7 +428,7 @@ for node_key, node_attributes in workflow_graph_output.nodes(data=True):
 
 ??? Success "output"
     ```
-    0 {'name': 'input system', 'type': 'input', 'entry_type': None, 'path_info': {'mainfile_path': 'Emin/mdrun_Emin.log', 'supersection_index': 0, 'section_type': 'system', 'section_index': 0, 'archive_path': 'run/0/system/0'}, 'in_edge_nodes': [], 'out_edge_nodes': [1]}
+    0 {'name': 'input system', 'type': 'input', 'entry_type': None, 'path_info': {'mainfile_path': 'Emin/mdrun_Emin.log', 'section_type': 'system', 'archive_path': 'run/0/system/-1'}, 'in_edge_nodes': [], 'out_edge_nodes': [1]}
     1 {'name': 'Geometry Optimization', 'type': 'workflow', 'entry_type': 'simulation', 'path_info': {'mainfile_path': 'Emin/mdrun_Emin.log', 'archive_path': 'workflow2'}, 'in_edge_nodes': [], 'out_edge_nodes': []}
     2 {'name': 'Equilibration NPT Molecular Dynamics', 'type': 'workflow', 'entry_type': 'simulation', 'path_info': {'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log', 'archive_path': 'workflow2'}, 'in_edge_nodes': [1], 'out_edge_nodes': []}
     3 {'name': 'Production NVT Molecular Dynamics', 'type': 'workflow', 'entry_type': 'simulation', 'path_info': {'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log', 'archive_path': 'workflow2'}, 'in_edge_nodes': [2], 'out_edge_nodes': []}
@@ -441,7 +437,7 @@ for node_key, node_attributes in workflow_graph_output.nodes(data=True):
     6 {'type': 'output', 'name': 'energies of the relaxed system', 'path_info': {'section_type': 'energy', 'supersection_path': 'run/0/calculation', 'supersection_index': -1, 'mainfile_path': 'Emin/mdrun_Emin.log', 'archive_path': 'run/0/calculation/-1/energy/-1'}}
     7 {'type': 'output', 'name': 'MD workflow properties (structural and dynamical)', 'path_info': {'section_type': 'results', 'mainfile_path': 'Equil_NPT/mdrun_Equil-NPT.log', 'archive_path': 'workflow2/results/-1'}}
     8 {'type': 'output', 'name': 'MD workflow properties (structural and dynamical)', 'path_info': {'section_type': 'results', 'mainfile_path': 'Prod_NVT/mdrun_Prod-NVT.log', 'archive_path': 'workflow2/results/-1'}}
-    9 {'type': 'input', 'name': 'input run/0/system/0 from input system', 'path_info': {'mainfile_path': 'Emin/mdrun_Emin.log', 'supersection_index': 0, 'section_type': 'system', 'section_index': 0, 'archive_path': 'run/0/system/0'}, 'is_default': True}
+    9 {'type': 'input', 'name': 'input run/0/system/-1 from input system', 'path_info': {'mainfile_path': 'Emin/mdrun_Emin.log', 'section_type': 'system', 'archive_path': 'run/0/system/-1'}, 'is_default': True}
     10 {'type': 'output', 'name': 'output system from Geometry Optimization', 'path_info': {'entry_id': None, 'upload_id': None, 'section_type': 'system', 'mainfile_path': 'Emin/mdrun_Emin.log'}}
     11 {'type': 'output', 'name': 'output calculation from Geometry Optimization', 'path_info': {'entry_id': None, 'upload_id': None, 'section_type': 'calculation', 'mainfile_path': 'Emin/mdrun_Emin.log'}}
     12 {'type': 'input', 'name': 'input system from Geometry Optimization', 'path_info': {'entry_id': None, 'upload_id': None, 'section_type': 'system', 'mainfile_path': 'Emin/mdrun_Emin.log'}}
@@ -459,7 +455,7 @@ for edge_1, edge_2, edge_attributes in workflow_graph_output.edges(data=True):
 
 ??? Success "output"
     ```
-    0 1 {'inputs': [], 'outputs': [{'name': 'input run/0/system/0 from input system', 'path_info': {'mainfile_path': 'Emin/mdrun_Emin.log', 'supersection_index': 0, 'section_type': 'system', 'section_index': 0, 'archive_path': 'run/0/system/0'}, 'is_default': True}]}
+    0 1 {'inputs': [], 'outputs': [{'name': 'input run/0/system/-1 from input system', 'path_info': {'mainfile_path': 'Emin/mdrun_Emin.log', 'section_type': 'system', 'archive_path': 'run/0/system/-1'}, 'is_default': True}]}
     1 6 {'inputs': [{'name': 'energies of the relaxed system', 'path_info': {'section_type': 'energy', 'supersection_path': 'run/0/calculation', 'supersection_index': -1, 'mainfile_path': 'Emin/mdrun_Emin.log', 'archive_path': 'run/0/calculation/-1/energy/-1'}}, {'name': 'output system from Geometry Optimization', 'path_info': {'entry_id': None, 'upload_id': None, 'section_type': 'system', 'mainfile_path': 'Emin/mdrun_Emin.log'}}, {'name': 'output calculation from Geometry Optimization', 'path_info': {'entry_id': None, 'upload_id': None, 'section_type': 'calculation', 'mainfile_path': 'Emin/mdrun_Emin.log'}}], 'outputs': []}
     1 2 {'inputs': [], 'outputs': [{'name': 'input system from Geometry Optimization', 'path_info': {'entry_id': None, 'upload_id': None, 'section_type': 'system', 'mainfile_path': 'Emin/mdrun_Emin.log'}}]}
     1 10 {}
@@ -485,7 +481,7 @@ The resulting `workflow.archive.yaml` file will look like:
   'name': 'Equilibration Procedure'
   'inputs':
   - 'name': 'input system'
-    'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/0'
+    'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/-1'
   'outputs':
   - 'name': 'MD workflow properties (structural and dynamical)'
     'section': '../upload/archive/mainfile/Prod_NVT/mdrun_Prod-NVT.log#/workflow2/results/-1'
@@ -498,8 +494,8 @@ The resulting `workflow.archive.yaml` file will look like:
     'name': 'Geometry Optimization'
     'task': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/workflow2'
     'inputs':
-    - 'name': 'input run/0/system/0 from input system'
-      'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/0'
+    - 'name': 'input run/0/system/-1 from input system'
+      'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/system/-1'
     'outputs':
     - 'name': 'energies of the relaxed system'
       'section': '../upload/archive/mainfile/Emin/mdrun_Emin.log#/run/0/calculation/-1/energy/-1'
@@ -557,7 +553,6 @@ By clicking on the middle task box "Equilibration NPT Mole...", you will open th
 
 For more details on node attributes and other options, see:
 
-* [Explanation > Workflow > Node Attributes](../explanation/workflows.md#node-attributes)
 * [Reference > Workflows](../reference/workflows.md)
 
 

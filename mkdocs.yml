@@ -13,8 +13,6 @@ nav:
       - Perform API Calls: how_to/use_api_functions.md
       - Create Custom Workflows: how_to/create_custom_workflows.md
       - Add Custom Taks: how_to/add_custom_tasks.md
-  # - Explanation:
-  #   - Workflows: explanation/workflows.md
   - Reference:
     - Workflows: reference/workflows.md
 plugins:
