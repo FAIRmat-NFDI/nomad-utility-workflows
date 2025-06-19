@@ -1,7 +1,7 @@
 # How to add custom tasks to workflows using NOMAD's ELN Functionalities
 <!-- Implemented in nomad-utility-workflows/tests/utils/workflow_yaml_examples/solute_in_bilayer/ -->
 
-This how-to covers how to add a custom NOMAD entry in the case that some tasks or input/output of your workflow, will not automatically parsed and stored within a NOMAD archive, i.e., there it cannot be referenced within your workflow.
+This how-to covers how to add a custom NOMAD entry in the case that some tasks or inputs/outputs of your workflow are not automatically parsed and stored within a NOMAD entry, i.e., preventing you to reference these within your workflow.
 
 
 ## Example Overview
@@ -17,7 +17,7 @@ Consider the following setup, simulation, and analysis protocol:
 
 [Download Example Data](../assets/solute_in_bilayer.zip){:target="_blank" .md-button}
 
-The minimize, equilibrate, and production (workflow) tasks are analogous to that described in [How to > Create Custom Workflows](./create_custom_workflows.md). The remaining tasks (green boxes) correspond to steps in the simulation protocol that are not supported by the NOMAD simulation parsers, e.g., creation of the initial configuration or model parameter files, or post-simulation analysis.
+The minimize, equilibrate, and production (workflow) tasks are analogous to that described in [How to > Create Custom Workflows](./create_custom_workflows.md). The remaining tasks correspond to steps in the simulation protocol that are not supported by the NOMAD simulation parsers, e.g., creation of the initial configuration or model parameter files, or post-simulation analysis.
 
 ## Create an ELN entry with ElnBaseSection
 
@@ -81,13 +81,12 @@ Now that we have a mainfile for each task, we can specify the graph strucuture a
 
 ```python
 import gravis as gv
-import networkx as nx
 
 from nomad_utility_workflows.utils.workflows import (
     NodeAttributesUniverse,
     NodeAttributes,
+    NomadWorkflow,
     nodes_to_graph,
-    build_nomad_workflow,
 )
 
 path_to_job = ''
@@ -177,21 +176,15 @@ node_attributes_universe = NodeAttributesUniverse(
 
 ## Generate the input workflow graph and workflow yaml
 
-Identically to `Create Custom Workflows >` [Complete Workflow Creation Example](./create_custom_workflows.md#complete-workflow-creation-example) and [Generate the workflow yaml](./create_custom_workflows.md#step-3-generate-the-workflow-yaml), we simply apply the `node_to_graph()` and `build_nomad_workflow()` functions:
+Identically to `Create Custom Workflows >` [Complete Workflow Creation Example](./create_custom_workflows.md#complete-workflow-creation-example) and [Generate the workflow yaml](./create_custom_workflows.md#step-4-generate-the-workflow-yaml), we create a `NomadWorkflow` object with the appropriate quantities:
 
 ```python
-workflow_graph_input = nodes_to_graph(node_attributes_universe)
-
-workflow_metadata = {
-    'destination_filename': 'solute_in_bilayer.workflow.archive.yaml',
-    'workflow_name': 'Solute in bilayer workflow',
-}
-
-workflow_graph_output = build_nomad_workflow(
-    workflow_metadata=workflow_metadata,
-    workflow_graph=nx.DiGraph(workflow_graph_input),
-    write_to_yaml=True,
+nomad_workflow = NomadWorkflow(
+    node_attributes_universe=node_attributes_universe,
+    destination_filename='solute_in_bilayer.workflow.archive.yaml',
+    name='Solute in bilayer workflow',
 )
+nomad_workflow.build_workflow_yaml()
 ```
 
 which produces the following workflow yaml:
@@ -279,3 +272,9 @@ which produces the following workflow yaml:
 ```
 
 When uploaded to NOMAD with the corresponding simulation files and ELN `archive.yaml`'s, you should obtain a workflow entry with the visualization show the top of this page.
+
+## References
+
+For more details on creating and customizing ELN entries within a workflow, see:
+
+* [Tutorial > Part 3: Creating Custom Entries in NOMAD](https://fairmat-nfdi.github.io/nomad-tutorial-workflows/latest/custom/){:target="\_blank"}

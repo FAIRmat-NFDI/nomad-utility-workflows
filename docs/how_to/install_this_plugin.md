@@ -5,14 +5,17 @@
 For direct usage and integrating the utility module into other plugins or codes, `nomad-utility-workflows` is available as a PyPI package:
 
 ```bash
-pip install nomad-utility-workflows>=0.1.0
+pip install nomad-utility-workflows>=0.2.0
 ```
 
 If you are following the How-to guides in the docs, use the "vis" optional dependencies tag (includes dependencies for, e.g., Jupyter notebook and graph visualization):
 
 ```bash
-pip install nomad-utility-workflows[vis]>=0.1.0
+pip install nomad-utility-workflows[vis]>=0.2.0
 ```
+
+!!! Warning "Warning"
+    There were breaking changes made in the transition to `nomad-utility-workflows` version 0.2.0. This is particularly relevant for the functions called for building the workflow yaml. To use older versions, you should reference the corresponding docs pages by checking out an older branch and serving the mkdocs page locally (See README.md).
 
 !!! Warning "Warning"
     There were breaking changes made in the transition to `nomad-utility-workflows` version 0.1.0. This is particularly relevant for the structure of inputs of the workflow graph generation functions. To use older versions, you should reference the corresponding docs pages by checking out an older branch and serving the mkdocs page locally (See README.md).
@@ -28,6 +31,12 @@ and insert your username and password.
 
 !!! Warning "CAUTION FOR DEVELOPERS"
     Never push your `.env` file to a repository. This would expose your password.
+
+### Running test Notebooks
+To run the test notebooks, create a jupyter kernel using your venv:
+```sh
+python -m ipykernel install --user --name=nomad_utility_workflows
+```
 
 ## Development
 
@@ -124,11 +133,5 @@ uv pip install -r requirements_docs.txt
 Run the documentation server:
 ```sh
 mkdocs serve
-```
-
-### Test Notebooks
-To run the test notebooks, create a jupyter kernel using your venv:
-```sh
-python -m ipykernel install --user --name=nomad_utility_workflows
 ```
 

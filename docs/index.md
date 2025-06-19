@@ -1,10 +1,10 @@
 # Welcome to the `nomad-utility-workflows` documentation
 
-A module with utilities for interacting with NOMAD via, e.g., a workflow manager.
+A module with utilities for interacting with NOMAD programmatically, e.g., via a workflow manager.
 
 ## Introduction
 
-NOMAD's API and workflow functionalities provide users with a route to FAIR data management of complex and highthroughput processes. However, the overhead for leveraging these capabilities remains rather large. This utility module assists lowers the barrier to these tools, currently with 2 distinct sets of tools: 1. python API wrappers, and 2. automated workflow yaml generation for building custom workflows.
+NOMAD's API and workflow functionalities provide users with a route to FAIR data management of complex and highthroughput processes. However, learning how to fully utilize these capabilities can be time consuming, or even intimidating depending on your programming background. This utility module aims to lower the barrier to using these tools, currently with 2 distinct sets of tools: 1. python API wrappers, and 2. automated workflow yaml generation for building custom workflows.
 
 <div markdown="block" class="home-grid">
 
@@ -31,7 +31,7 @@ How-to guides provide step-by-step instructions for a wide range of tasks, with 
 
 
 </div>
-<div markdown="block">
+<!-- <div markdown="block">
 
 ### Explanation
 
@@ -39,7 +39,7 @@ The explanation provides background knowledge on functionalities of this plugin:
 
 - [Workflows](explanation/workflows.md)
 
-</div>
+</div> -->
 
 <div markdown="block">
 
@@ -56,3 +56,10 @@ The reference section includes specifications for the relevant user-callable fun
 | Name | E-mail     |
 |------|------------|
 | Joseph F. Rudzinski | [joseph.rudzinski@physik.hu-berlin.de](mailto:joseph.rudzinski@physik.hu-berlin.de)
+| Andrea Albino |
+| Tristan Bereau |
+| Nathan Daelman |
+| Alvin N. Ladines |
+| Bernadette Mohr |
+| Jesper Pedersen |
+| Luis J. Walter |
