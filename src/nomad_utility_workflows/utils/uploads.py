@@ -53,9 +53,7 @@ class NomadUpload:
     upload_create_time: dt.datetime
     main_author: NomadUser
     process_running: bool
-    current_process: str
     process_status: str
-    last_status_message: str
     errors: list[Any]
     warnings: list[Any]
     coauthors: list[str]
@@ -72,6 +70,8 @@ class NomadUpload:
     embargo_length: float
     license: str
     entries: int
+    current_process: Optional[str] = None
+    last_status_message: Optional[str] = None
     n_entries: Optional[int] = None
     upload_files_server_path: Optional[str] = None
     publish_time: Optional[dt.datetime] = None
