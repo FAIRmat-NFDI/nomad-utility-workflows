@@ -40,9 +40,9 @@ def get_authentication_token(
     """
     url = get_nomad_url(url)
     logger.info('Requesting authentication token @ %s', url)
-    response = requests.get(
+    response = requests.post(
         url + '/auth/token',
-        params={'username': username, 'password': password},
+        data={'username': username, 'password': password, 'grant_type': 'password'},
         timeout=timeout_in_sec,
     )
     if not response.status_code == STATUS_CODE:
