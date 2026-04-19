@@ -161,7 +161,7 @@ class NomadEntry:
 @ttl_cache(maxsize=128, ttl=180)
 def get_entry_by_id(
     entry_id: str,
-    url: str = None,
+    url: Optional[str] = None,
     with_authentication: bool = False,
     timeout_in_sec: int = 10,
 ) -> NomadEntry:
@@ -183,7 +183,7 @@ def get_entry_by_id(
 @ttl_cache(maxsize=128, ttl=180)
 def get_entries_of_upload(
     upload_id: str,
-    url: str = None,
+    url: Optional[str] = None,
     with_authentication: bool = False,
     timeout_in_sec: int = 10,
 ) -> list[NomadEntry]:
@@ -206,7 +206,7 @@ def get_entries_of_upload(
 
 
 def get_entries_of_my_uploads(
-    url: str = None, timeout_in_sec: int = 10
+    url: Optional[str] = None, timeout_in_sec: int = 10
 ) -> list[NomadEntry]:
     return [
         upload_entry
@@ -222,7 +222,7 @@ def get_entries_of_my_uploads(
 # ! which was required to reduce the number of inputs for ruff
 def query_entries(
     query_params: QueryParams = default_query_params.copy(),
-    url: str = None,
+    url: Optional[str] = None,
 ) -> list[NomadEntry]:
     json_dict = {
         'query': {},
@@ -265,10 +265,10 @@ def query_entries(
 
 def download_entry_raw_data_by_id(
     entry_id: str,
-    url: str = None,
+    url: Optional[str] = None,
     timeout_in_sec: int = 10,
     with_authentication: bool = False,
-    zip_file_name: str = None,
+    zip_file_name: Optional[str] = None,
 ) -> ByteString:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
@@ -293,10 +293,10 @@ def download_entry_raw_data_by_id(
 
 def download_entry_by_id(
     entry_id: str,
-    url: str = None,
+    url: Optional[str] = None,
     timeout_in_sec: int = 10,
     with_authentication: bool = False,
-    zip_file_name: str = None,
+    zip_file_name: Optional[str] = None,
 ) -> dict:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
