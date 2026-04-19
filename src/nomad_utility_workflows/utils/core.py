@@ -59,7 +59,7 @@ class RequestOptions(TypedDict, total=False):
     """
 
     section: str
-    url: Optional[None] = None
+    url: Optional[str] = None
     timeout_in_sec: int = TIMEOUT_IN_SEC
     headers: Optional[dict] = None
     with_authentication: bool = False
