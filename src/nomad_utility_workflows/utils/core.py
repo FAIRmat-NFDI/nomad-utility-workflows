@@ -178,7 +178,7 @@ def post_nomad_request(
     request_options: RequestOptions = default_request_options.copy(),
     data: Any = None,
     json_dict: dict = None,
-) -> json:
+) -> Any:
     """_summary_
 
     Args:
@@ -224,7 +224,7 @@ def post_nomad_request(
 
 def delete_nomad_request(
     request_options: RequestOptions = default_request_options.copy(),
-) -> json:
+) -> Any:
     """_summary_
 
     Args:
