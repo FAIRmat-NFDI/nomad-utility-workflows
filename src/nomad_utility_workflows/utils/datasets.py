@@ -62,6 +62,7 @@ class NomadDataset:
 def retrieve_datasets(
     dataset_params: DatasetParams = default_dataset_params.copy(),
     url: str = None,
+    with_authentication: bool = False,
 ) -> list[NomadDataset]:
     parameters = []
     max_datasets = dataset_params.pop(
@@ -86,7 +87,10 @@ def retrieve_datasets(
             else section
         )
         response = get_nomad_request(
-            RequestOptions(section=section, headers=headers, url=url)
+            RequestOptions(section=section, 
+                           headers=headers, 
+                           url=url, 
+                           with_authentication=with_authentication)
         )
         if len(response['data']) == 0:
             break
@@ -97,8 +101,12 @@ def retrieve_datasets(
     return datasets
 
 
-def get_dataset_by_id(dataset_id: str, url: str = None) -> NomadDataset:
-    datasets = retrieve_datasets(DatasetParams(dataset_id=dataset_id), url=url)
+def get_dataset_by_id(dataset_id: str, 
+                      url: str = None, 
+                      with_authentication: bool = False) -> NomadDataset:
+    datasets = retrieve_datasets(DatasetParams(dataset_id=dataset_id), 
+                                 url=url, 
+                                 with_authentication=with_authentication)
     if len(datasets) != 1:
         raise ValueError(f'Problem retrieving dataset {dataset_id}: {datasets}')
     return datasets[0]
