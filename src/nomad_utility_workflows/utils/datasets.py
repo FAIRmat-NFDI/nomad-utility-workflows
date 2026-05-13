@@ -62,6 +62,7 @@ class NomadDataset:
 def retrieve_datasets(
     dataset_params: DatasetParams = default_dataset_params.copy(),
     url: Optional[str] = None,
+    with_authentication: Optional[bool] = False,
 ) -> list[NomadDataset]:
     parameters = []
     max_datasets = dataset_params.pop(
@@ -86,7 +87,10 @@ def retrieve_datasets(
             else section
         )
         response = get_nomad_request(
-            RequestOptions(section=section, headers=headers, url=url)
+            RequestOptions(section=section, 
+                           headers=headers, 
+                           url=url, 
+                           with_authentication=with_authentication)
         )
         if len(response['data']) == 0:
             break
@@ -97,14 +101,20 @@ def retrieve_datasets(
     return datasets
 
 
-def get_dataset_by_id(dataset_id: str, url: Optional[str] = None) -> NomadDataset:
-    datasets = retrieve_datasets(DatasetParams(dataset_id=dataset_id), url=url)
+def get_dataset_by_id(dataset_id: str, 
+                      url: Optional[str] = None, 
+                      with_authentication: Optional[bool] = False) -> NomadDataset:
+    datasets = retrieve_datasets(DatasetParams(dataset_id=dataset_id), 
+                                 url=url, 
+                                 with_authentication=with_authentication)
     if len(datasets) != 1:
         raise ValueError(f'Problem retrieving dataset {dataset_id}: {datasets}')
     return datasets[0]
 
 
-def create_dataset(dataset_name: str, url: Optional[str] = None, timeout_in_sec: int = 10) -> str:
+def create_dataset(dataset_name: str, 
+                   url: Optional[str] = None, 
+                   timeout_in_sec: int = 10) -> str:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
     logger.info('creating dataset name %s on %s server', dataset_name, url_name)
@@ -121,7 +131,9 @@ def create_dataset(dataset_name: str, url: Optional[str] = None, timeout_in_sec:
     return response.get('dataset_id')
 
 
-def delete_dataset(dataset_id: str, url: Optional[str] = None, timeout_in_sec: int = 10) -> None:
+def delete_dataset(dataset_id: str, 
+                   url: Optional[str] = None, 
+                   timeout_in_sec: int = 10) -> None:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
     logger.info('deleting dataset %s on %s server', dataset_id, url_name)

@@ -96,7 +96,8 @@ class NomadUpload:
 
 
 @ttl_cache(maxsize=128, ttl=180)
-def get_all_my_uploads(url: Optional[str] = None, timeout_in_sec: int = 10) -> list[NomadUpload]:
+def get_all_my_uploads(url: Optional[str] = None, 
+                       timeout_in_sec: int = 10) -> list[NomadUpload]:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
     logger.info('retrieving all uploads on %s server', url_name)
@@ -172,7 +173,9 @@ def upload_files_to_nomad(
         logger.error('could not upload %s. Response %s', filename, response)
 
 
-def publish_upload(upload_id: str, url: Optional[str] = None, timeout_in_sec: int = 10) -> dict:
+def publish_upload(upload_id: str, 
+                   url: Optional[str] = None, 
+                   timeout_in_sec: int = 10) -> dict:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
     logger.info('publishing upload %s on %s server', upload_id, url_name)
