@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, TypedDict
+from typing import Any, Optional, TypedDict
 
 import requests
 from cachetools.func import ttl_cache
@@ -19,7 +19,7 @@ TIMEOUT_IN_SEC = 60
 
 @ttl_cache(maxsize=128, ttl=180)
 def get_authentication_token(
-    url: str = None,
+    url: Optional[str] = None,
     username: str = NOMAD_USERNAME,
     password: str = NOMAD_PASSWORD,
     timeout_in_sec: int = TIMEOUT_IN_SEC,
@@ -59,9 +59,9 @@ class RequestOptions(TypedDict, total=False):
     """
 
     section: str
-    url: str = None
+    url: Optional[str] = None
     timeout_in_sec: int = TIMEOUT_IN_SEC
-    headers: dict = None
+    headers: Optional[dict] = None
     with_authentication: bool = False
 
 
@@ -136,7 +136,7 @@ def get_nomad_url_name(url: str) -> str:
         return 'unknown'
 
 
-def get_nomad_url(url: str) -> str:
+def get_nomad_url(url: Optional[str]) -> str:
     """
     Get the Nomad URL based on the given URL. If no URL is given, the NOMAD Test URL
     is returned by default. If the given URL is "prod", "staging" or "test",
@@ -178,7 +178,7 @@ def post_nomad_request(
     request_options: RequestOptions = default_request_options.copy(),
     data: Any = None,
     json_dict: dict = None,
-) -> json:
+) -> Any:
     """_summary_
 
     Args:
@@ -224,7 +224,7 @@ def post_nomad_request(
 
 def delete_nomad_request(
     request_options: RequestOptions = default_request_options.copy(),
-) -> json:
+) -> Any:
     """_summary_
 
     Args:
