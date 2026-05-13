@@ -41,7 +41,7 @@ class NomadUser:
 
 @ttl_cache(maxsize=128, ttl=180)
 def search_users_by_name(
-    user_name: str, url: str = None, timeout_in_sec: int = 10
+    user_name: str, url: Optional[str] = None, timeout_in_sec: int = 10
 ) -> NomadUser:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
@@ -56,7 +56,7 @@ def search_users_by_name(
 
 @ttl_cache(maxsize=128, ttl=180)
 def get_user_by_id(
-    user_id: str, url: str = None, timeout_in_sec: int = 10
+    user_id: str, url: Optional[str] = None, timeout_in_sec: int = 10
 ) -> NomadUser:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
@@ -71,7 +71,7 @@ def get_user_by_id(
 
 
 @ttl_cache(maxsize=128, ttl=180)
-def who_am_i(url: str = None, timeout_in_sec: int = 10) -> NomadUser:
+def who_am_i(url: Optional[str] = None, timeout_in_sec: int = 10) -> NomadUser:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
     logger.info('retrieving self user info on %s server', url_name)

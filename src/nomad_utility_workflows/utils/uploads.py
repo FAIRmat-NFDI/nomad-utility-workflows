@@ -96,7 +96,7 @@ class NomadUpload:
 
 
 @ttl_cache(maxsize=128, ttl=180)
-def get_all_my_uploads(url: str = None, timeout_in_sec: int = 10) -> list[NomadUpload]:
+def get_all_my_uploads(url: Optional[str] = None, timeout_in_sec: int = 10) -> list[NomadUpload]:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
     logger.info('retrieving all uploads on %s server', url_name)
@@ -113,7 +113,7 @@ def get_all_my_uploads(url: str = None, timeout_in_sec: int = 10) -> list[NomadU
 
 
 def get_upload_by_id(
-    upload_id: str, url: str = None, timeout_in_sec: int = 10
+    upload_id: str, url: Optional[str] = None, timeout_in_sec: int = 10
 ) -> NomadUpload:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
@@ -131,7 +131,7 @@ def get_upload_by_id(
 
 
 def delete_upload(
-    upload_id: str, url: str = None, timeout_in_sec: int = 10
+    upload_id: str, url: Optional[str] = None, timeout_in_sec: int = 10
 ) -> NomadUpload:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
@@ -149,7 +149,7 @@ def delete_upload(
 
 
 def upload_files_to_nomad(
-    filename: str, url: str = None, timeout_in_sec: int = 30
+    filename: str, url: Optional[str] = None, timeout_in_sec: int = 30
 ) -> str:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
@@ -172,7 +172,7 @@ def upload_files_to_nomad(
         logger.error('could not upload %s. Response %s', filename, response)
 
 
-def publish_upload(upload_id: str, url: str = None, timeout_in_sec: int = 10) -> dict:
+def publish_upload(upload_id: str, url: Optional[str] = None, timeout_in_sec: int = 10) -> dict:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
     logger.info('publishing upload %s on %s server', upload_id, url_name)
@@ -190,7 +190,7 @@ def publish_upload(upload_id: str, url: str = None, timeout_in_sec: int = 10) ->
 def edit_upload_metadata(
     upload_id: str,
     upload_metadata: UploadMetadata = {},
-    url: str = None,
+    url: Optional[str] = None,
     timeout_in_sec: int = 10,
 ) -> dict:
     url = get_nomad_url(url)

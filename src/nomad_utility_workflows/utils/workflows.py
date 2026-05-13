@@ -250,7 +250,7 @@ class NomadTask(BaseModel):
 
 
 class NomadWorkflowArchive(BaseModel):
-    archive_section: str = None
+    archive_section: Optional[str] = None
     m_def: Optional[str] = None
     name: Optional[str] = None
     inputs: list[NomadSection] = Field(default_factory=list)
@@ -474,16 +474,16 @@ class NomadWorkflow(BaseModel):
         './nomad_custom_workflow_archive.yaml',
         description='The full path and filename to write the output yaml file.',
     )
-    m_def: str = Field(
+    m_def: Optional[str] = Field(
         None, description='The NOMAD m_def path for a specific workflow type.'
     )
-    name: str = Field(None, description='User-defined name for the workflow.')
+    name: Optional[str] = Field(None, description='User-defined name for the workflow.')
     archive_section: str = Field(
         'workflow2',
         description='The root section of the archive to store the workflow.',
     )
     node_attributes_universe: NodeAttributesUniverse = Field(default_factory=dict)
-    workflow_graph: nx.DiGraph = None
+    workflow_graph: Optional[nx.DiGraph] = None
     task_elements: dict[str, NomadSection] = Field(default_factory=dict)
     simulation_default_sections: dict[str, list[str]] = Field(
         default_factory=dict,

@@ -61,8 +61,8 @@ class NomadDataset:
 
 def retrieve_datasets(
     dataset_params: DatasetParams = default_dataset_params.copy(),
-    url: str = None,
-    with_authentication: bool = False,
+    url: Optional[str] = None,
+    with_authentication: Optional[bool] = False,
 ) -> list[NomadDataset]:
     parameters = []
     max_datasets = dataset_params.pop(
@@ -102,8 +102,8 @@ def retrieve_datasets(
 
 
 def get_dataset_by_id(dataset_id: str, 
-                      url: str = None, 
-                      with_authentication: bool = False) -> NomadDataset:
+                      url: Optional[str] = None, 
+                      with_authentication: Optional[bool] = False) -> NomadDataset:
     datasets = retrieve_datasets(DatasetParams(dataset_id=dataset_id), 
                                  url=url, 
                                  with_authentication=with_authentication)
@@ -112,7 +112,7 @@ def get_dataset_by_id(dataset_id: str,
     return datasets[0]
 
 
-def create_dataset(dataset_name: str, url: str = None, timeout_in_sec: int = 10) -> str:
+def create_dataset(dataset_name: str, url: Optional[str] = None, timeout_in_sec: int = 10) -> str:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
     logger.info('creating dataset name %s on %s server', dataset_name, url_name)
@@ -129,7 +129,7 @@ def create_dataset(dataset_name: str, url: str = None, timeout_in_sec: int = 10)
     return response.get('dataset_id')
 
 
-def delete_dataset(dataset_id: str, url: str = None, timeout_in_sec: int = 10) -> None:
+def delete_dataset(dataset_id: str, url: Optional[str] = None, timeout_in_sec: int = 10) -> None:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
     logger.info('deleting dataset %s on %s server', dataset_id, url_name)
