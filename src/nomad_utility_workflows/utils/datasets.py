@@ -112,7 +112,9 @@ def get_dataset_by_id(dataset_id: str,
     return datasets[0]
 
 
-def create_dataset(dataset_name: str, url: Optional[str] = None, timeout_in_sec: int = 10) -> str:
+def create_dataset(dataset_name: str, 
+                   url: Optional[str] = None, 
+                   timeout_in_sec: int = 10) -> str:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
     logger.info('creating dataset name %s on %s server', dataset_name, url_name)
@@ -129,7 +131,9 @@ def create_dataset(dataset_name: str, url: Optional[str] = None, timeout_in_sec:
     return response.get('dataset_id')
 
 
-def delete_dataset(dataset_id: str, url: Optional[str] = None, timeout_in_sec: int = 10) -> None:
+def delete_dataset(dataset_id: str, 
+                   url: Optional[str] = None, 
+                   timeout_in_sec: int = 10) -> None:
     url = get_nomad_url(url)
     url_name = get_nomad_url_name(url)
     logger.info('deleting dataset %s on %s server', dataset_id, url_name)
