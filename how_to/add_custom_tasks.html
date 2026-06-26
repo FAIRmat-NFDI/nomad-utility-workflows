@@ -1,0 +1,847 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A module with utilities for interacting with NOMAD via, e.g., a workflow manager.">
+      
+      
+        <meta name="author" content="Joseph F. Rudzinski">
+      
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-8.1.1">
+    
+    
+      
+        <title>Add Custom Taks - nomad-utility-workflows</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.23b6d78a.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.e6a45f82.min.css">
+        
+          
+          
+          <meta name="theme-color" content="">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web:300,400,400i,700%7C&display=fallback">
+        <style>:root{--md-text-font:"Titillium Web";--md-code-font:""}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="#2a4cdf" data-md-color-accent="#008a67">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#how-to-add-custom-tasks-to-workflows-using-nomads-eln-functionalities" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="https://nomad-lab.eu" title="nomad-utility-workflows" class="md-header__button md-logo" aria-label="nomad-utility-workflows" data-md-component="logo">
+      
+  <img src="../assets/nomad-plugin-logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            nomad-utility-workflows
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Add Custom Taks
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/FAIRmat-NFDI/nomad-utility-workflows" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://nomad-lab.eu" title="nomad-utility-workflows" class="md-nav__button md-logo" aria-label="nomad-utility-workflows" data-md-component="logo">
+      
+  <img src="../assets/nomad-plugin-logo.png" alt="logo">
+
+    </a>
+    nomad-utility-workflows
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/FAIRmat-NFDI/nomad-utility-workflows" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorial/tutorial.html" class="md-nav__link">
+        Tutorial
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          How-to guides
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="How-to guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          How-to guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="install_this_plugin.html" class="md-nav__link">
+        Install
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="use_api_functions.html" class="md-nav__link">
+        Perform API Calls
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="create_custom_workflows.html" class="md-nav__link">
+        Create Custom Workflows
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Add Custom Taks
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="add_custom_tasks.html" class="md-nav__link md-nav__link--active">
+        Add Custom Taks
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example-overview" class="md-nav__link">
+    Example Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-an-eln-entry-with-elnbasesection" class="md-nav__link">
+    Create an ELN entry with ElnBaseSection
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#link-the-eln-entries-to-your-workflow" class="md-nav__link">
+    Link the ELN entries to your workflow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generate-the-input-workflow-graph-and-workflow-yaml" class="md-nav__link">
+    Generate the input workflow graph and workflow yaml
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    References
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/workflows.html" class="md-nav__link">
+        Workflows
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example-overview" class="md-nav__link">
+    Example Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-an-eln-entry-with-elnbasesection" class="md-nav__link">
+    Create an ELN entry with ElnBaseSection
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#link-the-eln-entries-to-your-workflow" class="md-nav__link">
+    Link the ELN entries to your workflow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generate-the-input-workflow-graph-and-workflow-yaml" class="md-nav__link">
+    Generate the input workflow graph and workflow yaml
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    References
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+<h1 id="how-to-add-custom-tasks-to-workflows-using-nomads-eln-functionalities">How to add custom tasks to workflows using NOMAD's ELN Functionalities<a class="headerlink" href="#how-to-add-custom-tasks-to-workflows-using-nomads-eln-functionalities" title="Permanent link">&para;</a></h1>
+<!-- Implemented in nomad-utility-workflows/tests/utils/workflow_yaml_examples/solute_in_bilayer/ -->
+
+<p>This how-to covers how to add a custom NOMAD entry in the case that some tasks or inputs/outputs of your workflow are not automatically parsed and stored within a NOMAD entry, i.e., preventing you to reference these within your workflow.</p>
+<h2 id="example-overview">Example Overview<a class="headerlink" href="#example-overview" title="Permanent link">&para;</a></h2>
+<p>Consider the following setup, simulation, and analysis protocol:</p>
+<div class="click-zoom">
+    <label>
+        <input type="checkbox">
+        <img src="images/solute_in_bilayer_workflow_graph_NOMAD.png" alt="" width="100%" title="Click to zoom in">
+    </label>
+</div>
+
+<p><a class="md-button" href="../assets/solute_in_bilayer.zip" target="_blank">Download Example Data</a></p>
+<p>The minimize, equilibrate, and production (workflow) tasks are analogous to that described in <a href="create_custom_workflows.html">How to &gt; Create Custom Workflows</a>. The remaining tasks correspond to steps in the simulation protocol that are not supported by the NOMAD simulation parsers, e.g., creation of the initial configuration or model parameter files, or post-simulation analysis.</p>
+<h2 id="create-an-eln-entry-with-elnbasesection">Create an ELN entry with ElnBaseSection<a class="headerlink" href="#create-an-eln-entry-with-elnbasesection" title="Permanent link">&para;</a></h2>
+<p>The basic strategy described here is to use NOMAD's existing ELN functionality to add (meta)data for the "non-recognized" steps of the workflow. Here we only provide a description quantity, but more advanced support is available, see <a href="https://nomad-lab.eu/prod/v1/docs/howto/manage/eln.html" target="_blank">NOMAD Docs &gt; How to &gt; Use ELNs</a>.</p>
+<p>Before we can add these as tasks in the workflow, we need to create mainfiles that NOMAD recognizes with the corresponding metadata. We can achieve this by creating an archive.yaml file as follows:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># insert_solute_in_box.archive.yaml</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">data</span><span class="p">:</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">m_def</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nomad.datamodel.metainfo.eln.ElnBaseSection</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;insert_solute_in_box&#39;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;This</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">description</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">method</span><span class="nv"> </span><span class="s">performed</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">insert</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">solute</span><span class="nv"> </span><span class="s">into</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">simulation</span><span class="nv"> </span><span class="s">box...&#39;</span>
+</code></pre></div>
+<p>This utilizes the <code>ELNBaseSection</code> class to create the following overview page upon upload:</p>
+<div class="click-zoom">
+    <label>
+        <input type="checkbox">
+        <img src="images/ELN_overview_page.png" alt="" width="90%" title="Click to zoom in">
+    </label>
+</div>
+
+<p>Similarly, the remaining (non-simulation) custom workflow steps (i.e., tasks) can be included in a similar manner:</p>
+<details class="abstract">
+<summary>workflow_parameters.archive.yaml</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">data</span><span class="p">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nt">m_def</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nomad.datamodel.metainfo.eln.ElnBaseSection</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;workflow_parameters&#39;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;This</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">description</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">overall</span><span class="nv"> </span><span class="s">workflow</span><span class="nv"> </span><span class="s">parameters,</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">alternatively</span><span class="nv"> </span><span class="s">standard</span><span class="nv"> </span><span class="s">workflow</span><span class="nv"> </span><span class="s">specification...&#39;</span>
+</code></pre></div>
+</details>
+<details class="abstract">
+<summary>convert_box_to_gro.archive.yaml</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">data</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="nt">m_def</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nomad.datamodel.metainfo.eln.ElnBaseSection</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;convert_box_to_gro&#39;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;This</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">description</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">method</span><span class="nv"> </span><span class="s">performed</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">create</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">initial</span><span class="nv"> </span><span class="s">gro</span><span class="nv"> </span><span class="s">file...&#39;</span>
+</code></pre></div>
+</details>
+<details class="abstract">
+<summary>update_topology_file.archive.yaml</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">data</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="nt">m_def</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nomad.datamodel.metainfo.eln.ElnBaseSection</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;update_topology_file&#39;</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;This</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">description</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">method</span><span class="nv"> </span><span class="s">performed</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">update</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">topology</span><span class="nv"> </span><span class="s">file...&#39;</span>
+</code></pre></div>
+</details>
+<details class="abstract">
+<summary>compute_wham.archive.yaml</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">data</span><span class="p">:</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">     </span><span class="nt">m_def</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nomad.datamodel.metainfo.eln.ElnBaseSection</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w w-Error">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;compute_wham&#39;</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;This</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">description</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">application</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">wham</span><span class="nv"> </span><span class="s">method...&#39;</span>
+</code></pre></div>
+</details>
+<p>All custom yaml entry files are already included in the example data provided above.</p>
+<h2 id="link-the-eln-entries-to-your-workflow">Link the ELN entries to your workflow<a class="headerlink" href="#link-the-eln-entries-to-your-workflow" title="Permanent link">&para;</a></h2>
+<p>Now that we have a mainfile for each task, we can specify the graph strucuture and node attributes as described in the <a href="create_custom_workflows.html#complete-workflow-creation-example">Create Custom Workflows &gt; Complete Workflow Creation Example</a>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span> <span class="nn">gravis</span> <span class="k">as</span> <span class="nn">gv</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kn">from</span> <span class="nn">nomad_utility_workflows.utils.workflows</span> <span class="kn">import</span> <span class="p">(</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">NodeAttributesUniverse</span><span class="p">,</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">NodeAttributes</span><span class="p">,</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">NomadWorkflow</span><span class="p">,</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">nodes_to_graph</span><span class="p">,</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">)</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="n">path_to_job</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="n">node_attributes_universe</span> <span class="o">=</span> <span class="n">NodeAttributesUniverse</span><span class="p">(</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="n">nodes</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>        <span class="mi">0</span><span class="p">:</span> <span class="n">NodeAttributes</span><span class="p">(</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Solute in bilayer workflow parameters&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;input&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>            <span class="n">path_info</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>                <span class="s1">&#39;archive_path&#39;</span><span class="p">:</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>                <span class="s1">&#39;mainfile_path&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_to_job</span><span class="si">}</span><span class="s1">workflow_parameters.archive.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>            <span class="p">},</span>
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>            <span class="n">out_edge_nodes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>        <span class="p">),</span>
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>        <span class="mi">1</span><span class="p">:</span> <span class="n">NodeAttributes</span><span class="p">(</span>
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;insert_solute_in_box&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;task&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>            <span class="n">path_info</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>                <span class="s1">&#39;mainfile_path&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_to_job</span><span class="si">}</span><span class="s1">insert_solute_in_box.archive.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>                <span class="s1">&#39;archive_path&#39;</span><span class="p">:</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>            <span class="p">},</span>
+<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>        <span class="p">),</span>
+<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>
+<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a>        <span class="mi">2</span><span class="p">:</span> <span class="n">NodeAttributes</span><span class="p">(</span>
+<a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;convert_box_to_gro&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a>            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;task&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a>            <span class="n">path_info</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a>                <span class="s1">&#39;mainfile_path&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_to_job</span><span class="si">}</span><span class="s1">convert_box_to_gro.archive.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a>                <span class="s1">&#39;archive_path&#39;</span><span class="p">:</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a>            <span class="p">},</span>
+<a id="__codelineno-5-39" name="__codelineno-5-39" href="#__codelineno-5-39"></a>            <span class="n">in_edge_nodes</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+<a id="__codelineno-5-40" name="__codelineno-5-40" href="#__codelineno-5-40"></a>        <span class="p">),</span>
+<a id="__codelineno-5-41" name="__codelineno-5-41" href="#__codelineno-5-41"></a>
+<a id="__codelineno-5-42" name="__codelineno-5-42" href="#__codelineno-5-42"></a>        <span class="mi">3</span><span class="p">:</span> <span class="n">NodeAttributes</span><span class="p">(</span>
+<a id="__codelineno-5-43" name="__codelineno-5-43" href="#__codelineno-5-43"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;update_topology_file&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-44" name="__codelineno-5-44" href="#__codelineno-5-44"></a>            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;task&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-45" name="__codelineno-5-45" href="#__codelineno-5-45"></a>            <span class="n">path_info</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-5-46" name="__codelineno-5-46" href="#__codelineno-5-46"></a>                <span class="s1">&#39;mainfile_path&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_to_job</span><span class="si">}</span><span class="s1">update_topology_file.archive.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-47" name="__codelineno-5-47" href="#__codelineno-5-47"></a>                <span class="s1">&#39;archive_path&#39;</span><span class="p">:</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-48" name="__codelineno-5-48" href="#__codelineno-5-48"></a>            <span class="p">},</span>
+<a id="__codelineno-5-49" name="__codelineno-5-49" href="#__codelineno-5-49"></a>        <span class="p">),</span>
+<a id="__codelineno-5-50" name="__codelineno-5-50" href="#__codelineno-5-50"></a>
+<a id="__codelineno-5-51" name="__codelineno-5-51" href="#__codelineno-5-51"></a>        <span class="mi">4</span><span class="p">:</span> <span class="n">NodeAttributes</span><span class="p">(</span>
+<a id="__codelineno-5-52" name="__codelineno-5-52" href="#__codelineno-5-52"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;minimize&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-53" name="__codelineno-5-53" href="#__codelineno-5-53"></a>            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;workflow&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-54" name="__codelineno-5-54" href="#__codelineno-5-54"></a>            <span class="n">entry_type</span><span class="o">=</span><span class="s2">&quot;simulation&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-55" name="__codelineno-5-55" href="#__codelineno-5-55"></a>            <span class="n">in_edge_nodes</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+<a id="__codelineno-5-56" name="__codelineno-5-56" href="#__codelineno-5-56"></a>            <span class="n">path_info</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-5-57" name="__codelineno-5-57" href="#__codelineno-5-57"></a>                <span class="s1">&#39;mainfile_path&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_to_job</span><span class="si">}</span><span class="s1">solute_in_bilayer_minimize.log&#39;</span>
+<a id="__codelineno-5-58" name="__codelineno-5-58" href="#__codelineno-5-58"></a>            <span class="p">},</span>
+<a id="__codelineno-5-59" name="__codelineno-5-59" href="#__codelineno-5-59"></a>        <span class="p">),</span>
+<a id="__codelineno-5-60" name="__codelineno-5-60" href="#__codelineno-5-60"></a>
+<a id="__codelineno-5-61" name="__codelineno-5-61" href="#__codelineno-5-61"></a>
+<a id="__codelineno-5-62" name="__codelineno-5-62" href="#__codelineno-5-62"></a>        <span class="mi">5</span><span class="p">:</span> <span class="n">NodeAttributes</span><span class="p">(</span>
+<a id="__codelineno-5-63" name="__codelineno-5-63" href="#__codelineno-5-63"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;equilibrate&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-64" name="__codelineno-5-64" href="#__codelineno-5-64"></a>            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;workflow&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-65" name="__codelineno-5-65" href="#__codelineno-5-65"></a>            <span class="n">entry_type</span><span class="o">=</span><span class="s2">&quot;simulation&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-66" name="__codelineno-5-66" href="#__codelineno-5-66"></a>            <span class="n">path_info</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-5-67" name="__codelineno-5-67" href="#__codelineno-5-67"></a>                <span class="s1">&#39;mainfile_path&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_to_job</span><span class="si">}</span><span class="s1">solute_in_bilayer_equilibrate.log&#39;</span>
+<a id="__codelineno-5-68" name="__codelineno-5-68" href="#__codelineno-5-68"></a>            <span class="p">},</span>
+<a id="__codelineno-5-69" name="__codelineno-5-69" href="#__codelineno-5-69"></a>            <span class="n">in_edge_nodes</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+<a id="__codelineno-5-70" name="__codelineno-5-70" href="#__codelineno-5-70"></a>        <span class="p">),</span>
+<a id="__codelineno-5-71" name="__codelineno-5-71" href="#__codelineno-5-71"></a>
+<a id="__codelineno-5-72" name="__codelineno-5-72" href="#__codelineno-5-72"></a>        <span class="mi">6</span><span class="p">:</span> <span class="n">NodeAttributes</span><span class="p">(</span>
+<a id="__codelineno-5-73" name="__codelineno-5-73" href="#__codelineno-5-73"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;production&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-74" name="__codelineno-5-74" href="#__codelineno-5-74"></a>            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;workflow&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-75" name="__codelineno-5-75" href="#__codelineno-5-75"></a>            <span class="n">entry_type</span><span class="o">=</span><span class="s2">&quot;simulation&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-76" name="__codelineno-5-76" href="#__codelineno-5-76"></a>            <span class="n">path_info</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-5-77" name="__codelineno-5-77" href="#__codelineno-5-77"></a>                <span class="s1">&#39;mainfile_path&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_to_job</span><span class="si">}</span><span class="s1">solute_in_bilayer_production.log&#39;</span>
+<a id="__codelineno-5-78" name="__codelineno-5-78" href="#__codelineno-5-78"></a>            <span class="p">},</span>
+<a id="__codelineno-5-79" name="__codelineno-5-79" href="#__codelineno-5-79"></a>            <span class="n">in_edge_nodes</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+<a id="__codelineno-5-80" name="__codelineno-5-80" href="#__codelineno-5-80"></a>            <span class="n">out_edge_nodes</span><span class="o">=</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span>
+<a id="__codelineno-5-81" name="__codelineno-5-81" href="#__codelineno-5-81"></a>        <span class="p">),</span>
+<a id="__codelineno-5-82" name="__codelineno-5-82" href="#__codelineno-5-82"></a>
+<a id="__codelineno-5-83" name="__codelineno-5-83" href="#__codelineno-5-83"></a>        <span class="mi">7</span><span class="p">:</span> <span class="n">NodeAttributes</span><span class="p">(</span>
+<a id="__codelineno-5-84" name="__codelineno-5-84" href="#__codelineno-5-84"></a>            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;WHAM Analysis&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-85" name="__codelineno-5-85" href="#__codelineno-5-85"></a>            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-86" name="__codelineno-5-86" href="#__codelineno-5-86"></a>            <span class="n">path_info</span><span class="o">=</span><span class="p">{</span>
+<a id="__codelineno-5-87" name="__codelineno-5-87" href="#__codelineno-5-87"></a>                <span class="s1">&#39;archive_path&#39;</span><span class="p">:</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span>
+<a id="__codelineno-5-88" name="__codelineno-5-88" href="#__codelineno-5-88"></a>                <span class="s1">&#39;mainfile_path&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path_to_job</span><span class="si">}</span><span class="s1">compute_wham.archive.yaml&#39;</span>
+<a id="__codelineno-5-89" name="__codelineno-5-89" href="#__codelineno-5-89"></a>            <span class="p">},</span>
+<a id="__codelineno-5-90" name="__codelineno-5-90" href="#__codelineno-5-90"></a>        <span class="p">),</span>
+<a id="__codelineno-5-91" name="__codelineno-5-91" href="#__codelineno-5-91"></a>    <span class="p">}</span>
+<a id="__codelineno-5-92" name="__codelineno-5-92" href="#__codelineno-5-92"></a><span class="p">)</span>
+</code></pre></div>
+<h2 id="generate-the-input-workflow-graph-and-workflow-yaml">Generate the input workflow graph and workflow yaml<a class="headerlink" href="#generate-the-input-workflow-graph-and-workflow-yaml" title="Permanent link">&para;</a></h2>
+<p>Identically to <code>Create Custom Workflows &gt;</code> <a href="create_custom_workflows.html#complete-workflow-creation-example">Complete Workflow Creation Example</a> and <a href="create_custom_workflows.html#step-4-generate-the-workflow-yaml">Generate the workflow yaml</a>, we create a <code>NomadWorkflow</code> object with the appropriate quantities:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">nomad_workflow</span> <span class="o">=</span> <span class="n">NomadWorkflow</span><span class="p">(</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">node_attributes_universe</span><span class="o">=</span><span class="n">node_attributes_universe</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">destination_filename</span><span class="o">=</span><span class="s1">&#39;solute_in_bilayer.workflow.archive.yaml&#39;</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Solute in bilayer workflow&#39;</span><span class="p">,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">)</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="n">nomad_workflow</span><span class="o">.</span><span class="n">build_workflow_yaml</span><span class="p">()</span>
+</code></pre></div>
+<p>which produces the following workflow yaml:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="s">&#39;workflow2&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;Solute</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">bilayer</span><span class="nv"> </span><span class="s">workflow&#39;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="s">&#39;inputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;Solute</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">bilayer</span><span class="nv"> </span><span class="s">workflow</span><span class="nv"> </span><span class="s">parameters&#39;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/workflow_parameters.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="s">&#39;outputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;WHAM</span><span class="nv"> </span><span class="s">Analysis&#39;</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/compute_wham.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;output</span><span class="nv"> </span><span class="s">system</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">production&#39;</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1&#39;</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;output</span><span class="nv"> </span><span class="s">calculation</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">production&#39;</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/calculation/-1&#39;</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">  </span><span class="s">&#39;tasks&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;m_def&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;nomad.datamodel.metainfo.workflow.TaskReference&#39;</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">    </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;insert_solute_in_box&#39;</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">    </span><span class="s">&#39;task&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/insert_solute_in_box.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="w">    </span><span class="s">&#39;inputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;input</span><span class="nv"> </span><span class="s">data</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">Solute</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">bilayer</span><span class="nv"> </span><span class="s">workflow</span><span class="nv"> </span><span class="s">parameters&#39;</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/workflow_parameters.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="w">    </span><span class="s">&#39;outputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;output</span><span class="nv"> </span><span class="s">data</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">insert_solute_in_box&#39;</span>
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/insert_solute_in_box.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;m_def&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;nomad.datamodel.metainfo.workflow.TaskReference&#39;</span>
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="w">    </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;convert_box_to_gro&#39;</span>
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="w">    </span><span class="s">&#39;task&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/convert_box_to_gro.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="w">    </span><span class="s">&#39;inputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;input</span><span class="nv"> </span><span class="s">data</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">insert_solute_in_box&#39;</span>
+<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/insert_solute_in_box.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a><span class="w">    </span><span class="s">&#39;outputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;output</span><span class="nv"> </span><span class="s">data</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">convert_box_to_gro&#39;</span>
+<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/convert_box_to_gro.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;m_def&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;nomad.datamodel.metainfo.workflow.TaskReference&#39;</span>
+<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a><span class="w">    </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;update_topology_file&#39;</span>
+<a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a><span class="w">    </span><span class="s">&#39;task&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/update_topology_file.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a><span class="w">    </span><span class="s">&#39;inputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;input</span><span class="nv"> </span><span class="s">data</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">Solute</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">bilayer</span><span class="nv"> </span><span class="s">workflow</span><span class="nv"> </span><span class="s">parameters&#39;</span>
+<a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/workflow_parameters.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-38" name="__codelineno-7-38" href="#__codelineno-7-38"></a><span class="w">    </span><span class="s">&#39;outputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;output</span><span class="nv"> </span><span class="s">data</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">update_topology_file&#39;</span>
+<a id="__codelineno-7-40" name="__codelineno-7-40" href="#__codelineno-7-40"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/update_topology_file.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-41" name="__codelineno-7-41" href="#__codelineno-7-41"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;m_def&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;nomad.datamodel.metainfo.workflow.TaskReference&#39;</span>
+<a id="__codelineno-7-42" name="__codelineno-7-42" href="#__codelineno-7-42"></a><span class="w">    </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;minimize&#39;</span>
+<a id="__codelineno-7-43" name="__codelineno-7-43" href="#__codelineno-7-43"></a><span class="w">    </span><span class="s">&#39;task&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_minimize.log#/workflow2&#39;</span>
+<a id="__codelineno-7-44" name="__codelineno-7-44" href="#__codelineno-7-44"></a><span class="w">    </span><span class="s">&#39;inputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-45" name="__codelineno-7-45" href="#__codelineno-7-45"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;input</span><span class="nv"> </span><span class="s">data</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">convert_box_to_gro&#39;</span>
+<a id="__codelineno-7-46" name="__codelineno-7-46" href="#__codelineno-7-46"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/convert_box_to_gro.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-47" name="__codelineno-7-47" href="#__codelineno-7-47"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;input</span><span class="nv"> </span><span class="s">system</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">minimize&#39;</span>
+<a id="__codelineno-7-48" name="__codelineno-7-48" href="#__codelineno-7-48"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/system/-1&#39;</span>
+<a id="__codelineno-7-49" name="__codelineno-7-49" href="#__codelineno-7-49"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;input</span><span class="nv"> </span><span class="s">data</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">update_topology_file&#39;</span>
+<a id="__codelineno-7-50" name="__codelineno-7-50" href="#__codelineno-7-50"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/update_topology_file.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-51" name="__codelineno-7-51" href="#__codelineno-7-51"></a><span class="w">    </span><span class="s">&#39;outputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-52" name="__codelineno-7-52" href="#__codelineno-7-52"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;output</span><span class="nv"> </span><span class="s">system</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">minimize&#39;</span>
+<a id="__codelineno-7-53" name="__codelineno-7-53" href="#__codelineno-7-53"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/system/-1&#39;</span>
+<a id="__codelineno-7-54" name="__codelineno-7-54" href="#__codelineno-7-54"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;output</span><span class="nv"> </span><span class="s">calculation</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">minimize&#39;</span>
+<a id="__codelineno-7-55" name="__codelineno-7-55" href="#__codelineno-7-55"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/calculation/-1&#39;</span>
+<a id="__codelineno-7-56" name="__codelineno-7-56" href="#__codelineno-7-56"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;m_def&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;nomad.datamodel.metainfo.workflow.TaskReference&#39;</span>
+<a id="__codelineno-7-57" name="__codelineno-7-57" href="#__codelineno-7-57"></a><span class="w">    </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;equilibrate&#39;</span>
+<a id="__codelineno-7-58" name="__codelineno-7-58" href="#__codelineno-7-58"></a><span class="w">    </span><span class="s">&#39;task&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/workflow2&#39;</span>
+<a id="__codelineno-7-59" name="__codelineno-7-59" href="#__codelineno-7-59"></a><span class="w">    </span><span class="s">&#39;inputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-60" name="__codelineno-7-60" href="#__codelineno-7-60"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;input</span><span class="nv"> </span><span class="s">system</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">minimize&#39;</span>
+<a id="__codelineno-7-61" name="__codelineno-7-61" href="#__codelineno-7-61"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_minimize.log#/run/0/system/-1&#39;</span>
+<a id="__codelineno-7-62" name="__codelineno-7-62" href="#__codelineno-7-62"></a><span class="w">    </span><span class="s">&#39;outputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-63" name="__codelineno-7-63" href="#__codelineno-7-63"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;output</span><span class="nv"> </span><span class="s">system</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">equilibrate&#39;</span>
+<a id="__codelineno-7-64" name="__codelineno-7-64" href="#__codelineno-7-64"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/run/0/system/-1&#39;</span>
+<a id="__codelineno-7-65" name="__codelineno-7-65" href="#__codelineno-7-65"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;output</span><span class="nv"> </span><span class="s">calculation</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">equilibrate&#39;</span>
+<a id="__codelineno-7-66" name="__codelineno-7-66" href="#__codelineno-7-66"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/run/0/calculation/-1&#39;</span>
+<a id="__codelineno-7-67" name="__codelineno-7-67" href="#__codelineno-7-67"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;m_def&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;nomad.datamodel.metainfo.workflow.TaskReference&#39;</span>
+<a id="__codelineno-7-68" name="__codelineno-7-68" href="#__codelineno-7-68"></a><span class="w">    </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;production&#39;</span>
+<a id="__codelineno-7-69" name="__codelineno-7-69" href="#__codelineno-7-69"></a><span class="w">    </span><span class="s">&#39;task&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_production.log#/workflow2&#39;</span>
+<a id="__codelineno-7-70" name="__codelineno-7-70" href="#__codelineno-7-70"></a><span class="w">    </span><span class="s">&#39;inputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-71" name="__codelineno-7-71" href="#__codelineno-7-71"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;input</span><span class="nv"> </span><span class="s">system</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">equilibrate&#39;</span>
+<a id="__codelineno-7-72" name="__codelineno-7-72" href="#__codelineno-7-72"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_equilibrate.log#/run/0/system/-1&#39;</span>
+<a id="__codelineno-7-73" name="__codelineno-7-73" href="#__codelineno-7-73"></a><span class="w">    </span><span class="s">&#39;outputs&#39;</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-7-74" name="__codelineno-7-74" href="#__codelineno-7-74"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;output</span><span class="nv"> </span><span class="s">data</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">WHAM</span><span class="nv"> </span><span class="s">Analysis&#39;</span>
+<a id="__codelineno-7-75" name="__codelineno-7-75" href="#__codelineno-7-75"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/compute_wham.archive.yaml#/data&#39;</span>
+<a id="__codelineno-7-76" name="__codelineno-7-76" href="#__codelineno-7-76"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;output</span><span class="nv"> </span><span class="s">system</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">production&#39;</span>
+<a id="__codelineno-7-77" name="__codelineno-7-77" href="#__codelineno-7-77"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/system/-1&#39;</span>
+<a id="__codelineno-7-78" name="__codelineno-7-78" href="#__codelineno-7-78"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;output</span><span class="nv"> </span><span class="s">calculation</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">production&#39;</span>
+<a id="__codelineno-7-79" name="__codelineno-7-79" href="#__codelineno-7-79"></a><span class="w">      </span><span class="s">&#39;section&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;../upload/archive/mainfile/solute_in_bilayer_production.log#/run/0/calculation/-1&#39;</span>
+</code></pre></div>
+<p>When uploaded to NOMAD with the corresponding simulation files and ELN <code>archive.yaml</code>'s, you should obtain a workflow entry with the visualization show the top of this page.</p>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<p>For more details on creating and customizing ELN entries within a workflow, see:</p>
+<ul>
+<li><a href="https://fairmat-nfdi.github.io/nomad-tutorial-workflows/latest/custom/" target="_blank">Tutorial &gt; Part 3: Creating Custom Entries in NOMAD</a></li>
+</ul>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="create_custom_workflows.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Create Custom Workflows" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Create Custom Workflows
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../reference/workflows.html" class="md-footer__link md-footer__link--next" aria-label="Next: Workflows" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Workflows
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "content.buttons"], "search": "../assets/javascripts/workers/search.c7dec7e7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.da79ceb7.min.js"></script>
+      
+        <script src="../javascript.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
