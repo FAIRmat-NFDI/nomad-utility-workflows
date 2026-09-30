@@ -7,6 +7,8 @@ from marshmallow import EXCLUDE, Schema, pre_load
 from marshmallow_dataclass import class_schema, dataclass
 
 from nomad_utility_workflows.utils.core import (
+    NOMAD_PROD_URL,
+    NOMAD_TEST_URL,
     RequestOptions,
     delete_nomad_request,
     get_nomad_base_url,
@@ -92,6 +94,18 @@ class NomadUpload:
     def nomad_gui_url(self) -> str:
         if self.upload_id is None:
             raise ValueError(f"missing attributes 'upload_id' for entry {self}")
+
+        url = get_nomad_url(self.url)
+
+        if url == NOMAD_PROD_URL:
+            return f'{self.base_url}/gui/v2/projects/{self.upload_id}'
+
+        if url == NOMAD_TEST_URL:
+            return (
+                f'{self.base_url.removesuffix("/backend")}'
+                f'/projects/{self.upload_id}'
+            )
+
         return f'{self.base_url}/gui/user/uploads/upload/id/{self.upload_id}'
 
 

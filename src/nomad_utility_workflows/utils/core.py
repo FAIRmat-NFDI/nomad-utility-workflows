@@ -11,7 +11,7 @@ NOMAD_USERNAME = environ('NOMAD_USERNAME')
 NOMAD_PASSWORD = environ('NOMAD_PASSWORD')
 NOMAD_PROD_URL = 'https://nomad-lab.eu/prod/v1/api/v1'
 NOMAD_STAGING_URL = 'https://nomad-lab.eu/prod/v1/staging/api/v1'
-NOMAD_TEST_URL = 'https://nomad-lab.eu/prod/v1/test/api/v1'
+NOMAD_TEST_URL = 'https://nomad-lab.eu/test/backend/api/v1'
 STATUS_CODE = 200
 TIMEOUT_IN_SEC = 60
 
